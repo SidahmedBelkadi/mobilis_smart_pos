@@ -99,26 +99,26 @@ class SignInCubit extends Cubit<SignInState> {
         await localDataSource.clearLoginCredentials();
         await localDataSource.saveLoginCredentials(signInResponseEntity: signInOTPResponseEntity);
         emit(OTPSuccessful(signInOTPResponseEntity: signInOTPResponseEntity));
-        final passwordAge = signInOTPResponseEntity.passwordAge;
-        if (passwordAge != null) {
-          // Calculate expiry and notification dates
-          final expiryDate = NotificationService.calculateExpiryDate(passwordAge.toMap());
-          final notificationDate = NotificationService.calculateNotificationDate(expiryDate);
+        //     final passwordAge = signInOTPResponseEntity.passwordAge;
+        //     if (passwordAge != null) {
+        //       // Calculate expiry and notification dates
+        //       final expiryDate = NotificationService.calculateExpiryDate(passwordAge.toMap());
+        //       final notificationDate = NotificationService.calculateNotificationDate(expiryDate);
 
-          await NotificationService.cancelAll();
+        //       await NotificationService.cancelAll();
 
-          // Schedule a new notification
-          await NotificationService.schedulePasswordExpiryNotification(
-            notificationDate,
-            'Rappel',
-            'Votre mot de passe expirera dans 15 jours. Veuillez le changer.',
-          );
+        //       // Schedule a new notification
+        //       await NotificationService.schedulePasswordExpiryNotification(
+        //         notificationDate,
+        //         'Rappel',
+        //         'Votre mot de passe expirera dans 15 jours. Veuillez le changer.',
+        //       );
 
-          // Save the new notification date
-          await di
-              .serviceLocator<SmartPosLocalStorage>()
-              .saveScheduledNotificationDate(notificationDate);
-        }
+        //       // Save the new notification date
+        //       await di
+        //           .serviceLocator<SmartPosLocalStorage>()
+        //           .saveScheduledNotificationDate(notificationDate);
+        //     }
       },
     );
   }
