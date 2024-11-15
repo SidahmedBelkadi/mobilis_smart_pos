@@ -1,0 +1,2 @@
+-keep,allowoptimization class net.sf.scuba.** { *; }
+-keep,allowoptimization class org.bouncycastle.** { *; }

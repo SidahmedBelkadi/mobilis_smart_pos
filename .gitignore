@@ -1,0 +1,21 @@
+# Dart & Flutter-specific
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+
+# iOS-specific
+ios/Pods/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+
+# macOS-specific
+macos/Flutter/ephemeral/
+
+# Other
+.idea/
+*.iml
+*.apk
+*.aab
