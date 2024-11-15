@@ -48,8 +48,7 @@ class _SignInScreenState extends State<SignInScreen> {
           ),
         ),
         appBar: AppBar(
-          backgroundColor:
-              context.isDarkMode ? AppColors.darkGrey : Colors.white,
+          backgroundColor: context.isDarkMode ? AppColors.darkGrey : Colors.white,
           actions: [
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 8.sp),
@@ -58,10 +57,9 @@ class _SignInScreenState extends State<SignInScreen> {
                   return ThemeSwitcher(
                     selectedTheme: state.theme,
                     onThemeChanged: (value) {
-                      context.read<ThemeCubit>().changeTheme(
-                          value == AppThemes.darkTheme.name
-                              ? AppThemes.darkTheme
-                              : AppThemes.lightTheme);
+                      context.read<ThemeCubit>().changeTheme(value == AppThemes.darkTheme.name
+                          ? AppThemes.darkTheme
+                          : AppThemes.lightTheme);
                     },
                   );
                 },
@@ -72,11 +70,11 @@ class _SignInScreenState extends State<SignInScreen> {
             listener: (context, state) {},
             builder: (context, state) {
               return PopupMenuButton<String>(
-                icon: const FaIcon(FontAwesomeIcons.language,
-                    color: Colors.green),
+                icon: const FaIcon(FontAwesomeIcons.language, color: Colors.green),
                 onSelected: (value) {
-                  context.read<LocaleCubit>().changeLocale(
-                      languageCode: value.toString().toLowerCase().trim());
+                  context
+                      .read<LocaleCubit>()
+                      .changeLocale(languageCode: value.toString().toLowerCase().trim());
                 },
                 itemBuilder: (BuildContext context) {
                   return [
@@ -109,9 +107,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 children: [
                   // MOBILIS LOGO IMAGE
                   Image.asset(
-                    context.isDarkMode
-                        ? AppImages.msPosLogoVBlack
-                        : AppImages.msPosLogoV,
+                    context.isDarkMode ? AppImages.msPosLogoVBlack : AppImages.msPosLogoV,
                     height: 200.h,
                     width: 200.w,
                   ),
@@ -161,11 +157,10 @@ class _SignInScreenState extends State<SignInScreen> {
                                   suffixIcon: cubit.isObsecure
                                       ? Icons.visibility_outlined
                                       : Icons.visibility_off_outlined,
-                                  validationType: InputType.PASSWORD,
+                                  validationType: InputType.STRONG_PASSWORD,
                                   isObsecure: cubit.isObsecure,
                                   onSuffixTap: () => cubit.onObsecureClicked(),
-                                  textEditingController:
-                                      cubit.passwordController,
+                                  textEditingController: cubit.passwordController,
                                 );
                               },
                             ),
@@ -174,19 +169,14 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
 
                       Align(
-                        alignment: context.isArabicLocale
-                            ? Alignment.centerLeft
-                            : Alignment.centerRight,
+                        alignment:
+                            context.isArabicLocale ? Alignment.centerLeft : Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () => Navigator.of(context).pushNamed(
-                              Routes.forgotPassword,
-                              arguments: {"msisdn": null}),
+                          onPressed: () => Navigator.of(context)
+                              .pushNamed(Routes.forgotPassword, arguments: {"msisdn": null}),
                           child: Text(
                             "forgotPassword".tr(context),
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelMedium!
-                                .copyWith(
+                            style: Theme.of(context).textTheme.labelMedium!.copyWith(
                                   color: AppColors.primary,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -200,19 +190,14 @@ class _SignInScreenState extends State<SignInScreen> {
                       BlocConsumer<SignInCubit, SignInState>(
                         listener: (context, state) {
                           if (state is SignInSuccessful) {
-                            final isFirstLogin =
-                                state.signInResponseEntity.isFirstLogin;
+                            final isFirstLogin = state.signInResponseEntity.isFirstLogin;
                             if (isFirstLogin != null && isFirstLogin == true) {
                               AppToasts.showInfoToast(
-                                message: "USER_HAS_TO_CHANGE_DEFAULT_PASSWORD"
-                                    .tr(context),
+                                message: "USER_HAS_TO_CHANGE_DEFAULT_PASSWORD".tr(context),
                                 context: context,
                                 onAutoCompleteCompleted: (p0) {
-                                  Navigator.of(context).pushNamed(
-                                      Routes.forgotPassword,
-                                      arguments: {
-                                        "msisdn": cubit.phoneController.text
-                                      });
+                                  Navigator.of(context).pushNamed(Routes.forgotPassword,
+                                      arguments: {"msisdn": cubit.phoneController.text});
                                 },
                               );
                             } else {
@@ -220,25 +205,19 @@ class _SignInScreenState extends State<SignInScreen> {
                                 message: "code_has_been_sent".tr(context),
                                 context: context,
                               );
-                              Navigator.of(context).pushNamed(Routes.otp,
-                                  arguments: {
-                                    'params': cubit.params,
-                                    'responseParams': state.signInResponseEntity
-                                  });
+                              Navigator.of(context).pushNamed(Routes.otp, arguments: {
+                                'params': cubit.params,
+                                'responseParams': state.signInResponseEntity
+                              });
                             }
                           } else if (state is SignInFailed) {
-                            if (state.message ==
-                                "USER_HAS_TO_CHANGE_DEFAULT_PASSWORD") {
+                            if (state.message == "USER_HAS_TO_CHANGE_DEFAULT_PASSWORD") {
                               AppToasts.showInfoToast(
-                                message: "USER_HAS_TO_CHANGE_DEFAULT_PASSWORD"
-                                    .tr(context),
+                                message: "USER_HAS_TO_CHANGE_DEFAULT_PASSWORD".tr(context),
                                 context: context,
                                 onAutoCompleteCompleted: (p0) {
-                                  Navigator.of(context).pushNamed(
-                                      Routes.forgotPassword,
-                                      arguments: {
-                                        "msisdn": cubit.phoneController.text
-                                      });
+                                  Navigator.of(context).pushNamed(Routes.forgotPassword,
+                                      arguments: {"msisdn": cubit.phoneController.text});
                                 },
                               );
                             } else {
@@ -283,15 +262,11 @@ class Button extends StatelessWidget {
     return SignInElevatedButton(
       isDisabled: cubit.isDisabled,
       onPressed: () {
-        _onSignInElevatedButtonPressed(
-            cubit: cubit, formKey: formKey, context: context);
+        _onSignInElevatedButtonPressed(cubit: cubit, formKey: formKey, context: context);
       },
       child: Text(
         "seConnecter".tr(context),
-        style: Theme.of(context)
-            .textTheme
-            .bodyMedium!
-            .copyWith(color: Colors.white),
+        style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),
       ),
     );
   }
@@ -356,8 +331,7 @@ void _onSignInElevatedButtonPressed(
     return;
   }
 
-  final String phone =
-      "213${cubit.phoneController.text.trim().replaceAll(' ', '')}";
+  final String phone = "213${cubit.phoneController.text.trim().replaceAll(' ', '')}";
 
   final String password = cubit.passwordController.text.trim();
 
