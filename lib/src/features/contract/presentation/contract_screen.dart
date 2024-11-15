@@ -264,9 +264,9 @@ class _ContractScreenState extends State<ContractScreen> {
 
   bool _isDocumentRecognizedText(String text, DocumentsType docType) {
     if (docType == DocumentsType.frontIdCard) {
-      final pattern9Digits = RegExp(r'\b\d{9}\b');
-      final has9Digits = pattern9Digits.hasMatch(text);
-      return has9Digits;
+      final pattern9Digits = RegExp(r'\b\d{18}\b');
+      final has18Digits = pattern9Digits.hasMatch(text);
+      return has18Digits;
     } else if (docType == DocumentsType.backIdCard) {
       final patternIdDza = RegExp(r'IDDZA');
       final patternName = RegExp(r'Nom');
