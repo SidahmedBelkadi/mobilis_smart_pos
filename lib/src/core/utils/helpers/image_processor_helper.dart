@@ -18,7 +18,7 @@ class ImageHelper {
 
     final camera = _controller.description;
     final rotation = InputImageRotationValue.fromRawValue(camera.sensorOrientation) ??
-        InputImageRotation.rotation0deg;
+        InputImageRotation.rotation270deg;
 
     const inputImageFormat = InputImageFormat.yuv420;
 

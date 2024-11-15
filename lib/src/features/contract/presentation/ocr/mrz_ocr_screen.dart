@@ -58,11 +58,9 @@ class _MrzOCRScreenState extends State<MrzOCRScreen> {
     final cameras = await availableCameras();
     final firstCamera = cameras.first;
 
-    _controller = CameraController(firstCamera, ResolutionPreset.high,
-        enableAudio: false);
+    _controller = CameraController(firstCamera, ResolutionPreset.high, enableAudio: false);
     _controller!.setFocusMode(FocusMode.auto);
-    _controller!.setExposureMode(ExposureMode.auto);
-
+    _controller!.lockCaptureOrientation(DeviceOrientation.portraitUp);
     _initializeControllerFuture = _controller!.initialize();
     await _initializeControllerFuture;
     if (mounted) {
@@ -75,8 +73,7 @@ class _MrzOCRScreenState extends State<MrzOCRScreen> {
   bool _isDocumentRecognizedText(String text) {
     if (widget.documentType == 'id_card') {
       final RegExp documentNumberRegex = RegExp(r"IDDZA([0-9]{9})");
-      final RegExp idCardRegex =
-          RegExp(r"((\d{6}|[0-9]{2}<<<<))([0-9])([MF])([0-9]{6})");
+      final RegExp idCardRegex = RegExp(r"((\d{6}|[0-9]{2}<<<<))([0-9])([MF])([0-9]{6})");
 
       final documentNumberMatch = documentNumberRegex.firstMatch(text);
       if (documentNumberMatch == null) {
@@ -104,16 +101,14 @@ class _MrzOCRScreenState extends State<MrzOCRScreen> {
         expiryDate = extractedExpiryDate;
       });
 
-      return documentNumber.isNotEmpty &&
-          birthDate.isNotEmpty &&
-          expiryDate.isNotEmpty;
+      return documentNumber.isNotEmpty && birthDate.isNotEmpty && expiryDate.isNotEmpty;
     } else if (widget.documentType == 'passport') {
       if (!text.contains('P<')) {
         return false;
       }
 
-      final RegExp passportRegex = RegExp(
-          r"([A-Z0-9]{9})([0-9])([A-Z]{3})(\d{6}|\d{2}<<<<)([0-9])([MF])([0-9]{6})([0-9])");
+      final RegExp passportRegex =
+          RegExp(r"([A-Z0-9]{9})([0-9])([A-Z]{3})(\d{6}|\d{2}<<<<)([0-9])([MF])([0-9]{6})([0-9])");
 
       // Match the Passport MRZ data
       final passportMatch = passportRegex.firstMatch(text);
@@ -139,9 +134,7 @@ class _MrzOCRScreenState extends State<MrzOCRScreen> {
         expiryDate = extractedExpiryDate;
       });
 
-      return documentNumber.isNotEmpty &&
-          birthDate.isNotEmpty &&
-          expiryDate.isNotEmpty;
+      return documentNumber.isNotEmpty && birthDate.isNotEmpty && expiryDate.isNotEmpty;
     }
 
     return false;
@@ -157,12 +150,10 @@ class _MrzOCRScreenState extends State<MrzOCRScreen> {
 
     _isProcessing = true;
     try {
-      final inputImage =
-          ImageHelper.convertCameraImageToInputImage(image, _controller!);
+      final inputImage = ImageHelper.convertCameraImageToInputImage(image, _controller!);
       final recognizedText = await _textRecognizer.processImage(inputImage);
 
-      final isDocumentRecognized =
-          _isDocumentRecognizedText(recognizedText.text);
+      final isDocumentRecognized = _isDocumentRecognizedText(recognizedText.text);
 
       if (mounted) {
         setState(() {
@@ -224,8 +215,7 @@ class _MrzOCRScreenState extends State<MrzOCRScreen> {
       body: FutureBuilder<void>(
         future: _initializeControllerFuture,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done &&
-              _controller != null) {
+          if (snapshot.connectionState == ConnectionState.done && _controller != null) {
             return Stack(
               fit: StackFit.expand,
               children: [
