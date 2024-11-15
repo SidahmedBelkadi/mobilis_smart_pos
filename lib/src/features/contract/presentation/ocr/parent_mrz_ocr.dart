@@ -41,7 +41,7 @@ class _MrzOCRScreenState extends State<ParentMrzOCRScreen> {
   bool _isProcessing = false;
   bool _hasNavigated = false;
   int _frameCount = 0;
-  final int _frameThrottleRate = 5;
+  final int _frameThrottleRate = 3;
   late String documentNumber;
   late String birthDate;
   late String expiryDate;
