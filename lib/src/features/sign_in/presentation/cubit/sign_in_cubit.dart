@@ -1,15 +1,8 @@
-import 'dart:io';
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
-import 'package:mobilis_smart_pos/src/services/notification_service.dart';
-import 'package:permission_handler/permission_handler.dart';
-
-import '../../../../core/utils/helpers/toast_helper.dart';
 import '../../data/data_sources/smart_pos_local_storage.dart';
 import '../../domain/entities/sign_in_approve_contract_params.dart';
 import '../../domain/entities/sign_in_otp_request_params.dart';
@@ -19,7 +12,6 @@ import '../../domain/entities/sign_in_response.dart';
 import '../../domain/use_cases/approve_contract_use_case.dart';
 import '../../domain/use_cases/sign_in_use_case.dart';
 import '../../domain/use_cases/verify_otp_use_case.dart';
-import '../../../../dependency_injection/injection_container.dart' as di;
 
 part 'sign_in_state.dart';
 

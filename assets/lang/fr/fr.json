@@ -186,7 +186,7 @@
   "firstNameError": "Le Prénom doit contenir entre 5 et 100 caractères.",
   "lastNameError": "Le Nom doit contenir entre 5 et 100 caractères.",
   "phoneError": "Veuillez entrer un numéro de téléphone valide.",
-  "passwordError": "Le mot de passe doit contenir entre 6 et 100 caractères.",
+  "passwordError": "Le mot de passe doit contenir entre 8 et 100 caractères.",
   "strongPasswordError": "Le mot de passe doit contenir entre 8 et 100 caractères.\n- Il doit contenir un chiffre.\n- Il doit contenir une lettre majuscule.\n- Il doit contenir une lettre minuscule.\n- Il doit contenir un caractère spécial.",
   "emailError": "Veuillez entrer une adresse e-mail valide.",
   "addressError": "L'adresse doit contenir entre 5 et 200 caractères.",
