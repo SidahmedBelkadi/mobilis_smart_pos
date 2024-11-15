@@ -276,7 +276,6 @@
   "success": "Success",
   "failed": "Failed",
   "notifications": "Notifications",
-  "incorrect_image": "Please capture a clearer image of the document in question",
   "recto": "Font ID Card",
   "verso": "Back ID Card",
   "EMPLOYEE_DOES_NOT_HAVE_NIN": "The employee does not have a registered (NIN).",
@@ -292,5 +291,9 @@
   "identity_card_or_passport": "Identity card or Passport",
   "signature_approve": "Please confirm your signature for the contract and general terms of sale",
   "justification": "Power Of Attorney",
-  "downloaded": "Downloaded"
+  "downloaded": "Downloaded",
+  "incorrect_passport_image": "Invalid passport image.",
+  "incorrect_front_id_card_image": "Invalid front ID image.",
+  "incorrect_back_id_card_image": "Invalid back ID image.",
+  "incorrect_image": "Invalid image."
 }

@@ -278,7 +278,6 @@
   "notifications": "Notifications",
   "recto": "Carte d'identité recto",
   "verso": "Carte d'identité verso",
-  "incorrect_image": "Veuillez prendre une image plus claire du document concerné",
   "EMPLOYEE_DOES_NOT_HAVE_NIN": "L'employé n'a pas de (NIN) enregistré.",
   "CLIENT_HAS_5_CONTRACTS": "Le client a 5 cartes SIM actives et ne peut pas en acheter d'autres.",
   "ICCID_IN_USE": "Cette carte SIM a déjà été activée",
@@ -292,5 +291,9 @@
   "identity_card_or_passport": "Carte d'identité ou Passeport",
   "signature_approve": "Veuillez confirmer votre signature pour le contrat et les conditions générales de vente",
   "justification": "Procuration",
-  "downloaded": "Téléchargé"
+  "downloaded": "Téléchargé",
+  "incorrect_passport_image": "Image du passeport invalide.",
+  "incorrect_front_id_card_image": "Image du recto de la carte d'identité invalide.",
+  "incorrect_back_id_card_image": "Image du verso de la carte d'identité invalide.",
+  "incorrect_image": "Image invalide."
 }

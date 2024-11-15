@@ -276,7 +276,6 @@
   "success": "نجاح",
   "failed": "فشل",
   "notifications": "الإشعارات",
-  "incorrect_image": "يرجى التقاط صورة أكثر وضوحًا للوثيقة المطلوبة",
   "recto": "بطاقة الهوية الأمامية",
   "verso": "بطاقة الهوية الخلفية",
   "EMPLOYEE_DOES_NOT_HAVE_NIN": "لا يوجد لدى الموظف رقم تعريف وطني (NIN) مسجل.",
@@ -292,5 +291,9 @@
   "identity_card_or_passport": "بطاقة الهوية أو جواز السفر",
   "signature_approve": "يرجى موافقتكم على إدراج توقيعكم في العقد والشروط العامة للبيع",
   "justification": "وكالة",
-  "downloaded": "تم تحميل"
+  "downloaded": "تم تحميل",
+  "incorrect_passport_image": "صورة جواز السفر غير صالحة.",
+  "incorrect_front_id_card_image": "صورة الواجهة بطاقة الهوية غير صالحة.",
+  "incorrect_back_id_card_image": "صورة ظهر بطاقة الهوية غير صالحة.",
+  "incorrect_image": "صورة غير صالحة."
 }

@@ -86,9 +86,7 @@ class _ContractScreenState extends State<ContractScreen> {
     setState(() {
       _selectedWilaya = wilayaCode;
       _selectedCommune = null;
-      _filteredCommunes = _communes
-          .where((commune) => commune.stateCode == wilayaCode)
-          .toList();
+      _filteredCommunes = _communes.where((commune) => commune.stateCode == wilayaCode).toList();
     });
   }
 
@@ -177,8 +175,7 @@ class _ContractScreenState extends State<ContractScreen> {
     }
 
     if (RegExp(r'[\u0600-\u06FF]').hasMatch(addressEditingController.text)) {
-      AppToasts.showErrorToast(
-          message: "address_french_instruction".tr(context), context: context);
+      AppToasts.showErrorToast(message: "address_french_instruction".tr(context), context: context);
       return;
     }
 
@@ -199,10 +196,8 @@ class _ContractScreenState extends State<ContractScreen> {
     }
     String birthPlace = birthPlaceEditingController.text.trim();
     String nationality = nationalityEditingController.text.trim();
-    String normalizedAddress =
-        removeDiacritics(addressEditingController.text.trim());
-    String cleanedAddress =
-        normalizedAddress.replaceAll(RegExp(r'[^a-zA-Z0-9 ]'), '');
+    String normalizedAddress = removeDiacritics(addressEditingController.text.trim());
+    String cleanedAddress = normalizedAddress.replaceAll(RegExp(r'[^a-zA-Z0-9 ]'), '');
     String address = cleanedAddress;
 
     late int pdvId;
@@ -238,8 +233,7 @@ class _ContractScreenState extends State<ContractScreen> {
       street: address.toUpperCase(),
       folderUrl: null,
       nin: nin,
-      documentType:
-          CivilsInformationsConverterHelper.getToSubmitDocumentTypeValue(
+      documentType: CivilsInformationsConverterHelper.getToSubmitDocumentTypeValue(
         docType: widget.metaData['document_type'],
       ),
       documentNumber: docNumber,
@@ -258,15 +252,13 @@ class _ContractScreenState extends State<ContractScreen> {
             'contract': contract,
             'recto': rectoImage,
             'verso': versoImage,
-            'isPassport':
-                widget.metaData['document_type'] == 'passport' ? true : false
+            'isPassport': widget.metaData['document_type'] == 'passport' ? true : false
           })
         : Navigator.of(context).pushNamed(Routes.barCode, arguments: {
             'contract': contract,
             'recto': rectoImage,
             'verso': versoImage,
-            'isPassport':
-                widget.metaData['document_type'] == 'passport' ? true : false
+            'isPassport': widget.metaData['document_type'] == 'passport' ? true : false
           });
   }
 
@@ -300,8 +292,7 @@ class _ContractScreenState extends State<ContractScreen> {
       required DocumentsType docType}) async {
     final document = InputImage.fromFile(file);
     final recognizedText = await recognizer.processImage(document);
-    final isDocumentRecognized =
-        _isDocumentRecognizedText(recognizedText.text, docType);
+    final isDocumentRecognized = _isDocumentRecognizedText(recognizedText.text, docType);
     return isDocumentRecognized;
   }
 
@@ -310,12 +301,11 @@ class _ContractScreenState extends State<ContractScreen> {
     required DocumentsType docType,
     required BuildContext context,
   }) async {
-    final imagesPath = await CunningDocumentScanner.getPictures(
-        noOfPages: 1, isGalleryImportAllowed: false);
+    final imagesPath =
+        await CunningDocumentScanner.getPictures(noOfPages: 1, isGalleryImportAllowed: false);
     if (imagesPath != null && imagesPath.isNotEmpty) {
       File file = File(imagesPath[0]);
-      final validated = await checkDocument(
-          recognizer: recognizer, file: file, docType: docType);
+      final validated = await checkDocument(recognizer: recognizer, file: file, docType: docType);
       if (validated) {
         if (docType == DocumentsType.passport) {
           setState(() {
@@ -337,8 +327,23 @@ class _ContractScreenState extends State<ContractScreen> {
           }
         }
       } else {
-        AppToasts.showWarningToast(
-            message: "incorrect_image".tr(context), context: context);
+        // Display toast message specific to document type
+        String message;
+        switch (docType) {
+          case DocumentsType.passport:
+            message = "incorrect_passport_image".tr(context);
+            break;
+          case DocumentsType.frontIdCard:
+            message = "incorrect_front_id_card_image".tr(context);
+            break;
+          case DocumentsType.backIdCard:
+            message = "incorrect_back_id_card_image".tr(context);
+            break;
+          default:
+            message = "incorrect_image".tr(context);
+            break;
+        }
+        AppToasts.showWarningToast(message: message, context: context);
         return;
       }
     } else {
@@ -412,20 +417,16 @@ class _ContractScreenState extends State<ContractScreen> {
 
                       AppTextFormField(
                         enabled: false,
-                        disabledValue:
-                            CivilsInformationsConverterHelper.getFormatedGender(
-                                gender: widget.metaData['gender'],
-                                context: context),
+                        disabledValue: CivilsInformationsConverterHelper.getFormatedGender(
+                            gender: widget.metaData['gender'], context: context),
                         textEditingController: genderEditingController,
                         label: "genderLabel".tr(context),
                       ),
                       SizedBox(height: 16.sp),
                       AppTextFormField(
                         enabled: false,
-                        disabledValue: CivilsInformationsConverterHelper
-                            .formatToDisplayDate(
-                                date: widget.metaData['date_of_birth'],
-                                context: context),
+                        disabledValue: CivilsInformationsConverterHelper.formatToDisplayDate(
+                            date: widget.metaData['date_of_birth'], context: context),
                         textEditingController: birthDateEditingController,
                         label: "birthDateLabel".tr(context),
                       ),
@@ -480,9 +481,7 @@ class _ContractScreenState extends State<ContractScreen> {
                           ? InstaImageViewer(child: Image.file(rectoImage!))
                           : UploadImageField(
                               icon: FontAwesomeIcons.camera,
-                              label: isPassport
-                                  ? "passport".tr(context)
-                                  : "recto".tr(context),
+                              label: isPassport ? "passport".tr(context) : "recto".tr(context),
                               onTap: () async {
                                 return await captureDocument(
                                   recognizer: recognizer,
@@ -497,8 +496,7 @@ class _ContractScreenState extends State<ContractScreen> {
                           children: [
                             SizedBox(height: 16.sp),
                             versoImage != null
-                                ? InstaImageViewer(
-                                    child: Image.file(versoImage!))
+                                ? InstaImageViewer(child: Image.file(versoImage!))
                                 : UploadImageField(
                                     icon: FontAwesomeIcons.camera,
                                     label: "verso".tr(context),
