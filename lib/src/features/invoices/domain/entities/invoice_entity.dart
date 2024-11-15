@@ -24,12 +24,12 @@ class InvoiceEntity extends Equatable {
   String get formattedInvoiceDate {
     final dateTime = DateTime.tryParse(invoiceDate);
     if (dateTime == null) return '';
-    return DateFormat('dd/MM/yyyy HH:mm:ss').format(dateTime);
+    return DateFormat('dd/MM/yyyy - HH:mm:ss').format(dateTime);
   }
 
   String get formattedInvoiceDateInArabic {
     final dateTime = DateTime.tryParse(invoiceDate);
     if (dateTime == null) return '';
-    return DateFormat('yyyy/MM/dd HH:mm:ss').format(dateTime);
+    return DateFormat('yyyy/MM/dd - ss:mm:HH').format(dateTime);
   }
 }
