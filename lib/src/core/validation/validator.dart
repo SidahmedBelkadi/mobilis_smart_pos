@@ -39,6 +39,11 @@ class Validator {
             return "passwordError".tr(context);
           }
           break;
+        case InputType.STRONG_PASSWORD:
+          if (!RegExp(ValidationPatterns.strongPasswordPattern).hasMatch(value)) {
+            return "strongPasswordError".tr(context);
+          }
+          break;
         case InputType.EMAIL:
           if (!RegExp(ValidationPatterns.emailPattern).hasMatch(value)) {
             return "emailError".tr(context);

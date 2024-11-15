@@ -187,6 +187,7 @@
   "lastNameError": "The last name must be between 5 and 100 characters.",
   "phoneError": "Please enter a valid phone number.",
   "passwordError": "The password must be between 6 and 100 characters.",
+  "strongPasswordError": "Password must be 8–100 characters.\n- It must include a number.\n- It must include an uppercase letter.\n- It must include a lowercase letter.\n- It must include a special character.",
   "emailError": "Please enter a valid email address.",
   "addressError": "The address must be between 5 and 200 characters.",
   "yearsOfExperienceError": "Years of experience must be a valid number.",

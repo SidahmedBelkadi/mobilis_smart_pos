@@ -26,8 +26,7 @@ class ForgotPasswordOtpScreen extends StatefulWidget {
   final String msisdn;
 
   @override
-  State<ForgotPasswordOtpScreen> createState() =>
-      _ForgotPasswordOtpScreenState();
+  State<ForgotPasswordOtpScreen> createState() => _ForgotPasswordOtpScreenState();
 }
 
 class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
@@ -83,10 +82,8 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
                 Text(
                   "otp".tr(context),
                   textAlign: TextAlign.center,
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineSmall!
-                      .copyWith(color: AppColors.primary),
+                  style:
+                      Theme.of(context).textTheme.headlineSmall!.copyWith(color: AppColors.primary),
                 ),
 
                 SizedBox(height: 64.h),
@@ -133,8 +130,7 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
 }
 
 class ForgotPasswordBottomSheet extends StatelessWidget {
-  const ForgotPasswordBottomSheet(
-      {super.key, required this.otp, required this.msisdn});
+  const ForgotPasswordBottomSheet({super.key, required this.otp, required this.msisdn});
 
   final String otp;
   final String msisdn;
@@ -144,7 +140,6 @@ class ForgotPasswordBottomSheet extends StatelessWidget {
     final cubit = context.read<ForgotPasswordCubit>();
     return SingleChildScrollView(
       child: Container(
-        height: context.height,
         color: context.isDarkMode ? Colors.black : Colors.white,
         padding: EdgeInsets.only(
           right: 24.sp,
@@ -159,9 +154,7 @@ class ForgotPasswordBottomSheet extends StatelessWidget {
               "changePasswordSentence".tr(context),
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: context.isDarkMode
-                      ? Colors.white
-                      : AppColors.categoryTextColorGrey),
+                  color: context.isDarkMode ? Colors.white : AppColors.categoryTextColorGrey),
             ),
             SizedBox(height: 32.sp),
             Form(
@@ -174,7 +167,7 @@ class ForgotPasswordBottomSheet extends StatelessWidget {
                     suffixIcon: cubit.isObsecure
                         ? Icons.visibility_outlined
                         : Icons.visibility_off_outlined,
-                    validationType: InputType.PASSWORD,
+                    validationType: InputType.STRONG_PASSWORD,
                     isObsecure: cubit.isObsecure,
                     onSuffixTap: () => cubit.onObsecureClicked(),
                     textEditingController: cubit.passwordController,
@@ -186,8 +179,7 @@ class ForgotPasswordBottomSheet extends StatelessWidget {
             BlocConsumer<ForgotPasswordCubit, ForgotPasswordState>(
               listener: (context, state) {
                 if (state is ResetPasswordFailure) {
-                  AppToasts.showErrorToast(
-                      message: state.message.tr(context), context: context);
+                  AppToasts.showErrorToast(message: state.message.tr(context), context: context);
                   Navigator.of(context).pop();
                   cubit.passwordController.text = "";
                 }
@@ -197,11 +189,8 @@ class ForgotPasswordBottomSheet extends StatelessWidget {
                     context: context,
                   );
                   NotificationService.cancelAll();
-                  di
-                      .serviceLocator<SmartPosLocalStorage>()
-                      .clearScheduledNotificationDate();
-                  Navigator.of(context)
-                      .pushNamedAndRemoveUntil(Routes.signIn, (route) => false);
+                  di.serviceLocator<SmartPosLocalStorage>().clearScheduledNotificationDate();
+                  Navigator.of(context).pushNamedAndRemoveUntil(Routes.signIn, (route) => false);
                 }
               },
               builder: (context, state) {
@@ -215,12 +204,11 @@ class ForgotPasswordBottomSheet extends StatelessWidget {
                 return AppElevatedButtonWithText(
                   text: "confirm".tr(context),
                   onPressed: () {
-                    final String newPassword =
-                        cubit.passwordController.text.trim();
+                    final String newPassword = cubit.passwordController.text.trim();
                     final String phone = "213${msisdn.replaceAll(' ', '')}";
 
-                    ResetPasswordParams params = ResetPasswordParams(
-                        otp: otp, newPassword: newPassword, msisdn: phone);
+                    ResetPasswordParams params =
+                        ResetPasswordParams(otp: otp, newPassword: newPassword, msisdn: phone);
 
                     cubit.resetPassword(params: params);
                   },

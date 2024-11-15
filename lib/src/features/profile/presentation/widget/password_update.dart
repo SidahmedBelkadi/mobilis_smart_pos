@@ -22,8 +22,7 @@ class ProfilePasswordUpdateScreen extends StatefulWidget {
   const ProfilePasswordUpdateScreen({super.key});
 
   @override
-  State<ProfilePasswordUpdateScreen> createState() =>
-      _ProfilePasswordUpdateState();
+  State<ProfilePasswordUpdateScreen> createState() => _ProfilePasswordUpdateState();
 }
 
 late TextEditingController passwordController;
@@ -75,36 +74,30 @@ class _ProfilePasswordUpdateState extends State<ProfilePasswordUpdateScreen> {
       appBar: CustomAppBar(title: "change_password".tr(context)),
       body: SingleChildScrollView(
         child: Container(
-          height: context.height,
           width: context.width,
-          padding: EdgeInsets.all(48.sp),
+          padding: EdgeInsets.symmetric(vertical: 48.sp, horizontal: 24.sp),
           alignment: Alignment.center,
           child: BlocConsumer<ForgotPasswordCubit, ForgotPasswordState>(
             listener: (context, state) {
               if (state is ResetPasswordOTPFailure) {
-                AppToasts.showErrorToast(
-                    message: state.message.tr(context), context: context);
+                AppToasts.showErrorToast(message: state.message.tr(context), context: context);
               }
               if (state is ResetPasswordOTPSuccess) {
                 AppToasts.showSuccessToast(
-                    message: "code_has_been_sent".tr(context),
-                    context: context);
+                    message: "code_has_been_sent".tr(context), context: context);
                 setState(() {
                   isOTPRequested = true;
                 });
               }
               if (state is ResetPasswordFailure) {
-                AppToasts.showErrorToast(
-                    message: state.message.tr(context), context: context);
+                AppToasts.showErrorToast(message: state.message.tr(context), context: context);
               }
               if (state is ResetPasswordSuccess) {
-                AppToasts.showSuccessToast(
-                    message: state.message.tr(context), context: context);
+                AppToasts.showSuccessToast(message: state.message.tr(context), context: context);
                 /*   AppToasts.showSuccessToast(
                     message: "passwordChangeSuccess".tr(context),
                     context: context);*/
-                Navigator.of(context)
-                    .pushNamedAndRemoveUntil(Routes.signIn, (route) => false);
+                Navigator.of(context).pushNamedAndRemoveUntil(Routes.signIn, (route) => false);
               }
             },
             builder: (context, state) {
@@ -124,9 +117,10 @@ class _ProfilePasswordUpdateState extends State<ProfilePasswordUpdateScreen> {
                     Text(
                       "enterOtpMessage".tr(context),
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 48.sp),
                     OTPCustomWidget(
@@ -148,9 +142,10 @@ class _ProfilePasswordUpdateState extends State<ProfilePasswordUpdateScreen> {
                   children: [
                     Text(
                       "modifyPasswordTitle".tr(context),
-                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 32.sp),
                     AppTextFormField(
@@ -158,7 +153,7 @@ class _ProfilePasswordUpdateState extends State<ProfilePasswordUpdateScreen> {
                       suffixIcon: isPasswordObsecure
                           ? Icons.visibility_outlined
                           : Icons.visibility_off_outlined,
-                      validationType: InputType.PASSWORD,
+                      validationType: InputType.STRONG_PASSWORD,
                       isObsecure: isPasswordObsecure,
                       onSuffixTap: () => setState(() {
                         isPasswordObsecure = !isPasswordObsecure;
@@ -173,8 +168,7 @@ class _ProfilePasswordUpdateState extends State<ProfilePasswordUpdateScreen> {
                           : Icons.visibility_off_outlined,
                       isObsecure: isPasswordConfirmationObsecure,
                       onSuffixTap: () => setState(() {
-                        isPasswordConfirmationObsecure =
-                            !isPasswordConfirmationObsecure;
+                        isPasswordConfirmationObsecure = !isPasswordConfirmationObsecure;
                       }),
                       textEditingController: passwordConfirmationController,
                     ),
@@ -190,16 +184,13 @@ class _ProfilePasswordUpdateState extends State<ProfilePasswordUpdateScreen> {
                         : ElevatedButton(
                             onPressed: () => _onElevatedButtonPressed(cubit),
                             child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 12.sp, horizontal: 8.sp),
+                              padding: EdgeInsets.symmetric(vertical: 12.sp, horizontal: 24.sp),
                               child: Text(
                                 'changeButtonLabel'.tr(context),
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyMedium!
-                                    .copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
+                                    .copyWith(color: Colors.white, fontWeight: FontWeight.bold),
                               ),
                             ),
                           ),
@@ -219,16 +210,12 @@ class _ProfilePasswordUpdateState extends State<ProfilePasswordUpdateScreen> {
       return;
     }
 
-    if (passwordController.text.trim() !=
-        passwordConfirmationController.text.trim()) {
-      AppToasts.showWarningToast(
-          message: "passwordMismatchError".tr(context), context: context);
+    if (passwordController.text.trim() != passwordConfirmationController.text.trim()) {
+      AppToasts.showWarningToast(message: "passwordMismatchError".tr(context), context: context);
       return;
     }
-    final authenticationLocalDataSource =
-        di.serviceLocator<SmartPosLocalStorage>();
-    final savedCredentials =
-        authenticationLocalDataSource.getSavedLoginCredentials();
+    final authenticationLocalDataSource = di.serviceLocator<SmartPosLocalStorage>();
+    final savedCredentials = authenticationLocalDataSource.getSavedLoginCredentials();
     if (savedCredentials != null) {
       if (savedCredentials.msisdn != null) {
         setState(() {
@@ -237,12 +224,10 @@ class _ProfilePasswordUpdateState extends State<ProfilePasswordUpdateScreen> {
         final params = ResetPasswordRequestOtpParams(msisdn: msisdn);
         cubit.resetPasswordRequestOTP(params: params, isProfile: true);
       } else {
-        AppToasts.showErrorToast(
-            message: "internalErrorMessage".tr(context), context: context);
+        AppToasts.showErrorToast(message: "internalErrorMessage".tr(context), context: context);
       }
     } else {
-      AppToasts.showErrorToast(
-          message: "internalErrorMessage".tr(context), context: context);
+      AppToasts.showErrorToast(message: "internalErrorMessage".tr(context), context: context);
     }
   }
 }
