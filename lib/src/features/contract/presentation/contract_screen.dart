@@ -264,9 +264,14 @@ class _ContractScreenState extends State<ContractScreen> {
 
   bool _isDocumentRecognizedText(String text, DocumentsType docType) {
     if (docType == DocumentsType.frontIdCard) {
-      final pattern9Digits = RegExp(r'\b\d{18}\b');
-      final has18Digits = pattern9Digits.hasMatch(text);
-      return has18Digits;
+      final pattern18Digits = RegExp(r'\b\d{18}\b');
+      final has18Digits = pattern18Digits.hasMatch(text);
+      final match = pattern18Digits.firstMatch(text);
+      if (match != null) {
+        final extractedNumber = match.group(0);
+        return has18Digits && extractedNumber == widget.metaData['personal_number'];
+      }
+      return false;
     } else if (docType == DocumentsType.backIdCard) {
       final patternIdDza = RegExp(r'IDDZA');
       final patternName = RegExp(r'Nom');
@@ -282,14 +287,21 @@ class _ContractScreenState extends State<ContractScreen> {
 
       final hasP = patternP.hasMatch(text);
       final has9Digits = pattern9Digits.hasMatch(text);
-      return hasP && has9Digits;
+      final pattern18Digits = RegExp(r'\b\d{18}\b');
+      final match = pattern18Digits.firstMatch(text);
+      if (match != null) {
+        final extractedNumber = match.group(0);
+        return hasP & has9Digits && extractedNumber == widget.metaData['personal_number'];
+      }
+      return false;
     }
   }
 
-  Future<bool> checkDocument(
-      {required TextRecognizer recognizer,
-      required File file,
-      required DocumentsType docType}) async {
+  Future<bool> checkDocument({
+    required TextRecognizer recognizer,
+    required File file,
+    required DocumentsType docType,
+  }) async {
     final document = InputImage.fromFile(file);
     final recognizedText = await recognizer.processImage(document);
     final isDocumentRecognized = _isDocumentRecognizedText(recognizedText.text, docType);

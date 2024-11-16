@@ -68,8 +68,7 @@ class _MyHomePageState extends State<MainScreen> {
   }
 
   Future<void> checkForUpdate() async {
-    bool isUpdateAvailable =
-    await di.serviceLocator<UpgraderService>().checkIfLastVersionUpdate();
+    bool isUpdateAvailable = await di.serviceLocator<UpgraderService>().checkIfLastVersionUpdate();
 
     if (isUpdateAvailable) {
       _showUpdateDialog();
@@ -86,15 +85,13 @@ class _MyHomePageState extends State<MainScreen> {
         return PopScope(
           canPop: false,
           child: AlertDialog(
-            backgroundColor:
-            context.isDarkMode ? AppColors.darkerGrey : Colors.white,
+            backgroundColor: context.isDarkMode ? AppColors.darkerGrey : Colors.white,
             title: Text("update_available".tr(context)),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text('update_available_instruction'.tr(context)),
-                LottieBuilder.asset(AppImages.update,
-                    height: 120.sp, width: 120.sp),
+                LottieBuilder.asset(AppImages.update, height: 120.sp, width: 120.sp),
               ],
             ),
             actions: <Widget>[
@@ -119,21 +116,19 @@ class _MyHomePageState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SessionTimeout(
-      child: PopScope(
-        canPop: false,
-        child: Scaffold(
-          drawer: const HomeDrawer(),
-          bottomNavigationBar: CustomAppBottomNavBar(
-            currentIndex: screenIndex,
-            onTap: (index) => setState(
-                  () {
-                screenIndex = index;
-              },
-            ),
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        drawer: const HomeDrawer(),
+        bottomNavigationBar: CustomAppBottomNavBar(
+          currentIndex: screenIndex,
+          onTap: (index) => setState(
+            () {
+              screenIndex = index;
+            },
           ),
-          body: screens[screenIndex],
         ),
+        body: screens[screenIndex],
       ),
     );
   }

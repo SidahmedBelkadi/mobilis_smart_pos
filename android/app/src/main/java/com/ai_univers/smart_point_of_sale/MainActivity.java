@@ -34,6 +34,7 @@ public class MainActivity extends FlutterActivity {
     private static final String OTP_CHANNEL = "otp_receiver";
     private NfcAdapter nfcAdapter;
     private boolean isNfcReadCompleted = false;  // Flag to track if NFC reading is completed
+
     private boolean resultSent = false;
 
     @Override
@@ -115,7 +116,7 @@ public class MainActivity extends FlutterActivity {
             @Override
             public void onTagDiscovered(Tag tag) {
 
-                if (isNfcReadCompleted) {
+                if (isNfcReadCompleted || resultSent) {
                     return;  // Prevent further NFC reads if reading is already completed
                 }
 
@@ -142,8 +143,8 @@ public class MainActivity extends FlutterActivity {
                             }
                         });
                     } catch (Exception e) {
-                        Log.e("MainActivity", "Error reading NFC tag", e);
-                        runOnUiThread(() -> result.error("NFC_READ_ERROR", "Failed to read NFC tag", null));
+                        Log.e("MainActivity", "Error reading NFC tag : " + e, e);
+                        runOnUiThread(() -> result.error("NFC_READ_ERROR", "Failed to read NFC tag" + e, null));
                     }
                 }
             }
