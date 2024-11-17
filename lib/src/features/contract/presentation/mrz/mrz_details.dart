@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mobilis_smart_pos/src/services/nfc_service.dart';
 import '../../../../core/commom/widgets/custom_floating_action_button.dart';
 import '../../../../core/utils/helpers/dialog_helper.dart';
 import '../../../../services/screenshot_service.dart';
@@ -238,6 +239,14 @@ class MrzDetailsScreenState extends State<MrzDetailsScreen> {
                         : CupertinoIcons.chevron_right,
                     heroTag: 'continue-to-nfc',
                     onPressed: () async {
+                      final isNFcEnabled = await NFCService.isNfcEnabled();
+                      if (!isNFcEnabled) {
+                        AppToasts.showWarningToast(
+                          message: "enable_nfc".tr(context),
+                          context: context,
+                        );
+                        return;
+                      }
                       Navigator.of(context).pushReplacementNamed(Routes.nfcReader, arguments: {
                         'documentNumber': widget.documentNumber,
                         'dateOfBirth': widget.dateOfBirth,

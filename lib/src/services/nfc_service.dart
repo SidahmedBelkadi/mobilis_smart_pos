@@ -6,6 +6,10 @@ import 'package:flutter/services.dart';
 class NFCService {
   static const platform = MethodChannel('channel');
 
+  static Future<bool> isNfcEnabled() async {
+    return await platform.invokeMethod('isNfcEnabled');
+  }
+
   Future<Map<String, dynamic>> readNfc(
       String documentType,
       String documentNumber,

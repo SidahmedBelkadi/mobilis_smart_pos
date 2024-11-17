@@ -295,5 +295,7 @@
   "incorrect_passport_image": "Invalid passport image.",
   "incorrect_front_id_card_image": "Invalid front ID image.",
   "incorrect_back_id_card_image": "Invalid back ID image.",
-  "incorrect_image": "Invalid image."
+  "incorrect_image": "Invalid image.",
+  "try_scan_doc_again": "Please try scanning the document again",
+  "enable_nfc": "Please enable NFC in your device settings to start scanning"
 }

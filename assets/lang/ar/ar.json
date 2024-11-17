@@ -295,5 +295,7 @@
   "incorrect_passport_image": "صورة جواز السفر غير صالحة.",
   "incorrect_front_id_card_image": "صورة واجهة بطاقة الهوية غير صالحة.",
   "incorrect_back_id_card_image": "صورة ظهر بطاقة الهوية غير صالحة.",
-  "incorrect_image": "صورة غير صالحة."
+  "incorrect_image": "صورة غير صالحة.",
+  "try_scan_doc_again": "يرجى إعادة مسح الوثيقة..",
+  "enable_nfc": "يرجى تفعيل NFC في إعدادات الجهاز لبدء المسح."
 }

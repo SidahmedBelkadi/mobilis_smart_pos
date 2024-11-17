@@ -1,9 +1,11 @@
 package com.ai_univers.smart_point_of_sale;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.nfc.NfcAdapter;
+import android.nfc.NfcManager;
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
 import android.os.Build;
@@ -36,6 +38,17 @@ public class MainActivity extends FlutterActivity {
     private boolean isNfcReadCompleted = false;  // Flag to track if NFC reading is completed
 
     private boolean resultSent = false;
+
+
+    // Method to check if NFC is enabled on the device
+    public static boolean isNfcEnabled(Context context) {
+        NfcManager nfcManager = (NfcManager) context.getSystemService(Context.NFC_SERVICE);
+        if (nfcManager != null) {
+            NfcAdapter nfcAdapter = nfcManager.getDefaultAdapter();
+            return nfcAdapter != null && nfcAdapter.isEnabled();
+        }
+        return false;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +86,9 @@ public class MainActivity extends FlutterActivity {
 
                                 } else if (call.method.equals("otp_received")) {
                                     String otp = call.arguments.toString();
-                                    Log.d("OTPReceiver", "Received OTP: " + otp);
+
+                                } else if (call.method.equals("isNfcEnabled")) {
+                                    result.success(isNfcEnabled(MainActivity.this));
                                 }
                             }
                         }
@@ -109,7 +124,6 @@ public class MainActivity extends FlutterActivity {
             }, 1);
         }
     }
-
 
     private void startNfcReading(MethodChannel.Result result) {
         NfcAdapter.ReaderCallback readerCallback = new NfcAdapter.ReaderCallback() {
@@ -191,7 +205,6 @@ public class MainActivity extends FlutterActivity {
                 brand.contains("generic") || device.contains("generic"));
     }
 
-
     private boolean isDebuggerAttached() {
         return Debug.isDebuggerConnected() || Debug.waitingForDebugger();
     }
@@ -239,7 +252,6 @@ public class MainActivity extends FlutterActivity {
         return false;
     }
 
-
     // Helper method to check if a command can be executed
     private boolean canExecuteCommand(String command) {
         try {
@@ -250,7 +262,6 @@ public class MainActivity extends FlutterActivity {
             return false;  // The command could not be executed, so assume no root
         }
     }
-
 
     // Helper method to check if a known root app is installed
     private boolean isPackageInstalled(String packageName) {

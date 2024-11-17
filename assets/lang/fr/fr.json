@@ -295,5 +295,7 @@
   "incorrect_passport_image": "Image du passeport invalide.",
   "incorrect_front_id_card_image": "Image du recto de la carte d'identité invalide.",
   "incorrect_back_id_card_image": "Image du verso de la carte d'identité invalide.",
-  "incorrect_image": "Image invalide."
+  "incorrect_image": "Image invalide.",
+  "try_scan_doc_again": "Veuillez scanner le document à nouveau",
+  "enable_nfc": "Veuillez activer le NFC dans les paramètres de votre appareil pour commencer le scan"
 }

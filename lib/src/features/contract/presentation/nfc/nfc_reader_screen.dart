@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:mobilis_smart_pos/src/core/utils/helpers/toast_helper.dart';
 import '../../../../core/commom/widgets/custom_app_bar.dart';
 import '../../../../core/utils/helpers/app_localization_helper.dart';
 import '../../../../core/utils/helpers/media_query_values.dart';
@@ -84,8 +85,17 @@ class _NfcReaderScreenState extends State<NfcReaderScreen> {
       _isLoading = false;
       if (result.containsKey('error')) {
         _errorMessage = result['error'];
-        debugPrint("============== Error during NFC scan: $_errorMessage");
-        Navigator.pop(context, _errorMessage);
+        AppToasts.showWarningToast(
+          message: "try_scan_doc_again".tr(context),
+          context: context,
+        );
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          Routes.main,
+          (route) => false,
+          arguments: {
+            'index': 1,
+          },
+        );
       } else {
         _nfcData = result;
         debugPrint("NFC DATA : ${_nfcData}");
