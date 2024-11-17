@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.nfc.tech.IsoDep;
+import android.util.Log;
 
 import com.ai_univers.smart_point_of_sale.utils.ImageUtil;
 
@@ -65,6 +66,12 @@ public class DzNfcModel {
         if (this.dateOfBirth.length() == 2) {
             dateOfBirth = this.dateOfBirth + "0101";
         }
+
+        Log.d("DzNfcModel", "Received parameters: Document Type: " + documentType +
+                ", Document Number: " + documentNumber +
+                ", DOB: " + dateOfBirth +
+                ", DOE: " + dateOfExpiry);
+
 
         BACKey bacKey = new BACKey(this.documentNumber, dateOfBirth, this.dateOfExpiry);
         passportService.doBAC(bacKey);
@@ -183,7 +190,7 @@ public class DzNfcModel {
         resultJson.put("issuing_state", issuingState);
         resultJson.put("blood_group", bloodGroup);
         resultJson.put("date_of_delivery", formattedDateOfDelivery);
-        resultJson.put("issuing_authority", issuingAuthority.split("_")[1]);
+        resultJson.put("issuing_authority", issuingAuthority);
         resultJson.put("facial_image", facialImageBytes != null ? new JSONArray(convertByteArrayToList(facialImageBytes)) : JSONObject.NULL);
         resultJson.put("signature_image", signatureImageBytes != null ? new JSONArray(convertByteArrayToList(signatureImageBytes)) : JSONObject.NULL);
 

@@ -24,7 +24,7 @@ class NFCService {
       });
       return Map<String, dynamic>.from(json.decode(result));
     } on PlatformException catch (e) {
-      debugPrint("=================== Error starting NFC scan: ${e.message}");
+      debugPrint("=================== Error starting NFC scan: ${e.message} ${e.details}");
       return {'error': 'Failed to start NFC scan: ${e.message}'};
     }
   }

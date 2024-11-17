@@ -71,7 +71,7 @@ class _MrzOCRScreenState extends State<ParentMrzOCRScreen> {
 
     _controller = CameraController(firstCamera, ResolutionPreset.high, enableAudio: false);
     _initializeControllerFuture = _controller!.initialize();
-    _controller!.setFocusMode(FocusMode.locked);
+    _controller!.setFocusMode(FocusMode.auto);
     _controller!.lockCaptureOrientation(DeviceOrientation.portraitUp);
     await _initializeControllerFuture;
     if (mounted) {
