@@ -2,9 +2,9 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-import 'package:mobilis_smart_pos/src/core/commom/widgets/mrz_overlay.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/image_processor_helper.dart';
-import 'package:mobilis_smart_pos/src/services/screenshot_service.dart';
+import '../../../../core/commom/widgets/mrz_overlay.dart';
+import '../../../../core/utils/helpers/image_processor_helper.dart';
+import '../../../../services/screenshot_service.dart';
 
 import '../../../../config/routing/app_routes.dart';
 import '../../../../core/utils/enums/documents_type.dart';
@@ -89,7 +89,6 @@ class _MrzOCRScreenState extends State<MrzOCRScreen> {
       }
 
       final extractedBirthDate = dateMatch.group(1);
-      final gender = dateMatch.group(3);
       final extractedExpiryDate = dateMatch.group(5);
 
       if (extractedBirthDate == null || extractedExpiryDate == null) {
@@ -121,7 +120,6 @@ class _MrzOCRScreenState extends State<MrzOCRScreen> {
       final extractedDocumentNumber = passportMatch.group(1);
       final extractedBirthDate = passportMatch.group(4);
       final extractedExpiryDate = passportMatch.group(7);
-      final gender = passportMatch.group(6);
 
       if (extractedDocumentNumber == null ||
           extractedBirthDate == null ||

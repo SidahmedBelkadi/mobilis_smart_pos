@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:mobilis_smart_pos/src/features/profile/domain/user_cases/get_pdv_images_use_case.dart';
+import '../../domain/user_cases/get_pdv_images_use_case.dart';
 
 import '../../../sign_in/data/data_sources/smart_pos_local_storage.dart';
 import '../../domain/entities/profile_response_entity.dart';
@@ -26,12 +26,10 @@ class ProfileCubit extends Cubit<ProfileState> {
 
   Future<void> getPdvInfo() async {
     emit(ProfileInfoLoading());
-    final savedCredentials =
-        authenticationLocalDataSource.getSavedLoginCredentials();
+    final savedCredentials = authenticationLocalDataSource.getSavedLoginCredentials();
     if (savedCredentials != null) {
       if (savedCredentials.userId != null) {
-        final failureOrProfileReponseEntity =
-            await useCase(pdvID: savedCredentials.userId!);
+        final failureOrProfileReponseEntity = await useCase(pdvID: savedCredentials.userId!);
 
         failureOrProfileReponseEntity.fold(
           (error) {
@@ -62,8 +60,7 @@ class ProfileCubit extends Cubit<ProfileState> {
   }) async {
     emit(UpdateProfileInfoLoading());
 
-    final savedCredentials =
-        await authenticationLocalDataSource.getSavedLoginCredentials();
+    final savedCredentials = await authenticationLocalDataSource.getSavedLoginCredentials();
     if (savedCredentials != null) {
       if (savedCredentials.userId != null && savedCredentials.pdvCode != null) {
         final failureOrVoid = await updateUseCase(
@@ -98,12 +95,10 @@ class ProfileCubit extends Cubit<ProfileState> {
 
   Future<void> getPdvImages() async {
     emit(GetPdvImagesLoading());
-    final savedCredentials =
-        await authenticationLocalDataSource.getSavedLoginCredentials();
+    final savedCredentials = await authenticationLocalDataSource.getSavedLoginCredentials();
     if (savedCredentials != null) {
       if (savedCredentials.userId != null && savedCredentials.pdvCode != null) {
-        final failureOrImages =
-            await imagesUseCase(pdvCode: savedCredentials.pdvCode!);
+        final failureOrImages = await imagesUseCase(pdvCode: savedCredentials.pdvCode!);
         failureOrImages.fold(
           (error) {
             emit(GetPdvImagesFailure(message: error.message));

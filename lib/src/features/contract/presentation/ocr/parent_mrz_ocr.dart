@@ -4,12 +4,12 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-import 'package:mobilis_smart_pos/src/config/routing/app_routes.dart';
-import 'package:mobilis_smart_pos/src/core/commom/widgets/mrz_overlay.dart';
-import 'package:mobilis_smart_pos/src/core/utils/enums/documents_type.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/image_processor_helper.dart';
-import 'package:mobilis_smart_pos/src/core/utils/ressources/app_colors.dart';
-import 'package:mobilis_smart_pos/src/features/contract/domain/entities/contract_request_params_entitiy.dart';
+import '../../../../config/routing/app_routes.dart';
+import '../../../../core/commom/widgets/mrz_overlay.dart';
+import '../../../../core/utils/enums/documents_type.dart';
+import '../../../../core/utils/helpers/image_processor_helper.dart';
+import '../../../../core/utils/ressources/app_colors.dart';
+import '../../domain/entities/contract_request_params_entitiy.dart';
 
 class ParentMrzOCRScreen extends StatefulWidget {
   const ParentMrzOCRScreen({
@@ -99,7 +99,6 @@ class _MrzOCRScreenState extends State<ParentMrzOCRScreen> {
       }
 
       final extractedBirthDate = dateMatch.group(1);
-      final gender = dateMatch.group(3);
       final extractedExpiryDate = dateMatch.group(5);
 
       if (extractedBirthDate == null || extractedExpiryDate == null) {
@@ -131,7 +130,6 @@ class _MrzOCRScreenState extends State<ParentMrzOCRScreen> {
       final extractedDocumentNumber = passportMatch.group(1);
       final extractedBirthDate = passportMatch.group(4);
       final extractedExpiryDate = passportMatch.group(7);
-      final gender = passportMatch.group(6);
 
       if (extractedDocumentNumber == null ||
           extractedBirthDate == null ||

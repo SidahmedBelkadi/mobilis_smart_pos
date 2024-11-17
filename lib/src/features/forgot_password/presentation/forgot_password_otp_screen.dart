@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
-import 'package:mobilis_smart_pos/src/features/sign_in/data/data_sources/smart_pos_local_storage.dart';
-import 'package:mobilis_smart_pos/src/services/notification_service.dart';
+import '../../sign_in/data/data_sources/smart_pos_local_storage.dart';
+import '../../../services/notification_service.dart';
 
 import '../../../config/routing/app_routes.dart';
 import '../../../core/commom/widgets/app_elevated_button_text.dart';

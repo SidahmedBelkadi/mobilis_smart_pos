@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
-import 'package:mobilis_smart_pos/src/core/utils/ressources/app_colors.dart';
+import '../../../../core/utils/helpers/app_localization_helper.dart';
+import '../../../../core/utils/ressources/app_colors.dart';
 
 class ChangePasswordTile extends StatelessWidget {
   const ChangePasswordTile({
@@ -26,8 +26,7 @@ class ChangePasswordTile extends StatelessWidget {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("change_password".tr(context),
-                style: Theme.of(context).textTheme.bodySmall),
+            Text("change_password".tr(context), style: Theme.of(context).textTheme.bodySmall),
           ],
         ),
       ),

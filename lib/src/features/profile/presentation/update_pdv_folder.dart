@@ -7,14 +7,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:lottie/lottie.dart';
-import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_app_bar.dart';
-import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_floating_action_button.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
-import 'package:mobilis_smart_pos/src/core/utils/ressources/app_colors.dart';
-import 'package:mobilis_smart_pos/src/core/utils/ressources/app_images.dart';
-import 'package:mobilis_smart_pos/src/features/profile/presentation/widget/personnel_files_update_notice.dart';
-import 'package:mobilis_smart_pos/src/features/profile/presentation/widget/upload_image_field.dart';
+import '../../../core/commom/widgets/custom_app_bar.dart';
+import '../../../core/commom/widgets/custom_floating_action_button.dart';
+import '../../../core/utils/helpers/app_localization_helper.dart';
+import '../../../core/utils/helpers/media_query_values.dart';
+import '../../../core/utils/ressources/app_colors.dart';
+import '../../../core/utils/ressources/app_images.dart';
+import 'widget/personnel_files_update_notice.dart';
+import 'widget/upload_image_field.dart';
 
 import '../../../config/routing/app_routes.dart';
 import '../../../core/utils/enums/documents_type.dart';
@@ -80,8 +80,7 @@ class _UpdatePdvFolderState extends State<UpdatePdvFolder> {
         required DocumentsType docType}) async {
       final document = InputImage.fromFile(file);
       final recognizedText = await recognizer.processImage(document);
-      final isDocumentRecognized =
-          _isDocumentRecognizedText(recognizedText.text, docType);
+      final isDocumentRecognized = _isDocumentRecognizedText(recognizedText.text, docType);
       return isDocumentRecognized;
     }
 
@@ -90,12 +89,11 @@ class _UpdatePdvFolderState extends State<UpdatePdvFolder> {
       required DocumentsType docType,
       required BuildContext context,
     }) async {
-      final imagesPath = await CunningDocumentScanner.getPictures(
-          noOfPages: 1, isGalleryImportAllowed: false);
+      final imagesPath =
+          await CunningDocumentScanner.getPictures(noOfPages: 1, isGalleryImportAllowed: false);
       if (imagesPath != null && imagesPath.isNotEmpty) {
         File file = File(imagesPath[0]);
-        final validated = await checkDocument(
-            recognizer: recognizer, file: file, docType: docType);
+        final validated = await checkDocument(recognizer: recognizer, file: file, docType: docType);
         if (validated) {
           if (docType == DocumentsType.passport) {
             setState(() {
@@ -119,8 +117,7 @@ class _UpdatePdvFolderState extends State<UpdatePdvFolder> {
             });
           }
         } else {
-          AppToasts.showWarningToast(
-              message: "incorrect_image".tr(context), context: context);
+          AppToasts.showWarningToast(message: "incorrect_image".tr(context), context: context);
           return;
         }
       } else {
@@ -130,8 +127,7 @@ class _UpdatePdvFolderState extends State<UpdatePdvFolder> {
 
     void _showDrawer(BuildContext parentContext) {
       showModalBottomSheet(
-        backgroundColor:
-            parentContext.isDarkMode ? AppColors.darkGrey : Colors.white,
+        backgroundColor: parentContext.isDarkMode ? AppColors.darkGrey : Colors.white,
         showDragHandle: true,
         context: parentContext,
         builder: (BuildContext context) {
@@ -168,10 +164,7 @@ class _UpdatePdvFolderState extends State<UpdatePdvFolder> {
       if (isPassport && !isUploading) {
         return recto != null && commercialRegister != null && nif != null;
       } else if (isIdCard && !isUploading) {
-        return recto != null &&
-            verso != null &&
-            commercialRegister != null &&
-            nif != null;
+        return recto != null && verso != null && commercialRegister != null && nif != null;
       }
       return false;
     }
@@ -243,8 +236,7 @@ class _UpdatePdvFolderState extends State<UpdatePdvFolder> {
               }
               return ListView(
                 children: [
-                  if (!_areAllDocumentsUploaded())
-                    const PersonnelFilesUpdateNotice(),
+                  if (!_areAllDocumentsUploaded()) const PersonnelFilesUpdateNotice(),
                   SizedBox(height: 16.sp),
                   isIdCard
                       ? Column(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
+import '../../utils/helpers/media_query_values.dart';
 import '../../utils/enums/input_type.dart';
 import '../../utils/ressources/app_colors.dart';
 import '../../validation/validator.dart';
@@ -94,8 +94,12 @@ class AppTextFormField extends StatelessWidget {
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixIcon: suffixIcon != null ? _buildSuffixIcon() : null,
         filled: filled,
-        fillColor: filled ?  context.isDarkMode ? AppColors.darkGrey :  const Color.fromARGB(255, 208, 238, 187) : null,
-        border: filled ? _buildOutlineInputBorder( fillColor) : null,
+        fillColor: filled
+            ? context.isDarkMode
+                ? AppColors.darkGrey
+                : const Color.fromARGB(255, 208, 238, 187)
+            : null,
+        border: filled ? _buildOutlineInputBorder(fillColor) : null,
         enabledBorder: filled ? _buildOutlineInputBorder(fillColor) : null,
         focusedBorder: filled ? _buildOutlineInputBorder(fillColor) : null,
       ),

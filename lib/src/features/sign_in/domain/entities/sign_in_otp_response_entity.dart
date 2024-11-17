@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:mobilis_smart_pos/src/features/sign_in/domain/entities/password_age_entity.dart';
+import 'password_age_entity.dart';
 
 class SignInOTPResponseEntity extends Equatable {
   final String accessToken;
@@ -67,9 +67,7 @@ class SignInOTPResponseEntity extends Equatable {
       employeeId: map['employee'],
       msisdn: map['msisdn'],
       pdvCode: map['pdvCode'],
-      passwordAge: map['password_age'] != null
-          ? PasswordAge.fromMap(map['password_age'])
-          : null,
+      passwordAge: map['password_age'] != null ? PasswordAge.fromMap(map['password_age']) : null,
     );
   }
 }

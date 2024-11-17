@@ -8,11 +8,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:insta_image_viewer/insta_image_viewer.dart';
-import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_appbar_with_deny_contract.dart';
-import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_floating_action_button.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
-import 'package:mobilis_smart_pos/src/services/screenshot_service.dart';
+import '../../../core/commom/widgets/custom_appbar_with_deny_contract.dart';
+import '../../../core/commom/widgets/custom_floating_action_button.dart';
+import '../../../core/utils/helpers/app_localization_helper.dart';
+import '../../../core/utils/helpers/media_query_values.dart';
+import '../../../services/screenshot_service.dart';
 
 import '../../../config/routing/app_routes.dart';
 import '../../../core/commom/widgets/app_text_form_field.dart';
@@ -88,9 +88,7 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
     setState(() {
       _selectedWilaya = wilayaCode;
       _selectedCommune = null;
-      _filteredCommunes = _communes
-          .where((commune) => commune.stateCode == wilayaCode)
-          .toList();
+      _filteredCommunes = _communes.where((commune) => commune.stateCode == wilayaCode).toList();
     });
   }
 
@@ -179,8 +177,7 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
       required DocumentsType docType}) async {
     final document = InputImage.fromFile(file);
     final recognizedText = await recognizer.processImage(document);
-    final isDocumentRecognized =
-        _isDocumentRecognizedText(recognizedText.text, docType);
+    final isDocumentRecognized = _isDocumentRecognizedText(recognizedText.text, docType);
     return isDocumentRecognized;
   }
 
@@ -189,12 +186,11 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
     required DocumentsType docType,
     required BuildContext context,
   }) async {
-    final imagesPath = await CunningDocumentScanner.getPictures(
-        noOfPages: 1, isGalleryImportAllowed: false);
+    final imagesPath =
+        await CunningDocumentScanner.getPictures(noOfPages: 1, isGalleryImportAllowed: false);
     if (imagesPath != null && imagesPath.isNotEmpty) {
       File file = File(imagesPath[0]);
-      final validated = await checkDocument(
-          recognizer: recognizer, file: file, docType: docType);
+      final validated = await checkDocument(recognizer: recognizer, file: file, docType: docType);
       if (validated) {
         if (docType == DocumentsType.passport) {
           setState(() {
@@ -220,9 +216,7 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
           setState(() {
             justficatif = file;
           });
-          if (widget.parentIsPassport &&
-              rectoImage != null &&
-              justficatif != null) {
+          if (widget.parentIsPassport && rectoImage != null && justficatif != null) {
             setState(() {
               isCaptureDone = true;
             });
@@ -236,8 +230,7 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
           }
         }
       } else {
-        AppToasts.showWarningToast(
-            message: "incorrect_image".tr(context), context: context);
+        AppToasts.showWarningToast(message: "incorrect_image".tr(context), context: context);
         return;
       }
     } else {
@@ -276,8 +269,7 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
     }
 
     if (RegExp(r'[\u0600-\u06FF]').hasMatch(addressEditingController.text)) {
-      AppToasts.showErrorToast(
-          message: "address_french_instruction".tr(context), context: context);
+      AppToasts.showErrorToast(message: "address_french_instruction".tr(context), context: context);
       return;
     }
 
@@ -286,8 +278,6 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
     String docNumber = docNumberController.text.trim();
     String issuingCountry = issuingCountryController.text.trim();
     String issuingPlace = issuingPlaceControllerController.text.trim();
-    String docType = docTypeController.text.trim();
-    String bloodType = bloodTypeController.text.trim();
 
     String firstName = firstNameEditingController.text.trim();
     firstName = firstName.replaceAll(RegExp(r'-\s*'), ' ');
@@ -295,10 +285,8 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
     lastName = lastName.replaceAll(RegExp(r'-\s*'), ' ');
     String birthPlace = birthPlaceEditingController.text.trim();
     String nationality = nationalityEditingController.text.trim();
-    String normalizedAddress =
-        removeDiacritics(addressEditingController.text.trim());
-    String cleanedAddress =
-        normalizedAddress.replaceAll(RegExp(r'[^a-zA-Z0-9 ]'), '');
+    String normalizedAddress = removeDiacritics(addressEditingController.text.trim());
+    String cleanedAddress = normalizedAddress.replaceAll(RegExp(r'[^a-zA-Z0-9 ]'), '');
     String address = cleanedAddress;
 
     ContractRequestParamsEntitiy contract = widget.minorContract.copyWith(
@@ -307,8 +295,7 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
       parentGender: CivilsInformationsConverterHelper.getToSubmitGenderValue(
         gender: widget.parentExtractedNFCData['gender'],
       ),
-      parentBirthDate:
-          CivilsInformationsConverterHelper.convertToIso8601WithTiret(
+      parentBirthDate: CivilsInformationsConverterHelper.convertToIso8601WithTiret(
         widget.parentExtractedNFCData['date_of_birth'],
       ),
       parentBirthPlace: birthPlace,
@@ -317,15 +304,13 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
       parentCommune: _selectedCommune,
       parentStreet: address.toUpperCase(),
       parentNin: nin,
-      parentDocumentType:
-          CivilsInformationsConverterHelper.getToSubmitDocumentTypeValue(
+      parentDocumentType: CivilsInformationsConverterHelper.getToSubmitDocumentTypeValue(
         docType: widget.parentExtractedNFCData['document_type'],
       ),
       parentDocumentNumber: docNumber,
       parentIssuingCountry: issuingCountry,
       parentIssuingPlace: issuingPlace,
-      parentIssueDate:
-          CivilsInformationsConverterHelper.convertToIso8601WithTiret(
+      parentIssueDate: CivilsInformationsConverterHelper.convertToIso8601WithTiret(
         widget.parentExtractedNFCData['date_of_delivery'],
       ),
     );
@@ -385,8 +370,7 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
                     children: [
                       AppTextFormField(
                         enabled: false,
-                        disabledValue:
-                            widget.parentExtractedNFCData['first_name'],
+                        disabledValue: widget.parentExtractedNFCData['first_name'],
                         textEditingController: firstNameEditingController,
                         label: "firstNameLabel".tr(context),
                         // validationType: InputType.FIRST_NAME,
@@ -394,8 +378,7 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
                       SizedBox(height: 16.sp),
                       AppTextFormField(
                         enabled: false,
-                        disabledValue:
-                            widget.parentExtractedNFCData['last_name'],
+                        disabledValue: widget.parentExtractedNFCData['last_name'],
                         textEditingController: lastNameEditingController,
                         label: "lastNameLabel".tr(context),
                       ),
@@ -403,37 +386,30 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
 
                       AppTextFormField(
                         enabled: false,
-                        disabledValue:
-                            CivilsInformationsConverterHelper.getFormatedGender(
-                                gender: widget.parentExtractedNFCData['gender'],
-                                context: context),
+                        disabledValue: CivilsInformationsConverterHelper.getFormatedGender(
+                            gender: widget.parentExtractedNFCData['gender'], context: context),
                         textEditingController: genderEditingController,
                         label: "genderLabel".tr(context),
                       ),
                       SizedBox(height: 16.sp),
                       AppTextFormField(
                         enabled: false,
-                        disabledValue: CivilsInformationsConverterHelper
-                            .formatToDisplayDate(
-                                date: widget
-                                    .parentExtractedNFCData['date_of_birth'],
-                                context: context),
+                        disabledValue: CivilsInformationsConverterHelper.formatToDisplayDate(
+                            date: widget.parentExtractedNFCData['date_of_birth'], context: context),
                         textEditingController: birthDateEditingController,
                         label: "birthDateLabel".tr(context),
                       ),
                       SizedBox(height: 16.sp),
                       AppTextFormField(
                         enabled: false,
-                        disabledValue:
-                            widget.parentExtractedNFCData['place_of_birth'],
+                        disabledValue: widget.parentExtractedNFCData['place_of_birth'],
                         textEditingController: birthPlaceEditingController,
                         label: "birthPlaceLabel".tr(context),
                       ),
                       SizedBox(height: 16.sp),
                       AppTextFormField(
                         enabled: false,
-                        disabledValue:
-                            widget.parentExtractedNFCData['Nationality'],
+                        disabledValue: widget.parentExtractedNFCData['Nationality'],
                         textEditingController: nationalityEditingController,
                         label: "nationality".tr(context),
                       ),
@@ -491,8 +467,7 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
                           children: [
                             SizedBox(height: 16.sp),
                             versoImage != null
-                                ? InstaImageViewer(
-                                    child: Image.file(versoImage!))
+                                ? InstaImageViewer(child: Image.file(versoImage!))
                                 : UploadImageField(
                                     icon: FontAwesomeIcons.camera,
                                     label: "verso".tr(context),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mobilis_smart_pos/src/features/contract/domain/entities/daira_entity.dart';
+import '../../../features/contract/domain/entities/daira_entity.dart';
 
 import '../../utils/helpers/app_localization_helper.dart';
 import '../../utils/helpers/media_query_values.dart';

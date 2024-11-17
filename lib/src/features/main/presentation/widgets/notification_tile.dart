@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
+import '../../../../core/utils/helpers/app_localization_helper.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../core/utils/ressources/app_colors.dart';
@@ -10,12 +10,10 @@ class NotificationPermissionTile extends StatefulWidget {
   const NotificationPermissionTile({super.key});
 
   @override
-  State<NotificationPermissionTile> createState() =>
-      _NotificationPermissionTileState();
+  State<NotificationPermissionTile> createState() => _NotificationPermissionTileState();
 }
 
-class _NotificationPermissionTileState
-    extends State<NotificationPermissionTile> {
+class _NotificationPermissionTileState extends State<NotificationPermissionTile> {
   bool _isNotificationEnabled = false;
 
   @override

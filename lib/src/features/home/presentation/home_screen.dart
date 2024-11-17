@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mobilis_smart_pos/src/features/home/presentation/widgets/CustomCuvedEdges.dart';
-import 'package:mobilis_smart_pos/src/features/main/presentation/widgets/drawer.dart';
-import 'package:mobilis_smart_pos/src/features/sign_in/data/data_sources/smart_pos_local_storage.dart';
+import 'widgets/CustomCuvedEdges.dart';
+import '../../main/presentation/widgets/drawer.dart';
+import '../../sign_in/data/data_sources/smart_pos_local_storage.dart';
 
 import '../../../config/routing/app_routes.dart';
 import '../../../core/utils/helpers/app_localization_helper.dart';
@@ -36,8 +36,7 @@ class _MyHomePageState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final storedCredentials =
-        di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials();
+    final storedCredentials = di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials();
     String? businessName = '';
     if (storedCredentials != null && storedCredentials.businessName != null) {
       businessName = storedCredentials.businessName;
@@ -65,25 +64,15 @@ class _MyHomePageState extends State<HomeScreen> {
                             children: [
                               Text(
                                 "welcome".tr(context),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge!
-                                    .copyWith(
-                                        color: context.isDarkMode
-                                            ? Colors.white
-                                            : Colors.black),
+                                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                                    color: context.isDarkMode ? Colors.white : Colors.black),
                               ),
                               Flexible(
                                   child: Text(
                                 businessName ?? "",
                                 overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineSmall!
-                                    .copyWith(
-                                        color: context.isDarkMode
-                                            ? Colors.white
-                                            : Colors.black),
+                                style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                                    color: context.isDarkMode ? Colors.white : Colors.black),
                               )),
                             ],
                           ),
@@ -94,9 +83,7 @@ class _MyHomePageState extends State<HomeScreen> {
                           },
                           child: FaIcon(
                             Icons.menu,
-                            color: context.isDarkMode
-                                ? Colors.white
-                                : Colors.black,
+                            color: context.isDarkMode ? Colors.white : Colors.black,
                           ),
                         )
                       ],
@@ -161,15 +148,13 @@ class _MyHomePageState extends State<HomeScreen> {
                             image: AppImages.activations,
                             title: "mesActivations".tr(context),
                             onTap: () => Navigator.of(context)
-                                .pushReplacementNamed(Routes.main,
-                                    arguments: {'index': 1}),
+                                .pushReplacementNamed(Routes.main, arguments: {'index': 1}),
                           ),
                           SizedBox(width: 32.sp),
                           HomeIcon(
                             image: AppImages.operations,
                             title: "mesOperations".tr(context),
-                            onTap: () => Navigator.of(context)
-                                .pushNamed(Routes.invoices),
+                            onTap: () => Navigator.of(context).pushNamed(Routes.invoices),
                           ),
                         ],
                       ),

@@ -8,9 +8,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
-import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_app_bar.dart';
-import 'package:mobilis_smart_pos/src/features/sign_in/data/data_sources/smart_pos_local_storage.dart';
-import 'package:mobilis_smart_pos/src/services/screenshot_service.dart';
+import '../../../core/commom/widgets/custom_app_bar.dart';
+import '../../sign_in/data/data_sources/smart_pos_local_storage.dart';
+import '../../../services/screenshot_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:readmore/readmore.dart';
@@ -91,14 +91,10 @@ class _SignatureScreenState extends State<SignatureScreen> {
     );
     debugPrint("======================== SIGNATURE : RECTO : ${widget.recto}");
     debugPrint("======================== SIGNATURE : VERSO : ${widget.verso}");
-    debugPrint(
-        "======================== SIGNATURE : JUSTIFICATIF : ${widget.justificatif}");
-    debugPrint(
-        "======================== SIGNATURE : ISPASSPORT : ${widget.isPassport}");
-    debugPrint(
-        "======================== SIGNATURE : SMS : ${widget.formattedSmsCode}");
-    debugPrint(
-        "======================== SIGNATURE : CONTRACT : ${widget.contract}");
+    debugPrint("======================== SIGNATURE : JUSTIFICATIF : ${widget.justificatif}");
+    debugPrint("======================== SIGNATURE : ISPASSPORT : ${widget.isPassport}");
+    debugPrint("======================== SIGNATURE : SMS : ${widget.formattedSmsCode}");
+    debugPrint("======================== SIGNATURE : CONTRACT : ${widget.contract}");
 
     platform.setMethodCallHandler((call) async {
       if (call.method == "receivedSms") {
@@ -133,8 +129,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
 
   Future<void> setSenderPhoneNumber(String number) async {
     try {
-      await platform
-          .invokeMethod('setSenderPhoneNumber', {'senderPhoneNumber': number});
+      await platform.invokeMethod('setSenderPhoneNumber', {'senderPhoneNumber': number});
     } on PlatformException catch (e) {
       debugPrint("Failed to set sender phone number: '${e.message}'.");
     }
@@ -157,8 +152,9 @@ class _SignatureScreenState extends State<SignatureScreen> {
         debugPrint("==================== TIMER FOR SMS STARTED");
         // AppToasts.showWarningToast(message: "DSA Timeout", context: context);
         generateContractParamsEntity.msisdn = "";
-        context.read<ContractCubit>().attributeMsisdnAndGenerateContract(
-            params: generateContractParamsEntity);
+        context
+            .read<ContractCubit>()
+            .attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
       });
     } on PlatformException catch (e) {
       debugPrint("${e.message} ");
@@ -171,8 +167,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
       generateContractParamsEntity.dsaMessage = message;
     });
 
-    final RegExp regExp =
-        RegExp(r'La carte SIM (\d+) est activee, avec le numero (2136\d{8})');
+    final RegExp regExp = RegExp(r'La carte SIM (\d+) est activee, avec le numero (2136\d{8})');
     final RegExp regExp2 = RegExp(r'Activation en cours');
     final match = regExp.firstMatch(message);
     final cubit = context.read<ContractCubit>();
@@ -183,15 +178,13 @@ class _SignatureScreenState extends State<SignatureScreen> {
       debugPrint("==================== Extracted Phone Number : $phoneNumber");
       if (phoneNumber != null) {
         generateContractParamsEntity.msisdn = phoneNumber;
-        cubit.attributeMsisdnAndGenerateContract(
-            params: generateContractParamsEntity);
+        cubit.attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
       }
     } else {
       debugPrint("===================== Message: $message");
       if (!regExp2.hasMatch(message)) {
         generateContractParamsEntity.msisdn = "FAILED";
-        cubit.attributeMsisdnAndGenerateContract(
-            params: generateContractParamsEntity);
+        cubit.attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
       } else if (regExp2.hasMatch(message)) {
       } else {
         AppToasts.showErrorToast(message: message, context: context);
@@ -200,8 +193,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
     }
   }
 
-  Future<void> _checkPermissionsAndShowDialog(
-      BuildContext context, ContractCubit cubit) async {
+  Future<void> _checkPermissionsAndShowDialog(BuildContext context, ContractCubit cubit) async {
     final smsStatus = await Permission.sms.request();
     final phoneStatus = await Permission.phone.request();
 
@@ -240,8 +232,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
 
   Future<File> _saveSignature() async {
     final ui.Image image = await _signaturePadKey.currentState!.toImage();
-    final ByteData? byteData =
-        await image.toByteData(format: ui.ImageByteFormat.png);
+    final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     final Uint8List imageData = byteData!.buffer.asUint8List();
     final tempDir = await getTemporaryDirectory();
     final file = await File('${tempDir.path}/signature.png').create();
@@ -252,8 +243,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
     return file;
   }
 
-  Future<void> _showConfirmationDialog(
-      BuildContext context, ContractCubit cubit) {
+  Future<void> _showConfirmationDialog(BuildContext context, ContractCubit cubit) {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -318,24 +308,19 @@ class _SignatureScreenState extends State<SignatureScreen> {
             child: BlocConsumer<ContractCubit, ContractState>(
               listener: (context, state) {
                 if (state is EditContractFailed) {
-                  AppToasts.showErrorToast(
-                      message: state.message.tr(context), context: context);
+                  AppToasts.showErrorToast(message: state.message.tr(context), context: context);
                   Navigator.of(context).pop();
                 }
                 if (state is GenerateContractFailed) {
-                  AppToasts.showErrorToast(
-                      message: state.message.tr(context), context: context);
+                  AppToasts.showErrorToast(message: state.message.tr(context), context: context);
                   Navigator.of(context).pushNamedAndRemoveUntil(
-                      Routes.main,
-                      arguments: {'index': 1, 'fromSignin': true},
-                      (route) => false);
+                      Routes.main, arguments: {'index': 1, 'fromSignin': true}, (route) => false);
                 }
                 if (state is GenerateContractSuccess) {
                   // String message = state.generateContractResponseEntity.contractMessage +
                   //     state.generateContractResponseEntity.message;
                   // AppToasts.showSuccessToast(message: message, context: context);
-                  Navigator.of(context)
-                      .pushReplacementNamed(Routes.contractGenerated);
+                  Navigator.of(context).pushReplacementNamed(Routes.contractGenerated);
                 }
 
                 if (state is EditContractSuccess) {
@@ -349,14 +334,12 @@ class _SignatureScreenState extends State<SignatureScreen> {
                       dsaMessage: dsaMessage,
                     );
                   });
-                  debugPrint(
-                      "================ STATE IS SUCCESS ==============================  ");
+                  debugPrint("================ STATE IS SUCCESS ==============================  ");
                   // AppToasts.showSuccessToast(
                   //     message: "generated_success".tr(context), context: context);
 
                   // Now send the SMS after API call success
-                  final sms = CivilsInformationsConverterHelper
-                          .activationSerialNumberPrefix +
+                  final sms = CivilsInformationsConverterHelper.activationSerialNumberPrefix +
                       widget.contract.serialNumber.toString() +
                       widget.formattedSmsCode;
                   sendSms(sms, "444");
@@ -380,9 +363,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
                           style: Theme.of(context)
                               .textTheme
                               .bodyMedium!
-                              .copyWith(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.bold),
+                              .copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -428,18 +409,13 @@ class _SignatureScreenState extends State<SignatureScreen> {
                               SizedBox(height: 12.sp),
                               Text(
                                 "الجزائر، في $currentDateAr\nأنا، الممضي أسفله، أؤكد أنني قرأت و وافقت على كامل شروط البيع العامة",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium!
-                                    .copyWith(
-                                        color: AppColors.primary,
-                                        fontWeight: FontWeight.bold),
+                                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                    color: AppColors.primary, fontWeight: FontWeight.bold),
                               ),
                               SizedBox(height: 32.h),
                               Container(
                                 decoration: BoxDecoration(
-                                  border: Border.all(
-                                      width: 1, color: AppColors.secondary),
+                                  border: Border.all(width: 1, color: AppColors.secondary),
                                 ),
                                 height: 200.h,
                                 width: 300.w,

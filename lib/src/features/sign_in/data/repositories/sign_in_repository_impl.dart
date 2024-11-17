@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import 'package:mobilis_smart_pos/src/features/sign_in/domain/entities/sign_in_approve_contract_params.dart';
+import '../../domain/entities/sign_in_approve_contract_params.dart';
 
 import '../../../../core/error/exception.dart';
 import '../../../../core/error/failure.dart';
@@ -50,7 +50,8 @@ class SignInRepositoryImpl implements SignInRepository {
   }
 
   @override
-  Future<Either<Failure, String>> approveContract({required SignInApproveContractParams params}) async {
+  Future<Either<Failure, String>> approveContract(
+      {required SignInApproveContractParams params}) async {
     if (await networkInfo.isConnected) {
       try {
         final message = await remoteDataSource.approveContract(params: params);

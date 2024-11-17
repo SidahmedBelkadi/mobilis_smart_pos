@@ -3,16 +3,16 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mobilis_smart_pos/src/config/routing/app_routes.dart';
-import 'package:mobilis_smart_pos/src/core/commom/widgets/app_text_form_field.dart';
-import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_app_bar.dart';
-import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_floating_action_button.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/toast_helper.dart';
-import 'package:mobilis_smart_pos/src/core/utils/ressources/app_colors.dart';
-import 'package:mobilis_smart_pos/src/features/contract/domain/entities/contract_request_params_entitiy.dart';
-import 'package:mobilis_smart_pos/src/services/screenshot_service.dart';
+import '../../../../config/routing/app_routes.dart';
+import '../../../../core/commom/widgets/app_text_form_field.dart';
+import '../../../../core/commom/widgets/custom_app_bar.dart';
+import '../../../../core/commom/widgets/custom_floating_action_button.dart';
+import '../../../../core/utils/helpers/app_localization_helper.dart';
+import '../../../../core/utils/helpers/media_query_values.dart';
+import '../../../../core/utils/helpers/toast_helper.dart';
+import '../../../../core/utils/ressources/app_colors.dart';
+import '../../domain/entities/contract_request_params_entitiy.dart';
+import '../../../../services/screenshot_service.dart';
 
 class ParentOcrDetails extends StatefulWidget {
   const ParentOcrDetails({
@@ -96,9 +96,7 @@ class ParentOcrDetailsState extends State<ParentOcrDetails> {
     final age = currentDate.year - birthDateParsed.year;
 
     if (age < 19 ||
-        (age == 19 &&
-            currentDate.isBefore(
-                birthDateParsed.add(const Duration(days: 365 * 19))))) {
+        (age == 19 && currentDate.isBefore(birthDateParsed.add(const Duration(days: 365 * 19))))) {
       setState(() {
         isMinor = true;
       });
@@ -158,8 +156,7 @@ class ParentOcrDetailsState extends State<ParentOcrDetails> {
                     label: "continuer".tr(context),
                     icon: CupertinoIcons.right_chevron,
                     onPressed: () async {
-                      Navigator.of(context)
-                          .pushNamed(Routes.nfcReader, arguments: {
+                      Navigator.of(context).pushNamed(Routes.nfcReader, arguments: {
                         'documentNumber': widget.documentNumber,
                         'dateOfBirth': widget.dateOfBirth,
                         'dateOfExpiry': widget.dateOfExpiry,

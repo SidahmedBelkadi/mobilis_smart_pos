@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mobilis_smart_pos/src/core/utils/ressources/app_colors.dart';
+import '../../utils/ressources/app_colors.dart';
 
 class CustomFAB extends StatelessWidget {
-  const CustomFAB(
-      {super.key, required this.label, required this.icon, this.onPressed, this.heroTag = 'Hero-Tag',});
+  const CustomFAB({
+    super.key,
+    required this.label,
+    required this.icon,
+    this.onPressed,
+    this.heroTag = 'Hero-Tag',
+  });
 
   final String label;
   final IconData icon;
@@ -15,7 +20,7 @@ class CustomFAB extends StatelessWidget {
   Widget build(BuildContext context) {
     return FloatingActionButton.extended(
       heroTag: heroTag,
-  backgroundColor: AppColors.primary,
+      backgroundColor: AppColors.primary,
       onPressed: onPressed,
       label: Row(
         mainAxisSize: MainAxisSize.min,

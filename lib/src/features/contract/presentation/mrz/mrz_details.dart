@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_floating_action_button.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/dialog_helper.dart';
-import 'package:mobilis_smart_pos/src/services/screenshot_service.dart';
+import '../../../../core/commom/widgets/custom_floating_action_button.dart';
+import '../../../../core/utils/helpers/dialog_helper.dart';
+import '../../../../services/screenshot_service.dart';
 
 import '../../../../config/routing/app_routes.dart';
 import '../../../../core/commom/widgets/app_text_form_field.dart';
@@ -133,8 +133,7 @@ class MrzDetailsScreenState extends State<MrzDetailsScreen> {
           AppToasts.showErrorToast(
             message: "card_expired".tr(context),
             context: context,
-            onAutoCompleteCompleted: (p0) =>
-                Navigator.of(context).pushNamedAndRemoveUntil(
+            onAutoCompleteCompleted: (p0) => Navigator.of(context).pushNamedAndRemoveUntil(
               Routes.main,
               (route) => false,
             ),
@@ -147,8 +146,7 @@ class MrzDetailsScreenState extends State<MrzDetailsScreen> {
 
       if (age < 19 ||
           (age == 19 &&
-              currentDate.isBefore(
-                  birthDateParsed.add(const Duration(days: 365 * 19))))) {
+              currentDate.isBefore(birthDateParsed.add(const Duration(days: 365 * 19))))) {
         setState(() {
           isMinor = true;
         });
@@ -159,8 +157,7 @@ class MrzDetailsScreenState extends State<MrzDetailsScreen> {
             content: "client_is_minor_instruction".tr(context),
             acceptName: "yes",
             discardName: "no",
-            onPressed: () =>
-                Navigator.of(context).pushNamed(Routes.nfcReader, arguments: {
+            onPressed: () => Navigator.of(context).pushNamed(Routes.nfcReader, arguments: {
               'documentNumber': widget.documentNumber,
               'dateOfBirth': widget.dateOfBirth,
               'dateOfExpiry': widget.dateOfExpiry,
@@ -241,8 +238,7 @@ class MrzDetailsScreenState extends State<MrzDetailsScreen> {
                         : CupertinoIcons.chevron_right,
                     heroTag: 'continue-to-nfc',
                     onPressed: () async {
-                      Navigator.of(context)
-                          .pushReplacementNamed(Routes.nfcReader, arguments: {
+                      Navigator.of(context).pushReplacementNamed(Routes.nfcReader, arguments: {
                         'documentNumber': widget.documentNumber,
                         'dateOfBirth': widget.dateOfBirth,
                         'dateOfExpiry': widget.dateOfExpiry,

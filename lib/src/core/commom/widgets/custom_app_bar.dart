@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
+import '../../utils/helpers/media_query_values.dart';
 
 import '../../utils/ressources/app_colors.dart';
 

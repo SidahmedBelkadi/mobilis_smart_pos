@@ -1,9 +1,8 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mobilis_smart_pos/src/core/utils/ressources/app_colors.dart';
+import '../../../../core/utils/ressources/app_colors.dart';
 
 class CustomAppBottomNavBar extends StatelessWidget {
   const CustomAppBottomNavBar({super.key, this.onTap, this.currentIndex});

@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mobilis_smart_pos/src/features/contract/presentation/parent_contract_screen.dart';
-import 'package:mobilis_smart_pos/src/features/contract/presentation/parent_preparation_screen.dart';
-import 'package:mobilis_smart_pos/src/features/profile/presentation/cubit/profile_cubit.dart';
-import 'package:mobilis_smart_pos/src/features/profile/presentation/pdv_folder_screen.dart';
-import 'package:mobilis_smart_pos/src/features/profile/presentation/update_pdv_folder.dart';
+import '../../features/contract/presentation/parent_contract_screen.dart';
+import '../../features/contract/presentation/parent_preparation_screen.dart';
+import '../../features/profile/presentation/cubit/profile_cubit.dart';
+import '../../features/profile/presentation/pdv_folder_screen.dart';
+import '../../features/profile/presentation/update_pdv_folder.dart';
 
 import '../../core/animation/routes_animation_manager.dart';
 import '../../dependency_injection/injection_container.dart';
@@ -117,8 +117,7 @@ class AppRoutes {
         );
 
       case Routes.contractGenerated:
-        return RoutesAnimationManager.slideFromRightTransition(
-            const ContractGenerated());
+        return RoutesAnimationManager.slideFromRightTransition(const ContractGenerated());
 
       case Routes.signIn:
         return RoutesAnimationManager.slideFromRightTransition(
@@ -194,8 +193,7 @@ class AppRoutes {
         return RoutesAnimationManager.slideFromRightTransition(
           ParentMrzOCRScreen(
             documentType: params['documentType'],
-            minorContract:
-                params['minorContract'] as ContractRequestParamsEntitiy,
+            minorContract: params['minorContract'] as ContractRequestParamsEntitiy,
             minorRecto: params['minorRecto'] as File?,
             minorVerso: params['minorVerso'] as File?,
             minorIsPassport: params['minorIsPassport'] as bool,
@@ -227,8 +225,7 @@ class AppRoutes {
             dateOfBirth: params['dateOfBirth'],
             dateOfExpiry: params['dateOfExpiry'],
             docType: params['docType'],
-            minorContract:
-                params['minorContract'] as ContractRequestParamsEntitiy,
+            minorContract: params['minorContract'] as ContractRequestParamsEntitiy,
             minorRecto: params['minorRecto'] as File?,
             minorVerso: params['minorVerso'] as File?,
             minorIsPassport: params['minorIsPassport'] as bool,
@@ -259,8 +256,7 @@ class AppRoutes {
             dateOfExpiry: params['dateOfExpiry'],
             docType: params['docType'],
             isMinor: params['isMinor'],
-            minorContract:
-                params['minorContract'] as ContractRequestParamsEntitiy?,
+            minorContract: params['minorContract'] as ContractRequestParamsEntitiy?,
             minorRecto: params['minorRecto'] as File?,
             minorVerso: params['minorVerso'] as File?,
             minorIsPassport: params['minorIsPassport'] as bool?,
@@ -323,8 +319,7 @@ class AppRoutes {
         return RoutesAnimationManager.slideFromRightTransition(
           args: args,
           BlocProvider(
-            create: (_) =>
-                serviceLocator<InvoicesCubit>()..getInvoices(isFirstTime: true),
+            create: (_) => serviceLocator<InvoicesCubit>()..getInvoices(isFirstTime: true),
             child: const InvoicesScreen(),
           ),
         );

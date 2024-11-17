@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
-import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_floating_action_button.dart';
+import '../../../../core/commom/widgets/custom_floating_action_button.dart';
 
 import '../../../../config/routing/app_routes.dart';
 import '../../../../core/commom/widgets/custom_app_bar.dart';

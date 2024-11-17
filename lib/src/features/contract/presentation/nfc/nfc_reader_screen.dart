@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
-import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_app_bar.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
-import 'package:mobilis_smart_pos/src/features/contract/domain/entities/contract_request_params_entitiy.dart';
+import '../../../../core/commom/widgets/custom_app_bar.dart';
+import '../../../../core/utils/helpers/app_localization_helper.dart';
+import '../../../../core/utils/helpers/media_query_values.dart';
+import '../../domain/entities/contract_request_params_entitiy.dart';
 
 import '../../../../config/routing/app_routes.dart';
 import '../../../../core/utils/ressources/app_images.dart';
@@ -101,8 +101,7 @@ class _NfcReaderScreenState extends State<NfcReaderScreen> {
   }
 
   _navigateToParentContract() {
-    Navigator.of(context)
-        .pushReplacementNamed(Routes.parentContract, arguments: {
+    Navigator.of(context).pushReplacementNamed(Routes.parentContract, arguments: {
       'minorContract': widget.minorContract,
       'minorRecto': widget.minorRecto,
       'minorVerso': widget.minorVerso,

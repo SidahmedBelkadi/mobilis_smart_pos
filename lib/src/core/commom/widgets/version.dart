@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
+import '../../utils/helpers/media_query_values.dart';
 import 'package:package_info_plus/package_info_plus.dart'; // Import package_info_plus
 
 import '../../utils/helpers/app_localization_helper.dart';
@@ -14,19 +14,19 @@ class VersionWidget extends StatefulWidget {
 }
 
 class _VersionWidgetState extends State<VersionWidget> {
-  String _appVersion = '';  // To store the app version
+  String _appVersion = ''; // To store the app version
 
   @override
   void initState() {
     super.initState();
-    _getAppVersion();  // Fetch app version
+    _getAppVersion(); // Fetch app version
   }
 
   Future<void> _getAppVersion() async {
     // Use PackageInfo to get app version
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     setState(() {
-      _appVersion = packageInfo.version;  // Set the fetched version
+      _appVersion = packageInfo.version; // Set the fetched version
     });
   }
 
@@ -46,15 +46,18 @@ class _VersionWidgetState extends State<VersionWidget> {
         children: [
           Text(
             "version".tr(context),
-            style: Theme.of(context).textTheme.labelSmall!.copyWith(color: context.isDarkMode ? Colors.white : AppColors.primary),
+            style: Theme.of(context)
+                .textTheme
+                .labelSmall!
+                .copyWith(color: context.isDarkMode ? Colors.white : AppColors.primary),
           ),
           SizedBox(width: 4.sp),
           Text(
             _appVersion.isNotEmpty ? _appVersion : '1.0.0',
             style: Theme.of(context).textTheme.labelSmall!.copyWith(
-              color: context.isDarkMode ? Colors.white : AppColors.primary,
-              fontWeight: FontWeight.bold,
-            ),
+                  color: context.isDarkMode ? Colors.white : AppColors.primary,
+                  fontWeight: FontWeight.bold,
+                ),
           ),
         ],
       ),

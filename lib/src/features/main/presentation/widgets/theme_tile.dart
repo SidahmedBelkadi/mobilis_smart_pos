@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mobilis_smart_pos/src/core/utils/enums/themes_enum.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
-import 'package:mobilis_smart_pos/src/core/utils/ressources/app_colors.dart';
+import '../../../../core/utils/enums/themes_enum.dart';
+import '../../../../core/utils/helpers/app_localization_helper.dart';
+import '../../../../core/utils/ressources/app_colors.dart';
 
 class ThemeTile extends StatelessWidget {
   final AppThemes selectedTheme;
@@ -28,14 +28,12 @@ class ThemeTile extends StatelessWidget {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("dark_mode".tr(context),
-                style: Theme.of(context).textTheme.bodySmall),
+            Text("dark_mode".tr(context), style: Theme.of(context).textTheme.bodySmall),
             Switch(
               value: selectedTheme.name == AppThemes.darkTheme.name,
               onChanged: (value) {
-                onThemeChanged(value == true
-                    ? AppThemes.darkTheme.name
-                    : AppThemes.lightTheme.name);
+                onThemeChanged(
+                    value == true ? AppThemes.darkTheme.name : AppThemes.lightTheme.name);
               },
             ),
           ],

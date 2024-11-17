@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
-import 'package:mobilis_smart_pos/src/core/api/dio_consumer.dart';
-import 'package:mobilis_smart_pos/src/core/api/end_points.dart';
-import 'package:mobilis_smart_pos/src/features/sign_in/data/data_sources/smart_pos_local_storage.dart';
+import '../core/api/dio_consumer.dart';
+import '../core/api/end_points.dart';
+import '../features/sign_in/data/data_sources/smart_pos_local_storage.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../dependency_injection/injection_container.dart' as di;
@@ -22,8 +22,7 @@ class UpgraderService {
       debugPrint("======= LAST UPDATE CHECK DATE : $lastCheckDate");
 
       // Check if 60 minute has passed since the last check
-      if (lastCheckDate != null &&
-          DateTime.now().difference(lastCheckDate).inMinutes < 60) {
+      if (lastCheckDate != null && DateTime.now().difference(lastCheckDate).inMinutes < 60) {
         return false;
       }
 

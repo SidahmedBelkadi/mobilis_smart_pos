@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
+import '../../../../core/utils/helpers/app_localization_helper.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../core/utils/enums/invoice_status.dart';
@@ -55,10 +55,9 @@ class InvoiceSkeleton extends StatelessWidget {
                       Flexible(
                         child: Text(
                           "CT0000000T0005",
-                          style:
-                              Theme.of(context).textTheme.labelMedium!.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ),
                     ],
@@ -75,10 +74,9 @@ class InvoiceSkeleton extends StatelessWidget {
                       Flexible(
                         child: Text(
                           "213661113838",
-                          style:
-                              Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ),
                     ],
@@ -95,10 +93,9 @@ class InvoiceSkeleton extends StatelessWidget {
                       Flexible(
                         child: Text(
                           "1414666666666666",
-                          style:
-                              Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ),
                     ],

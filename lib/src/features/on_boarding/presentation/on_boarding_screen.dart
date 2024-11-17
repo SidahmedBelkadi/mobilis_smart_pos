@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_floating_action_button.dart';
+import '../../../core/commom/widgets/custom_floating_action_button.dart';
 import 'package:typewritertext/typewritertext.dart';
 
 import '../../../config/routing/app_routes.dart';
@@ -36,8 +36,7 @@ class OnBoardingScreenState extends State<OnBoardingScreen> {
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
     flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()!
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()!
         .requestNotificationsPermission();
     Timer(
       const Duration(seconds: 13),
@@ -100,12 +99,8 @@ class OnBoardingScreenState extends State<OnBoardingScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   if (_currentIndex > 0)
-                    Image.asset(
-                        context.isDarkMode
-                            ? AppImages.msPosLogoBlack
-                            : AppImages.msPosLogo,
-                        height: 250.sp,
-                        width: 250.sp),
+                    Image.asset(context.isDarkMode ? AppImages.msPosLogoBlack : AppImages.msPosLogo,
+                        height: 250.sp, width: 250.sp),
                   TypeWriter.text(
                     _texts[0],
                     duration: const Duration(milliseconds: 50),

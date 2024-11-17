@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mobilis_smart_pos/src/core/utils/enums/invoice_status.dart';
-import 'package:mobilis_smart_pos/src/features/invoices/presentation/widgets/invoice_status.dart';
+import '../../../../core/utils/enums/invoice_status.dart';
+import 'invoice_status.dart';
 
 import '../../../../core/utils/helpers/app_localization_helper.dart';
 import '../../../../core/utils/helpers/media_query_values.dart';
@@ -61,10 +61,9 @@ class Invoice extends StatelessWidget {
                     Flexible(
                       child: Text(
                         invoiceEntity.contractCode,
-                        style:
-                            Theme.of(context).textTheme.labelMedium!.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                     ),
                   ],

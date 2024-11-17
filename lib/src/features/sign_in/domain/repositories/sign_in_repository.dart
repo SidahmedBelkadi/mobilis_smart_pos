@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import 'package:mobilis_smart_pos/src/features/sign_in/domain/entities/sign_in_approve_contract_params.dart';
+import '../entities/sign_in_approve_contract_params.dart';
 
 import '../../../../core/error/failure.dart';
 import '../entities/sign_in_otp_request_params.dart';

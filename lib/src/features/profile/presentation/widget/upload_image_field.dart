@@ -2,7 +2,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
+import '../../../../core/utils/helpers/app_localization_helper.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../core/utils/helpers/media_query_values.dart';
@@ -10,10 +10,7 @@ import '../../../../core/utils/ressources/app_colors.dart';
 
 class UploadImageField extends StatelessWidget {
   const UploadImageField(
-      {super.key,
-      required this.label,
-      required this.onTap,
-      this.icon = FontAwesomeIcons.plus});
+      {super.key, required this.label, required this.onTap, this.icon = FontAwesomeIcons.plus});
 
   final String label;
   final void Function()? onTap;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mobilis_smart_pos/src/features/contract/domain/entities/wilaya_entity.dart';
+import '../../../features/contract/domain/entities/wilaya_entity.dart';
 
 import '../../utils/helpers/app_localization_helper.dart';
 import '../../utils/helpers/media_query_values.dart';
@@ -29,15 +29,21 @@ class WilayaDropDown extends StatelessWidget {
         floatingLabelBehavior: FloatingLabelBehavior.always,
         label: Text("wilayaLabel".tr(context)),
         border: OutlineInputBorder(
-          borderSide:  BorderSide(color: context.isDarkMode ? AppColors.primary : AppColors.categorybackgroundColorGrey),
+          borderSide: BorderSide(
+              color:
+                  context.isDarkMode ? AppColors.primary : AppColors.categorybackgroundColorGrey),
           borderRadius: BorderRadius.circular(12.sp),
         ),
         enabledBorder: OutlineInputBorder(
-          borderSide:  BorderSide(color:context.isDarkMode ? AppColors.primary : AppColors.categorybackgroundColorGrey),
+          borderSide: BorderSide(
+              color:
+                  context.isDarkMode ? AppColors.primary : AppColors.categorybackgroundColorGrey),
           borderRadius: BorderRadius.circular(12.sp),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide:  BorderSide(color: context.isDarkMode ? AppColors.primary : AppColors.categorybackgroundColorGrey),
+          borderSide: BorderSide(
+              color:
+                  context.isDarkMode ? AppColors.primary : AppColors.categorybackgroundColorGrey),
           borderRadius: BorderRadius.circular(12.sp),
         ),
       ),

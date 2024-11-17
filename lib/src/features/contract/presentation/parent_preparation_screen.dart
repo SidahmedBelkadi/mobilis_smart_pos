@@ -3,13 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
-import 'package:mobilis_smart_pos/src/config/routing/app_routes.dart';
-import 'package:mobilis_smart_pos/src/core/commom/widgets/app_elevated_button_text.dart';
-import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_appbar_with_deny_contract.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
-import 'package:mobilis_smart_pos/src/core/utils/ressources/app_images.dart';
-import 'package:mobilis_smart_pos/src/features/contract/domain/entities/contract_request_params_entitiy.dart';
+import '../../../config/routing/app_routes.dart';
+import '../../../core/commom/widgets/app_elevated_button_text.dart';
+import '../../../core/commom/widgets/custom_appbar_with_deny_contract.dart';
+import '../../../core/utils/helpers/app_localization_helper.dart';
+import '../../../core/utils/helpers/media_query_values.dart';
+import '../../../core/utils/ressources/app_images.dart';
+import '../domain/entities/contract_request_params_entitiy.dart';
 
 class ParentPreparationScreen extends StatelessWidget {
   const ParentPreparationScreen({
@@ -53,8 +53,7 @@ class ParentPreparationScreen extends StatelessWidget {
                     AppElevatedButtonWithText(
                       text: "identityCard".tr(context),
                       onPressed: () {
-                        Navigator.of(context)
-                            .pushNamed(Routes.parentMrzOcr, arguments: {
+                        Navigator.of(context).pushNamed(Routes.parentMrzOcr, arguments: {
                           'documentType': 'id_card',
                           'minorContract': contract,
                           'minorRecto': recto,
@@ -68,8 +67,7 @@ class ParentPreparationScreen extends StatelessWidget {
                     AppElevatedButtonWithText(
                       text: "passport".tr(context),
                       onPressed: () {
-                        Navigator.of(context)
-                            .pushNamed(Routes.parentMrzOcr, arguments: {
+                        Navigator.of(context).pushNamed(Routes.parentMrzOcr, arguments: {
                           'documentType': 'passport',
                           'minorContract': contract,
                           'minorRecto': recto,

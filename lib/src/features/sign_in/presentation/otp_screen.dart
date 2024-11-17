@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
-import 'package:mobilis_smart_pos/src/features/sign_in/domain/entities/sign_in_response.dart';
+import '../domain/entities/sign_in_response.dart';
 
 import '../../../config/routing/app_routes.dart';
 import '../../../core/commom/widgets/otp_custom_widget.dart';
@@ -82,10 +82,8 @@ class _OTPScreenState extends State<OTPScreen> {
                 Text(
                   "otp".tr(context),
                   textAlign: TextAlign.center,
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineSmall!
-                      .copyWith(color: AppColors.primary),
+                  style:
+                      Theme.of(context).textTheme.headlineSmall!.copyWith(color: AppColors.primary),
                 ),
 
                 SizedBox(height: 64.h),
@@ -94,8 +92,7 @@ class _OTPScreenState extends State<OTPScreen> {
                 BlocConsumer<SignInCubit, SignInState>(
                   listener: (context, state) {
                     if (state is OTPSuccessful) {
-                      final bool? isConsent =
-                          state.signInOTPResponseEntity.userIsConsent;
+                      final bool? isConsent = state.signInOTPResponseEntity.userIsConsent;
                       if (widget.responseParams.isFirstLogin != null &&
                           widget.responseParams.isFirstLogin == true) {
                         Navigator.of(context).pushNamed(
@@ -107,16 +104,15 @@ class _OTPScreenState extends State<OTPScreen> {
                         return;
                       }
                       if (isConsent != null && isConsent) {
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                            Routes.main, (route) => false);
+                        Navigator.of(context)
+                            .pushNamedAndRemoveUntil(Routes.main, (route) => false);
                         return;
                       } else {
                         Navigator.of(context).pushNamedAndRemoveUntil(
                             Routes.pdvEngagements,
                             arguments: {
                               'phone': widget.signInParams.phone,
-                              'refresh_token':
-                                  state.signInOTPResponseEntity.refreshToken,
+                              'refresh_token': state.signInOTPResponseEntity.refreshToken,
                             },
                             (route) => false);
                       }

@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:skeletonizer/skeletonizer.dart';
 
-import '../../../../core/api/end_points.dart';
 import '../../../../core/utils/helpers/app_localization_helper.dart';
 import '../../../../core/utils/helpers/media_query_values.dart';
 import '../../../../core/utils/helpers/toast_helper.dart';
@@ -55,9 +54,7 @@ class ProfileInfo extends StatelessWidget {
 
   String modifyNumber(String number, BuildContext context) {
     if (number.startsWith('213')) {
-      return context.isArabicLocale
-          ? '${number.substring(3)} 06'
-          : '06 ${number.substring(3)}';
+      return context.isArabicLocale ? '${number.substring(3)} 06' : '06 ${number.substring(3)}';
     }
     return number;
   }
@@ -79,18 +76,10 @@ class ProfileInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pdvCode =
-        authenticationLocalDataSource.getSavedLoginCredentials()!.pdvCode!;
-    final accessToken =
-        authenticationLocalDataSource.getSavedLoginCredentials()!.accessToken;
-    final baseUrl = "${EndPoints.baseUrl}/file/employee/$pdvCode/0";
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-
     return BlocConsumer<ProfileCubit, ProfileState>(
       listener: (context, state) {
         if (state is ProfileInfoFailure) {
-          AppToasts.showErrorToast(
-              message: state.message.tr(context), context: context);
+          AppToasts.showErrorToast(message: state.message.tr(context), context: context);
         }
       },
       builder: (context, state) {
@@ -106,9 +95,7 @@ class ProfileInfo extends StatelessWidget {
               SizedBox(height: 12.h),
               ProfileItem(label: "name".tr(context), value: profile.fullName),
               SizedBox(height: 16.h),
-              ProfileItem(
-                  label: "enterprise".tr(context),
-                  value: profile.entrepriseName),
+              ProfileItem(label: "enterprise".tr(context), value: profile.entrepriseName),
               SizedBox(height: 16.h),
               ProfileItem(
                 label: "msisdn_apn".tr(context),
@@ -132,8 +119,7 @@ class ProfileInfo extends StatelessWidget {
                   obsecureOption: true),
               SizedBox(height: 16.h),
               ProfileItem(
-                  label: "commercial_register".tr(context),
-                  value: profile.commercialRegister),
+                  label: "commercial_register".tr(context), value: profile.commercialRegister),
               SizedBox(height: 16.h),
               ProfileItem(label: "nif".tr(context), value: profile.nif),
               SizedBox(height: 16.h),

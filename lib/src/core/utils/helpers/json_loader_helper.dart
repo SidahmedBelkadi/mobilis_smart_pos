@@ -1,8 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
-import 'package:mobilis_smart_pos/src/features/contract/domain/entities/daira_entity.dart';
-import 'package:mobilis_smart_pos/src/features/contract/domain/entities/wilaya_entity.dart';
+import '../../../features/contract/domain/entities/wilaya_entity.dart';
 
 import '../../../features/contract/domain/entities/commune_entity.dart';
 

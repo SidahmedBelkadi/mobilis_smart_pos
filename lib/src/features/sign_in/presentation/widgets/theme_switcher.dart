@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_switch/flutter_switch.dart'; // Import the flutter_switch package
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mobilis_smart_pos/src/core/utils/enums/themes_enum.dart';
-import 'package:mobilis_smart_pos/src/core/utils/ressources/app_colors.dart';
+import '../../../../core/utils/enums/themes_enum.dart';
+import '../../../../core/utils/ressources/app_colors.dart';
 
 class ThemeSwitcher extends StatelessWidget {
   final AppThemes selectedTheme;
@@ -39,9 +39,7 @@ class ThemeSwitcher extends StatelessWidget {
           activeColor: Colors.grey[800]!,
           inactiveColor: AppColors.secondary,
           onToggle: (value) {
-            onThemeChanged(value == true
-                ? AppThemes.darkTheme.name
-                : AppThemes.lightTheme.name);
+            onThemeChanged(value == true ? AppThemes.darkTheme.name : AppThemes.lightTheme.name);
           }),
     );
   }

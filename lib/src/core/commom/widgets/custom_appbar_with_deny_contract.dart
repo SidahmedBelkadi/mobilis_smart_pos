@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
+import '../../utils/helpers/app_localization_helper.dart';
 
 import '../../../config/routing/app_routes.dart';
 import '../../utils/ressources/app_colors.dart';
 
-class CustomAppbarWithDenyContract extends StatelessWidget
-    implements PreferredSizeWidget {
+class CustomAppbarWithDenyContract extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppbarWithDenyContract({
     super.key,
     required this.title,
@@ -35,8 +34,10 @@ class CustomAppbarWithDenyContract extends StatelessWidget
               Flexible(
                 child: Text(
                   title,
-                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                      fontWeight: FontWeight.bold, color: Colors.black),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge!
+                      .copyWith(fontWeight: FontWeight.bold, color: Colors.black),
                 ),
               ),
               if (showProgressIndicator != null)
@@ -59,8 +60,7 @@ class CustomAppbarWithDenyContract extends StatelessWidget
                 return [
                   PopupMenuItem<String>(
                     onTap: () {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                          Routes.main, (route) => false);
+                      Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
                     },
                     value: 'cancel',
                     child: Text("discard_activation".tr(context)),

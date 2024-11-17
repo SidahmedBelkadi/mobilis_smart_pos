@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:mobilis_smart_pos/src/app.dart';
-import 'package:mobilis_smart_pos/src/config/routing/app_routes.dart';
+import '../../app.dart';
+import '../../config/routing/app_routes.dart';
 
 import '../../../src/dependency_injection/injection_container.dart' as di;
 import '../../features/sign_in/data/data_sources/smart_pos_local_storage.dart';
@@ -22,19 +22,15 @@ class DioInterceptor extends Interceptor {
   });
 
   @override
-  Future<void> onRequest(
-      RequestOptions options, RequestInterceptorHandler handler) async {
+  Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     options.headers[HttpHeaders.acceptHeader] = ContentType.json.toString();
 
-    if (options.headers.containsKey(skipAuthHeader) ||
-        options.path == EndPoints.refreshToken) {
+    if (options.headers.containsKey(skipAuthHeader) || options.path == EndPoints.refreshToken) {
       options.headers.remove(skipAuthHeader);
     } else {
-      final authResponse =
-          authLocalDataSource.getSavedLoginCredentials(); // Await the Future
+      final authResponse = authLocalDataSource.getSavedLoginCredentials(); // Await the Future
       if (authResponse != null) {
-        options.headers[HttpHeaders.authorizationHeader] =
-            'Bearer ${authResponse.accessToken}';
+        options.headers[HttpHeaders.authorizationHeader] = 'Bearer ${authResponse.accessToken}';
       }
     }
 
@@ -47,8 +43,7 @@ class DioInterceptor extends Interceptor {
   }
 
   @override
-  Future<void> onError(
-      DioException err, ErrorInterceptorHandler handler) async {
+  Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == StatusCode.tokenExpired) {
       final authResponse = authLocalDataSource.getSavedLoginCredentials();
       if (authResponse != null) {
@@ -59,8 +54,7 @@ class DioInterceptor extends Interceptor {
       }
     } else if (err.response?.statusCode == StatusCode.userAccountOnHold) {
       await di.serviceLocator<SmartPosLocalStorage>().clearLoginCredentials();
-      navigatorKey.currentState
-          ?.pushNamedAndRemoveUntil(Routes.signIn, (route) => false);
+      navigatorKey.currentState?.pushNamedAndRemoveUntil(Routes.signIn, (route) => false);
       return;
     }
     handler.next(err); // Continue with the error
@@ -96,8 +90,7 @@ class DioInterceptor extends Interceptor {
       );
 
       // Save the new access token in local storage
-      await authLocalDataSource.saveLoginCredentials(
-          signInResponseEntity: updatedAuthResponse);
+      await authLocalDataSource.saveLoginCredentials(signInResponseEntity: updatedAuthResponse);
       return true;
     } else {
       return false;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_app_bar.dart';
+import '../../../core/commom/widgets/custom_app_bar.dart';
 
 import '../../../core/utils/helpers/app_localization_helper.dart';
 import '../../sign_in/data/data_sources/smart_pos_local_storage.dart';

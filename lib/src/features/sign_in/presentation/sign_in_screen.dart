@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:mobilis_smart_pos/src/features/sign_in/presentation/widgets/theme_switcher.dart';
+import 'widgets/theme_switcher.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../config/routing/app_routes.dart';

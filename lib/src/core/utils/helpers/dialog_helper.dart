@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
+import 'media_query_values.dart';
 
 import '../ressources/app_colors.dart';
 import 'app_localization_helper.dart';
@@ -23,8 +23,7 @@ abstract class AppDialog {
         return PopScope(
           canPop: false,
           child: AlertDialog(
-            backgroundColor:
-                context.isDarkMode ? AppColors.darkerGrey : Colors.white,
+            backgroundColor: context.isDarkMode ? AppColors.darkerGrey : Colors.white,
             title: Text(
               title,
               textAlign: TextAlign.center,
@@ -40,8 +39,7 @@ abstract class AppDialog {
               TextButton(
                 onPressed: onPressed,
                 child: Text(acceptName.tr(context),
-                    style: const TextStyle(
-                        color: AppColors.primary, fontWeight: FontWeight.bold)),
+                    style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -66,8 +64,7 @@ abstract class AppDialog {
               onPressed: () => Navigator.of(context).pop(true),
               child: const Text(
                 "yes",
-                style: TextStyle(
-                    color: AppColors.primary, fontWeight: FontWeight.bold),
+                style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
               ),
             ),
           ],

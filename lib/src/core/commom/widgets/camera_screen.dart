@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
-import 'package:mobilis_smart_pos/src/services/screenshot_service.dart';
+import '../../../services/screenshot_service.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -105,8 +105,8 @@ class CameraScreenState extends State<CameraScreen> {
     );
 
     // Encode the cropped image back to a file
-    final croppedFilePath = join(
-        (await getTemporaryDirectory()).path, '${DateTime.now()}_cropped.png');
+    final croppedFilePath =
+        join((await getTemporaryDirectory()).path, '${DateTime.now()}_cropped.png');
     final croppedFile = File(croppedFilePath);
     await croppedFile.writeAsBytes(img.encodePng(croppedImage));
 

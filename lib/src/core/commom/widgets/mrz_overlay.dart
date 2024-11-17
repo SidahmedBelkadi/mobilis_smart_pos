@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobilis_smart_pos/src/core/utils/enums/documents_type.dart';
+import '../../utils/enums/documents_type.dart';
 
 class MRZOverlay extends CustomPainter {
   final bool isDocumentRecognized;
@@ -29,13 +29,13 @@ class MRZOverlay extends CustomPainter {
       const Radius.circular(borderRadius),
     );
 
-     final path = Path.combine(
-       PathOperation.difference,
-       Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height)),
-       Path()..addRRect(rect),
-     );
+    final path = Path.combine(
+      PathOperation.difference,
+      Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height)),
+      Path()..addRRect(rect),
+    );
 
-     canvas.drawPath(path, Paint()..color = Colors.black.withOpacity(0.5));
+    canvas.drawPath(path, Paint()..color = Colors.black.withOpacity(0.5));
 
     canvas.drawRRect(rect, paint);
 

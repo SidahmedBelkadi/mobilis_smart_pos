@@ -6,12 +6,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:insta_image_viewer/insta_image_viewer.dart';
 import 'package:lottie/lottie.dart';
-import 'package:mobilis_smart_pos/src/config/routing/app_routes.dart';
-import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_app_bar.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
-import 'package:mobilis_smart_pos/src/core/utils/ressources/app_images.dart';
-import 'package:mobilis_smart_pos/src/features/sign_in/data/data_sources/smart_pos_local_storage.dart';
+import '../../../config/routing/app_routes.dart';
+import '../../../core/commom/widgets/custom_app_bar.dart';
+import '../../../core/utils/helpers/app_localization_helper.dart';
+import '../../../core/utils/helpers/media_query_values.dart';
+import '../../../core/utils/ressources/app_images.dart';
+import '../../sign_in/data/data_sources/smart_pos_local_storage.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../.././dependency_injection/injection_container.dart' as di;

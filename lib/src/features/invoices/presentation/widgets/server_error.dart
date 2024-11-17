@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
+import '../../../../core/utils/helpers/app_localization_helper.dart';
 
 class ServerError extends StatelessWidget {
   const ServerError({

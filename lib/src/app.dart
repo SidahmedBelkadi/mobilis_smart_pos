@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mobilis_smart_pos/src/core/utils/enums/themes_enum.dart';
-import 'package:mobilis_smart_pos/src/features/main/presentation/cubits/cubit/theme_cubit.dart';
+import 'core/utils/enums/themes_enum.dart';
+import 'features/main/presentation/cubits/cubit/theme_cubit.dart';
 
 import '../src/dependency_injection/injection_container.dart' as di;
 import 'config/routing/app_routes.dart';
@@ -25,8 +25,7 @@ class SmartPos extends StatelessWidget {
     final initialRouteHelper = di.serviceLocator<InitialRouteHelper>();
 
     _getTheme() {
-      final storedTheme =
-          di.serviceLocator<SmartPosLocalStorage>().getCurrentTheme();
+      final storedTheme = di.serviceLocator<SmartPosLocalStorage>().getCurrentTheme();
       return storedTheme;
     }
 
@@ -57,8 +56,7 @@ class SmartPos extends StatelessWidget {
                 builder: (context, themeState) {
                   if (!di.serviceLocator.isRegistered<DioConsumer>()) {
                     di.serviceLocator.registerLazySingleton<DioConsumer>(
-                      () => DioConsumer(
-                          client: di.serviceLocator(), context: context),
+                      () => DioConsumer(client: di.serviceLocator(), context: context),
                     );
                   }
 
@@ -79,8 +77,7 @@ class SmartPos extends StatelessWidget {
                     localeResolutionCallback: (deviceLocale, supportedLocales) {
                       for (var locale in supportedLocales) {
                         if (deviceLocale != null &&
-                            (deviceLocale.languageCode ==
-                                locale.languageCode)) {
+                            (deviceLocale.languageCode == locale.languageCode)) {
                           return deviceLocale;
                         }
                       }

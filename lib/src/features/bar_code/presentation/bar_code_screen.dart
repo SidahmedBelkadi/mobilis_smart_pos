@@ -1,15 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
-import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_appbar_with_deny_contract.dart';
 
 import '../../../config/routing/app_routes.dart';
 import '../../../core/commom/widgets/app_elevated_button_text.dart';
+import '../../../core/commom/widgets/custom_appbar_with_deny_contract.dart';
 import '../../../core/utils/helpers/app_localization_helper.dart';
 import '../../../core/utils/helpers/media_query_values.dart';
 import '../../../core/utils/helpers/toast_helper.dart';
@@ -50,8 +48,7 @@ late ContractRequestParamsEntitiy newContract;
 class SimScannerScreenState extends State<SimScannerScreen> {
   @override
   void initState() {
-    debugPrint(
-        "=============================== JUSTIFICATIF : ${widget.justificatif}");
+    debugPrint("=============================== JUSTIFICATIF : ${widget.justificatif}");
     cubit = context.read<ContractCubit>();
     super.initState();
   }
@@ -121,7 +118,7 @@ class SimScannerScreenState extends State<SimScannerScreen> {
                 }
                 return SimScannerBody(
                   onPressed: () {
-                    _scanBarCode(context);
+                    // _scanBarCode(context);
                   },
                 );
               },
@@ -132,47 +129,47 @@ class SimScannerScreenState extends State<SimScannerScreen> {
     );
   }
 
-  Future<void> _scanBarCode(BuildContext context) async {
-    String barCodeScanRes;
-    do {
-      try {
-        barCodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-          "#91ff59",
-          "discard".tr(context),
-          true,
-          ScanMode.BARCODE,
-        );
+  // Future<void> _scanBarCode(BuildContext context) async {
+  //   String barCodeScanRes;
+  //   do {
+  //     try {
+  //       barCodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+  //         "#91ff59",
+  //         "discard".tr(context),
+  //         true,
+  //         ScanMode.BARCODE,
+  //       );
 
-        if (barCodeScanRes == "-1") {
-          // User pressed cancel
-          return;
-        }
+  //       if (barCodeScanRes == "-1") {
+  //         // User pressed cancel
+  //         return;
+  //       }
 
-        // Regex to check if the barcode is 13 characters long
-        RegExp regex = RegExp(r'\d{13}$');
+  //       // Regex to check if the barcode is 13 characters long
+  //       RegExp regex = RegExp(r'\d{13}$');
 
-        if (regex.hasMatch(barCodeScanRes)) {
-          if (barCodeScanRes.startsWith("892130")) {
-            AppToasts.showErrorToast(
-                message: "Please scan the innner bar code of the sim",
-                context: context);
-            return;
-          }
+  //       if (regex.hasMatch(barCodeScanRes)) {
+  //         if (barCodeScanRes.startsWith("892130")) {
+  //           AppToasts.showErrorToast(
+  //               message: "Please scan the innner bar code of the sim",
+  //               context: context);
+  //           return;
+  //         }
 
-          _showBarcodeDialog(context, barCodeScanRes);
-          return;
-        }
-        // If the barcode is not valid, continue scanning
-      } on PlatformException catch (e) {
-        debugPrint(
-            "================= PlatformException during barcode scan: ${e.message}");
-        AppToasts.showErrorToast(
-          message: "================= Error opening scanner: ${e.message}",
-          context: context,
-        );
-      }
-    } while (true);
-  }
+  //         _showBarcodeDialog(context, barCodeScanRes);
+  //         return;
+  //       }
+  //       // If the barcode is not valid, continue scanning
+  //     } on PlatformException catch (e) {
+  //       debugPrint(
+  //           "================= PlatformException during barcode scan: ${e.message}");
+  //       AppToasts.showErrorToast(
+  //         message: "================= Error opening scanner: ${e.message}",
+  //         context: context,
+  //       );
+  //     }
+  //   } while (true);
+  // }
 
   Future<void> _showBarcodeDialog(BuildContext context, String barcode) async {
     return showDialog<void>(
@@ -204,8 +201,7 @@ class SimScannerScreenState extends State<SimScannerScreen> {
               child: Text('yes'.tr(context)),
               onPressed: () {
                 Navigator.of(context).pop(); // Dismiss the dialog
-                _continueWithBarcode(
-                    context, barcode); // Continue with the operation
+                _continueWithBarcode(context, barcode); // Continue with the operation
               },
             ),
           ],
@@ -239,8 +235,7 @@ class SimScannerBody extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Lottie.asset(AppImages.barCodeAnimation5,
-              height: 200.h, width: 200.w),
+          Lottie.asset(AppImages.barCodeAnimation5, height: 200.h, width: 200.w),
           SizedBox(height: 32.h),
           Text(
             "bar_code_instruction".tr(context),

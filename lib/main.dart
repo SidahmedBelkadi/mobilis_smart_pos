@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/insecure_device_checker.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/security_helper.dart';
-import 'package:mobilis_smart_pos/src/services/notification_service.dart';
+import 'src/core/utils/helpers/insecure_device_checker.dart';
+import 'src/core/utils/helpers/security_helper.dart';
+import 'src/services/notification_service.dart';
 
 import 'src/app.dart';
 import 'src/dependency_injection/injection_container.dart' as di;

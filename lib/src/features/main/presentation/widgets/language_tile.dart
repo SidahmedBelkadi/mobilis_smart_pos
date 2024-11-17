@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
+import '../../../../core/utils/helpers/media_query_values.dart';
 
 import '../../../../core/utils/helpers/app_localization_helper.dart';
 import '../../../../core/utils/ressources/app_colors.dart';
@@ -29,8 +29,7 @@ class LanguageTile extends StatelessWidget {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("Lang".tr(context),
-                style: Theme.of(context).textTheme.bodySmall),
+            Text("Lang".tr(context), style: Theme.of(context).textTheme.bodySmall),
             DropdownButton<String>(
               dropdownColor: context.isDarkMode ? Colors.black : Colors.white,
               value: selectedLanguage,
@@ -42,8 +41,7 @@ class LanguageTile extends StatelessWidget {
                   onLanguageChanged(newValue);
                 }
               },
-              items: <String>['ar', 'fr', 'en']
-                  .map<DropdownMenuItem<String>>((String value) {
+              items: <String>['ar', 'fr', 'en'].map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(

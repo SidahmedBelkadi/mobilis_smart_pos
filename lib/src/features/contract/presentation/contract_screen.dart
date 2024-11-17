@@ -9,12 +9,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:insta_image_viewer/insta_image_viewer.dart';
-import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_appbar_with_deny_contract.dart';
-import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_floating_action_button.dart';
-import 'package:mobilis_smart_pos/src/core/utils/enums/documents_type.dart';
-import 'package:mobilis_smart_pos/src/features/contract/domain/entities/wilaya_entity.dart';
-import 'package:mobilis_smart_pos/src/features/profile/presentation/widget/upload_image_field.dart';
-import 'package:mobilis_smart_pos/src/services/screenshot_service.dart';
+import '../../../core/commom/widgets/custom_appbar_with_deny_contract.dart';
+import '../../../core/commom/widgets/custom_floating_action_button.dart';
+import '../../../core/utils/enums/documents_type.dart';
+import '../domain/entities/wilaya_entity.dart';
+import '../../profile/presentation/widget/upload_image_field.dart';
+import '../../../services/screenshot_service.dart';
 
 import '../../../config/routing/app_routes.dart';
 import '../../../core/commom/widgets/app_text_form_field.dart';
@@ -184,7 +184,6 @@ class _ContractScreenState extends State<ContractScreen> {
     String docNumber = docNumberController.text.trim();
     String issuingCountry = issuingCountryController.text.trim();
     String issuingPlace = issuingPlaceControllerController.text.trim();
-    String docType = docTypeController.text.trim();
     String bloodType = bloodTypeController.text.trim();
 
     String firstName = firstNameEditingController.text.trim();

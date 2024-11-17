@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
+import 'media_query_values.dart';
 import 'package:toastification/toastification.dart';
 
 import '../ressources/app_colors.dart';
@@ -8,8 +8,7 @@ abstract class AppToasts {
   static const progressBarTheme =
       ProgressIndicatorThemeData(refreshBackgroundColor: AppColors.secondary);
 
-  static void showSuccessToast(
-      {required String message, required BuildContext context}) {
+  static void showSuccessToast({required String message, required BuildContext context}) {
     toastification.show(
       backgroundColor: context.isDarkMode ? Colors.black : Colors.white,
       foregroundColor: context.isDarkMode ? Colors.white : Colors.black,
@@ -41,8 +40,7 @@ abstract class AppToasts {
         refreshBackgroundColor: Colors.blueAccent,
         color: Colors.blue,
       ),
-      callbacks: ToastificationCallbacks(
-          onAutoCompleteCompleted: onAutoCompleteCompleted),
+      callbacks: ToastificationCallbacks(onAutoCompleteCompleted: onAutoCompleteCompleted),
     );
   }
 
@@ -68,8 +66,7 @@ abstract class AppToasts {
         ));
   }
 
-  static void showWarningToast(
-      {required String message, required BuildContext context}) {
+  static void showWarningToast({required String message, required BuildContext context}) {
     toastification.show(
       backgroundColor: context.isDarkMode ? Colors.black : Colors.white,
       foregroundColor: context.isDarkMode ? Colors.white : Colors.black,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
+import '../../../../core/utils/helpers/app_localization_helper.dart';
 
 import '../../../../core/utils/helpers/toast_helper.dart';
 import '../../domain/entities/invoice_entity.dart';
@@ -44,8 +44,7 @@ class InvoicesListView extends StatelessWidget {
             builder: (context, constraints) {
               return NotificationListener<ScrollNotification>(
                 onNotification: (ScrollNotification scrollInfo) {
-                  if (scrollInfo.metrics.pixels ==
-                          scrollInfo.metrics.maxScrollExtent &&
+                  if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent &&
                       state is GetInvoicesSuccess &&
                       state.hasMoreInvoices &&
                       constraints.maxHeight < invoices.length * 100) {
@@ -65,8 +64,7 @@ class InvoicesListView extends StatelessWidget {
                         if (index == invoices.length) {
                           if (state is FetchingMoreInvoices) {
                             return const InvoiceSkeleton();
-                          } else if (state is GetInvoicesSuccess &&
-                              !state.hasMoreInvoices) {
+                          } else if (state is GetInvoicesSuccess && !state.hasMoreInvoices) {
                             return const NoMoreInvoices();
                           }
                           return const SizedBox.shrink();

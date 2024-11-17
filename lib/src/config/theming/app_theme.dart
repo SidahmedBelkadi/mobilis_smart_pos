@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mobilis_smart_pos/src/config/theming/widgets/dark/app_bar.dart';
-import 'package:mobilis_smart_pos/src/config/theming/widgets/dark/elevated_button.dart';
-import 'package:mobilis_smart_pos/src/config/theming/widgets/dark/form_field.dart';
-import 'package:mobilis_smart_pos/src/config/theming/widgets/dark/text.dart';
+import 'widgets/dark/app_bar.dart';
+import 'widgets/dark/elevated_button.dart';
+import 'widgets/dark/form_field.dart';
+import 'widgets/dark/text.dart';
 
 import '../../core/utils/ressources/app_colors.dart';
 import 'widgets/app_bar.dart';
@@ -42,8 +42,7 @@ ThemeData smartDealerTheme(Locale locale) {
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.primary,
       ),
-      bottomSheetTheme:
-          const BottomSheetThemeData(backgroundColor: Colors.white),
+      bottomSheetTheme: const BottomSheetThemeData(backgroundColor: Colors.white),
       popupMenuTheme: const PopupMenuThemeData(color: Colors.white));
 }
 
@@ -78,7 +77,6 @@ ThemeData smartDealerThemeDark(Locale locale) {
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.primary,
       ),
-      bottomSheetTheme:
-          const BottomSheetThemeData(backgroundColor: Colors.black),
+      bottomSheetTheme: const BottomSheetThemeData(backgroundColor: Colors.black),
       popupMenuTheme: const PopupMenuThemeData(color: Colors.black));
 }
