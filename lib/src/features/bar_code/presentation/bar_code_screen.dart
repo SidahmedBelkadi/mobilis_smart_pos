@@ -126,9 +126,36 @@ class SimScannerScreenState extends State<SimScannerScreen> {
                           String barcode = '';
 
                           return MobileScanner(
+                            overlayBuilder: (context, constraints) {
+                              return Center(
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Container(
+                                      width: 300.w,
+                                      height: 150.h,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.green, width: 3),
+                                        borderRadius: BorderRadius.circular(16.sp),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
                             onDetect: (barcodes) async {
                               barcode = barcodes.barcodes.first.rawValue!;
-                              debugPrint("============== BAR CODE : $barcode");
+
+                              RegExp regex = RegExp(r'\d{13}$');
+
+                              if (regex.hasMatch(barcode)) {
+                                if (barcode.startsWith("892130")) {
+                                  barcode = barcode.substring(6);
+                                }
+                              } else {
+                                return;
+                              }
+
                               Navigator.of(context).pop();
                               _showBarcodeDialog(context, barcode);
                             },
