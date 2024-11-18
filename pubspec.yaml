@@ -16,7 +16,6 @@ dependencies:
   flutter_native_splash: ^2.4.1
   flutter_screenutil: ^5.9.1
   dotted_border: ^2.1.0
-  pretty_qr_code: ^3.3.0
   readmore: ^3.0.0
   equatable: ^2.0.5
   dartz: ^0.10.1
@@ -76,6 +75,7 @@ dependencies:
   android_intent_plus: ^5.2.0
   camera_android_camerax: ^0.6.8+2
   carousel_slider: ^5.0.0
+  mobile_scanner: ^6.0.2
 
 dev_dependencies:
   flutter_test:

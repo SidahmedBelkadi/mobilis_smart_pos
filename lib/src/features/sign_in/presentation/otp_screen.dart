@@ -131,7 +131,8 @@ class _OTPScreenState extends State<OTPScreen> {
 
                     return OTPCustomWidget(
                       controller: otpController,
-                      onCompleted: (value) {
+                      onCompleted: (value) async {
+                        await Future.delayed(const Duration(seconds: 1));
                         SignInOTPRequestParams params = SignInOTPRequestParams(
                           msisdn: widget.signInParams.phone,
                           otp: int.parse(value),

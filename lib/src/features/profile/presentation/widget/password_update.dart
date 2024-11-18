@@ -125,7 +125,9 @@ class _ProfilePasswordUpdateState extends State<ProfilePasswordUpdateScreen> {
                     SizedBox(height: 48.sp),
                     OTPCustomWidget(
                       controller: otpController,
-                      onCompleted: (value) {
+                      onCompleted: (value) async {
+                        await Future.delayed(const Duration(seconds: 1));
+
                         final params = ResetPasswordParams(
                             otp: value,
                             newPassword: passwordController.text.trim(),

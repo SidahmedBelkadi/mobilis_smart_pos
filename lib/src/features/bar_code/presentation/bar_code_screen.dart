@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../config/routing/app_routes.dart';
 import '../../../core/commom/widgets/app_elevated_button_text.dart';
@@ -48,7 +49,6 @@ late ContractRequestParamsEntitiy newContract;
 class SimScannerScreenState extends State<SimScannerScreen> {
   @override
   void initState() {
-    debugPrint("=============================== JUSTIFICATIF : ${widget.justificatif}");
     cubit = context.read<ContractCubit>();
     super.initState();
   }
@@ -119,6 +119,23 @@ class SimScannerScreenState extends State<SimScannerScreen> {
                 return SimScannerBody(
                   onPressed: () {
                     // _scanBarCode(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          String barcode = '';
+
+                          return MobileScanner(
+                            onDetect: (barcodes) async {
+                              barcode = barcodes.barcodes.first.rawValue!;
+                              debugPrint("============== BAR CODE : $barcode");
+                              Navigator.of(context).pop();
+                              _showBarcodeDialog(context, barcode);
+                            },
+                          );
+                        },
+                      ),
+                    );
                   },
                 );
               },

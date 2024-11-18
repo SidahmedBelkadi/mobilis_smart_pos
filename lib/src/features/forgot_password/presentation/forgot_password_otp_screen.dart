@@ -101,7 +101,8 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
                     }
                     return OTPCustomWidget(
                       controller: otpController,
-                      onCompleted: (value) {
+                      onCompleted: (value) async {
+                        await Future.delayed(const Duration(seconds: 1));
                         showModalBottomSheet(
                           isDismissible: false,
                           isScrollControlled: true,

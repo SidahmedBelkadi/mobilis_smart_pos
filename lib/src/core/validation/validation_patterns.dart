@@ -3,7 +3,7 @@ class ValidationPatterns {
   static const String phonePattern = r'^6 (\d{2} ){3}\d{2}$';
   static const String passwordPattern = r'^.{8,100}$';
   static const String strongPasswordPattern =
-      r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$';
+      r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&])[A-Za-z\d@#$!%*?&]{8,}$';
   static const String emailPattern = r'^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$';
   static const String addressPattern = r'^.{5,200}$';
   static const String yearsOfExperiencePattern = r'^\d+$';
