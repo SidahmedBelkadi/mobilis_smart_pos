@@ -54,8 +54,9 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
                     onPressed: () async {
                       bool hasPermission = await _requestCameraPermission();
                       if (hasPermission) {
-                        Navigator.of(context)
-                            .pushNamed(Routes.mrzPreparation, arguments: {'isPassport': false});
+                        Navigator.of(context).pushNamed(Routes.mrzOcr, arguments: {
+                          'documentType': 'id_card',
+                        });
                       } else {
                         await _showPermissionDeniedDialog(context);
                       }
@@ -67,8 +68,9 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
                     onPressed: () async {
                       bool hasPermission = await _requestCameraPermission();
                       if (hasPermission) {
-                        Navigator.of(context)
-                            .pushNamed(Routes.mrzPreparation, arguments: {'isPassport': true});
+                        Navigator.of(context).pushNamed(Routes.mrzOcr, arguments: {
+                          'documentType': 'passport',
+                        });
                       } else {
                         await _showPermissionDeniedDialog(context);
                       }
