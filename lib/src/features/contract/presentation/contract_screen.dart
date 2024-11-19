@@ -98,6 +98,40 @@ class _ContractScreenState extends State<ContractScreen> {
   void initState() {
     super.initState();
 
+    final String isoBirthDate = CivilsInformationsConverterHelper.convertToIso8601WithTiret(
+      widget.metaData['date_of_birth'],
+    );
+
+    if (isoBirthDate.isNotEmpty) {
+      try {
+        final DateTime birthDate = DateTime.parse(isoBirthDate);
+        final DateTime today = DateTime.now();
+
+        // Calculate the age
+        int age = today.year - birthDate.year;
+
+        // Adjust for the birthday not yet reached this year
+        if (today.month < birthDate.month ||
+            (today.month == birthDate.month && today.day < birthDate.day)) {
+          age--;
+        }
+
+        if (age < 19) {
+          if (!widget.isMinor) {
+            AppToasts.showInfoToast(
+                message: "THIS_MINOR_IS_PRESUMING_TO_BE_ADULT".tr(context), context: context);
+            Navigator.of(context)
+                .pushNamedAndRemoveUntil(Routes.home, (route) => false, arguments: {'index': 1});
+            return;
+          }
+        }
+      } catch (e) {
+        debugPrint("Error parsing birth date: $e");
+      }
+    } else {
+      debugPrint("============== Birth date is not provided or invalid.");
+    }
+
     ScreenshotService.preventScreenshotOn();
 
     _loadData();

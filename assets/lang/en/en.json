@@ -297,5 +297,6 @@
   "incorrect_back_id_card_image": "Invalid back ID image.",
   "incorrect_image": "Invalid image.",
   "try_scan_doc_again": "Please try scanning the document again",
-  "enable_nfc": "Please enable NFC in your device settings to start scanning"
+  "enable_nfc": "Please enable NFC in your device settings to start scanning",
+  "THIS_MINOR_IS_PRESUMING_TO_BE_ADULT": "Client is a minor. Please rescan the document in better lighting"
 }
