@@ -42,14 +42,10 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
             children: [
               Text(
                 "chooseCard".tr(context),
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyLarge!
-                    .copyWith(color: AppColors.primary),
+                style: Theme.of(context).textTheme.bodyLarge!.copyWith(color: AppColors.primary),
                 textAlign: TextAlign.center,
               ),
-              Lottie.asset(AppImages.chooseScanAnimation,
-                  height: 320.h, width: 320.w),
+              Lottie.asset(AppImages.chooseScanAnimation, height: 320.h, width: 320.w),
               SizedBox(height: 32.h),
               Column(
                 children: [
@@ -58,8 +54,8 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
                     onPressed: () async {
                       bool hasPermission = await _requestCameraPermission();
                       if (hasPermission) {
-                        Navigator.of(context).pushNamed(Routes.mrzPreparation,
-                            arguments: {'isPassport': false});
+                        Navigator.of(context)
+                            .pushNamed(Routes.mrzPreparation, arguments: {'isPassport': false});
                       } else {
                         await _showPermissionDeniedDialog(context);
                       }
@@ -71,8 +67,8 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
                     onPressed: () async {
                       bool hasPermission = await _requestCameraPermission();
                       if (hasPermission) {
-                        Navigator.of(context).pushNamed(Routes.mrzPreparation,
-                            arguments: {'isPassport': true});
+                        Navigator.of(context)
+                            .pushNamed(Routes.mrzPreparation, arguments: {'isPassport': true});
                       } else {
                         await _showPermissionDeniedDialog(context);
                       }
@@ -114,8 +110,7 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
   }
 
   Future<bool> _requestCameraPermission() async {
-    PermissionStatus status =
-        await PermissionsUtil.checkPermissionStatus(Permission.camera);
+    PermissionStatus status = await PermissionsUtil.checkPermissionStatus(Permission.camera);
     if (status.isDenied || status.isRestricted) {
       return await PermissionsUtil.requestPermission(Permission.camera);
     } else if (status.isPermanentlyDenied) {

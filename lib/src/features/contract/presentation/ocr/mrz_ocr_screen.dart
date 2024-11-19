@@ -63,7 +63,6 @@ class _MrzOCRScreenState extends State<MrzOCRScreen> {
     _initializeControllerFuture = _controller!.initialize();
     await _initializeControllerFuture;
     _controller!.setFocusMode(FocusMode.auto);
-    _controller!.lockCaptureOrientation(DeviceOrientation.portraitUp);
     if (mounted) {
       setState(() {});
     }
@@ -185,10 +184,6 @@ class _MrzOCRScreenState extends State<MrzOCRScreen> {
   @override
   void initState() {
     ScreenshotService.preventScreenshotOn();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
 
     super.initState();
     _initializeCamera();

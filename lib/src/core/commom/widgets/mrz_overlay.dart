@@ -35,7 +35,7 @@ class MRZOverlay extends CustomPainter {
       Path()..addRRect(rect),
     );
 
-    canvas.drawPath(path, Paint()..color = Colors.black.withOpacity(0.8));
+    // canvas.drawPath(path, Paint()..color = Colors.black.withOpacity(0.0));
 
     canvas.drawRRect(rect, paint);
 
