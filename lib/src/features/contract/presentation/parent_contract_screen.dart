@@ -147,9 +147,14 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
 
   bool _isDocumentRecognizedText(String text, DocumentsType docType) {
     if (docType == DocumentsType.frontIdCard) {
-      final pattern9Digits = RegExp(r'\b\d{9}\b');
-      final has9Digits = pattern9Digits.hasMatch(text);
-      return has9Digits;
+      final pattern18Digits = RegExp(r'\b\d{18}\b');
+      final has18Digits = pattern18Digits.hasMatch(text);
+      final match = pattern18Digits.firstMatch(text);
+      if (match != null) {
+        final extractedNumber = match.group(0);
+        return has18Digits && extractedNumber == widget.parentExtractedNFCData['personal_number'];
+      }
+      return false;
     } else if (docType == DocumentsType.backIdCard) {
       final patternIdDza = RegExp(r'IDDZA');
       final patternName = RegExp(r'Nom');
@@ -165,7 +170,14 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
 
       final hasP = patternP.hasMatch(text);
       final has9Digits = pattern9Digits.hasMatch(text);
-      return hasP && has9Digits;
+      final pattern18Digits = RegExp(r'\b\d{18}\b');
+      final match = pattern18Digits.firstMatch(text);
+      if (match != null) {
+        final extractedNumber = match.group(0);
+        return hasP & has9Digits &&
+            extractedNumber == widget.parentExtractedNFCData['personal_number'];
+      }
+      return false;
     } else {
       return true;
     }
@@ -230,7 +242,23 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
           }
         }
       } else {
-        AppToasts.showWarningToast(message: "incorrect_image".tr(context), context: context);
+        // Display toast message specific to document type
+        String message;
+        switch (docType) {
+          case DocumentsType.passport:
+            message = "incorrect_passport_image".tr(context);
+            break;
+          case DocumentsType.frontIdCard:
+            message = "incorrect_front_id_card_image".tr(context);
+            break;
+          case DocumentsType.backIdCard:
+            message = "incorrect_back_id_card_image".tr(context);
+            break;
+          default:
+            message = "incorrect_image".tr(context);
+            break;
+        }
+        AppToasts.showWarningToast(message: message, context: context);
         return;
       }
     } else {
