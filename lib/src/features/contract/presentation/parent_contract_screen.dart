@@ -311,6 +311,9 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
     firstName = firstName.replaceAll(RegExp(r'-\s*'), ' ');
     String lastName = lastNameEditingController.text.trim();
     lastName = lastName.replaceAll(RegExp(r'-\s*'), ' ');
+    if (lastName.isEmpty || lastName == "") {
+      lastName = "SNP";
+    }
     String birthPlace = birthPlaceEditingController.text.trim();
     String nationality = nationalityEditingController.text.trim();
     String normalizedAddress = removeDiacritics(addressEditingController.text.trim());
