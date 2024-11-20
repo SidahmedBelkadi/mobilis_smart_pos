@@ -30,7 +30,7 @@ class _MrzOCRScreenState extends State<MrzOCRScreen> {
   bool _isProcessing = false;
   bool _hasNavigated = false;
   int _frameCount = 0;
-  final int _frameThrottleRate = 1;
+  final int _frameThrottleRate = 2;
   late String documentNumber;
   late String birthDate;
   late String expiryDate;
@@ -70,43 +70,124 @@ class _MrzOCRScreenState extends State<MrzOCRScreen> {
     _controller!.startImageStream(_processCameraImage);
   }
 
-  bool _isDocumentRecognizedText(String text) {
-    debugPrint("============= $text");
-    if (widget.documentType == 'id_card') {
-      final RegExp documentNumberRegex = RegExp(r"IDDZA([0-9]{9})");
-      final RegExp idCardRegex = RegExp(r"((\d{6}|[0-9]{2}<<<<))([0-9])([MF])([0-9]{6})");
+  // bool _isDocumentRecognizedText(String text) {
+  //   debugPrint("============= $text");
+  //   if (widget.documentType == 'id_card') {
+  //     final RegExp documentNumberRegex = RegExp(r"IDDZA([0-9]{9})");
+  //     final RegExp idCardRegex = RegExp(r"((\d{6}|[0-9]{2}<<<<))([0-9])([MF])([0-9]{6})");
 
+  //     final documentNumberMatch = documentNumberRegex.firstMatch(text);
+  //     if (documentNumberMatch == null) {
+  //       return false;
+  //     }
+
+  //     final extractedDocumentNumber = documentNumberMatch.group(1);
+  //     final dateMatch = idCardRegex.firstMatch(text);
+
+  //     if (dateMatch == null) {
+  //       return false;
+  //     }
+
+  //     final extractedBirthDate = dateMatch.group(1);
+  //     final extractedExpiryDate = dateMatch.group(5);
+
+  //     if (extractedBirthDate == null || extractedExpiryDate == null) {
+  //       return false;
+  //     }
+
+  //     setState(() {
+  //       documentNumber = extractedDocumentNumber!;
+  //       birthDate = extractedBirthDate;
+  //       expiryDate = extractedExpiryDate;
+  //     });
+
+  //     return documentNumber.isNotEmpty && birthDate.isNotEmpty && expiryDate.isNotEmpty;
+  //   } else if (widget.documentType == 'passport') {
+  //     if (!text.contains('P<')) {
+  //       return false;
+  //     }
+
+  //     final RegExp passportRegex =
+  //         RegExp(r"([A-Z0-9]{9})([0-9])([A-Z]{3})(\d{6}|\d{2}<<<<)([0-9])([MF])([0-9]{6})([0-9])");
+
+  //     // Match the Passport MRZ data
+  //     final passportMatch = passportRegex.firstMatch(text);
+  //     if (passportMatch == null) {
+  //       return false;
+  //     }
+
+  //     // Extract document number, birthdate, expiry date, and gender
+  //     final extractedDocumentNumber = passportMatch.group(1);
+  //     final extractedBirthDate = passportMatch.group(4);
+  //     final extractedExpiryDate = passportMatch.group(7);
+
+  //     if (extractedDocumentNumber == null ||
+  //         extractedBirthDate == null ||
+  //         extractedExpiryDate == null) {
+  //       return false;
+  //     }
+
+  //     setState(() {
+  //       documentNumber = extractedDocumentNumber;
+  //       birthDate = extractedBirthDate;
+  //       expiryDate = extractedExpiryDate;
+  //     });
+
+  //     return documentNumber.isNotEmpty && birthDate.isNotEmpty && expiryDate.isNotEmpty;
+  //   }
+
+  //   return false;
+  // }
+
+  bool _isDocumentRecognizedText(String text) {
+    if (widget.documentType == 'id_card') {
+      // Clean the text
+      text = text.replaceAll(' ', '').replaceAll(RegExp(r'[^a-zA-Z0-9<]'), '');
+
+      final RegExp documentNumberRegex = RegExp(r"IDDZA([0-9]{9})");
+      final RegExp line2Regex = RegExp(r"([0-9<]{6})([0-9]{1})([M|F|X|<]{1})([0-9]{6})");
+
+      // Step 2: Extract Line 1 (Document Number)
       final documentNumberMatch = documentNumberRegex.firstMatch(text);
       if (documentNumberMatch == null) {
         return false;
       }
 
       final extractedDocumentNumber = documentNumberMatch.group(1);
-      final dateMatch = idCardRegex.firstMatch(text);
-
-      if (dateMatch == null) {
-        return false;
-      }
-
-      final extractedBirthDate = dateMatch.group(1);
-      final extractedExpiryDate = dateMatch.group(5);
-
-      if (extractedBirthDate == null || extractedExpiryDate == null) {
-        return false;
-      }
+      debugPrint("================ $extractedDocumentNumber");
 
       setState(() {
         documentNumber = extractedDocumentNumber!;
-        birthDate = extractedBirthDate;
-        expiryDate = extractedExpiryDate;
       });
 
-      return documentNumber.isNotEmpty && birthDate.isNotEmpty && expiryDate.isNotEmpty;
-    } else if (widget.documentType == 'passport') {
-      if (!text.contains('P<')) {
+      // Step 3: Extract Line 2 (Other Information)
+      final matchLine2 = line2Regex.firstMatch(text);
+      if (matchLine2 != null) {
+        final String birthDateRaw = matchLine2.group(1)!; // Group 1: Birth Date (YYMMDD)
+        final String expiryDateRaw = matchLine2.group(4)!; // Group 4: Expiry Date (YYMMDD)
+        final String gender = matchLine2.group(3)!; // Group 3: Gender (M/F/X)
+
+        // Validate dates (ensure YYMMDD format)
+        if (birthDateRaw.length == 6 && expiryDateRaw.length == 6) {
+          setState(() {
+            birthDate = birthDateRaw;
+            expiryDate = expiryDateRaw;
+          });
+
+          debugPrint("============== Extracted Birth Date: $birthDate");
+          debugPrint("============== Extracted Expiry Date: $expiryDate");
+          debugPrint("=============== Extracted Gender: $gender");
+
+          return true;
+        } else {
+          debugPrint("Invalid Date Format in Line 2");
+          return false;
+        }
+      } else {
+        debugPrint("Line 2 Regex did not match");
         return false;
       }
-
+    } else if (widget.documentType == 'passport') {
       final RegExp passportRegex =
           RegExp(r"([A-Z0-9]{9})([0-9])([A-Z]{3})(\d{6}|\d{2}<<<<)([0-9])([MF])([0-9]{6})([0-9])");
 
