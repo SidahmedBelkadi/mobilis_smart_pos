@@ -40,7 +40,7 @@ class _MrzOCRScreenState extends State<ParentMrzOCRScreen> {
   bool _isProcessing = false;
   bool _hasNavigated = false;
   int _frameCount = 0;
-  final int _frameThrottleRate = 2;
+  final int _frameThrottleRate = 3;
   late String documentNumber;
   late String birthDate;
   late String expiryDate;
@@ -252,7 +252,7 @@ class _MrzOCRScreenState extends State<ParentMrzOCRScreen> {
         // Navigate to the NFC screen only once
         if (_isDocumentRecognized && !_hasNavigated) {
           _hasNavigated = true; // Prevent further navigation
-          await Future.delayed(const Duration(microseconds: 500));
+          await Future.delayed(const Duration(microseconds: 1500));
           _navigateToMRZDetails();
         }
       }
@@ -264,7 +264,6 @@ class _MrzOCRScreenState extends State<ParentMrzOCRScreen> {
   }
 
   void _navigateToMRZDetails() {
-    _controller?.dispose();
     Navigator.of(context).pushReplacementNamed(Routes.parentMrzOcrDetails, arguments: {
       'documentNumber': documentNumber,
       'dateOfBirth': birthDate,
