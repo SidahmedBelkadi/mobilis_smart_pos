@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:mobilis_smart_pos/src/core/commom/widgets/version.dart';
 import '../../../../core/utils/enums/themes_enum.dart';
 import '../../../../core/utils/ressources/app_colors.dart';
 import '../cubits/cubit/theme_cubit.dart';
@@ -31,6 +32,10 @@ class HomeDrawer extends StatelessWidget {
               context.isArabicLocale ? AppImages.mobilisAr : AppImages.mobilisEn,
               width: context.width,
               height: 220.sp,
+            ),
+            const VersionWidget(),
+            SizedBox(
+              height: 8.sp,
             ),
             ExpansionTile(
               iconColor: AppColors.primary,
