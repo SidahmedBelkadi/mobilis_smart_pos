@@ -22,7 +22,7 @@ class UpgraderService {
       debugPrint("======= LAST UPDATE CHECK DATE : $lastCheckDate");
 
       // Check if 60 minute has passed since the last check
-      if (lastCheckDate != null && DateTime.now().difference(lastCheckDate).inMinutes < 60) {
+      if (lastCheckDate != null && DateTime.now().difference(lastCheckDate).inMinutes < 30) {
         return false;
       }
 
