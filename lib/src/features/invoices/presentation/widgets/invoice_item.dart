@@ -15,6 +15,22 @@ class Invoice extends StatelessWidget {
 
   final InvoiceEntity invoiceEntity;
 
+  InvoiceStatusEnum _filterInvoiceStatus(String status, String? msisdn) {
+    if (status.toLowerCase() == "dsa timeout" && msisdn == null) {
+      return InvoiceStatusEnum.failed;
+    } else if (status.toLowerCase() == "network_failure_treated" && msisdn == null) {
+      return InvoiceStatusEnum.failed;
+    } else if (status.toLowerCase() == "dsa Retrieval" && msisdn != null) {
+      return InvoiceStatusEnum.success;
+    } else if (status.toLowerCase() == "success" && msisdn != null) {
+      return InvoiceStatusEnum.success;
+    } else if (status.toLowerCase() == "pending" && msisdn == null) {
+      return InvoiceStatusEnum.pending;
+    } else {
+      return InvoiceStatusEnum.failed;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -38,9 +54,9 @@ class Invoice extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     InvoiceStatus(
-                        invoiceStatus: invoiceEntity.msisdn != null
-                            ? InvoiceStatusEnum.success
-                            : InvoiceStatusEnum.failed),
+                      invoiceStatus:
+                          _filterInvoiceStatus(invoiceEntity.status, invoiceEntity.msisdn),
+                    ),
                     Text(
                       context.isArabicLocale
                           ? invoiceEntity.formattedInvoiceDateInArabic

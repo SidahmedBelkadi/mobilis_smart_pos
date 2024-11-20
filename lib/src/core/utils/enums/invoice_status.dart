@@ -21,11 +21,17 @@ class InvoiceStatusEnum {
     AppColors.waittingBackgroundColor,
   );
 
+  static const InvoiceStatusEnum pending = InvoiceStatusEnum._(
+    "pending",
+    AppColors.white,
+    Colors.amber,
+  );
+
   static const InvoiceStatusEnum skeleton = InvoiceStatusEnum._(
     "skeleton",
     Colors.black,
     AppColors.darkerGrey,
   );
 
-  static const List<InvoiceStatusEnum> values = [success, failed];
+  static const List<InvoiceStatusEnum> values = [success, failed, pending, skeleton];
 }

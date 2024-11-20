@@ -298,5 +298,6 @@
   "incorrect_image": "Image invalide.",
   "try_scan_doc_again": "Veuillez scanner le document à nouveau",
   "enable_nfc": "Veuillez activer le NFC dans les paramètres de votre appareil pour commencer le scan",
-  "THIS_MINOR_IS_PRESUMING_TO_BE_ADULT": "Le client est mineur. Veuillez rescanner le document dans de meilleures conditions de lumière"
+  "THIS_MINOR_IS_PRESUMING_TO_BE_ADULT": "Le client est mineur. Veuillez rescanner le document dans de meilleures conditions de lumière",
+  "pending": "En attente"
 }

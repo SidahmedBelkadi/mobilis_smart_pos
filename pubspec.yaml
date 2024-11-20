@@ -72,7 +72,7 @@ dependencies:
   url_launcher: ^6.0.20
   cunning_document_scanner: ^1.2.3
   flutter_switch: ^0.3.2
-  android_intent_plus: ^5.2.0
+  # android_intent_plus: ^5.2.0
   # camera_android_camerax: ^0.6.8+2
   carousel_slider: ^5.0.0
   mobile_scanner: ^6.0.2

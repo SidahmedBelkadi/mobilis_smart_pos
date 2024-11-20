@@ -298,5 +298,6 @@
   "incorrect_image": "صورة غير صالحة.",
   "try_scan_doc_again": "يرجى إعادة مسح الوثيقة..",
   "enable_nfc": "يرجى تفعيل NFC في إعدادات الجهاز لبدء المسح.",
-  "THIS_MINOR_IS_PRESUMING_TO_BE_ADULT": "الزبون قاصر. يرجى إعادة مسح الوثيقة في ظروف إضاءة أفضل "
+  "THIS_MINOR_IS_PRESUMING_TO_BE_ADULT": "الزبون قاصر. يرجى إعادة مسح الوثيقة في ظروف إضاءة أفضل ,",
+  "pending": "قيد الانتظار"
 }

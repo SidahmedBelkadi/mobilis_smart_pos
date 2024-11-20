@@ -23,11 +23,10 @@ class InvoiceStatus extends StatelessWidget {
       child: Text(
         invoiceStatus.name == "success"
             ? "success".tr(context)
-            : "failed".tr(context),
-        style: Theme.of(context)
-            .textTheme
-            .labelMedium!
-            .copyWith(color: invoiceStatus.color),
+            : invoiceStatus.name == "failed"
+                ? "failed".tr(context)
+                : "pending".tr(context),
+        style: Theme.of(context).textTheme.labelMedium!.copyWith(color: invoiceStatus.color),
       ),
     );
   }
