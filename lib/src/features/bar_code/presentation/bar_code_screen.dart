@@ -145,7 +145,7 @@ class SimScannerScreenState extends State<SimScannerScreen> {
                             },
                             onDetect: (barcodes) async {
                               barcode = barcodes.barcodes.first.rawValue!;
-
+                              debugPrint("========== $barcode");
                               RegExp regex = RegExp(r'\d{13}$');
 
                               if (regex.hasMatch(barcode)) {
@@ -173,52 +173,10 @@ class SimScannerScreenState extends State<SimScannerScreen> {
     );
   }
 
-  // Future<void> _scanBarCode(BuildContext context) async {
-  //   String barCodeScanRes;
-  //   do {
-  //     try {
-  //       barCodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-  //         "#91ff59",
-  //         "discard".tr(context),
-  //         true,
-  //         ScanMode.BARCODE,
-  //       );
-
-  //       if (barCodeScanRes == "-1") {
-  //         // User pressed cancel
-  //         return;
-  //       }
-
-  //       // Regex to check if the barcode is 13 characters long
-  //       RegExp regex = RegExp(r'\d{13}$');
-
-  //       if (regex.hasMatch(barCodeScanRes)) {
-  //         if (barCodeScanRes.startsWith("892130")) {
-  //           AppToasts.showErrorToast(
-  //               message: "Please scan the innner bar code of the sim",
-  //               context: context);
-  //           return;
-  //         }
-
-  //         _showBarcodeDialog(context, barCodeScanRes);
-  //         return;
-  //       }
-  //       // If the barcode is not valid, continue scanning
-  //     } on PlatformException catch (e) {
-  //       debugPrint(
-  //           "================= PlatformException during barcode scan: ${e.message}");
-  //       AppToasts.showErrorToast(
-  //         message: "================= Error opening scanner: ${e.message}",
-  //         context: context,
-  //       );
-  //     }
-  //   } while (true);
-  // }
-
   Future<void> _showBarcodeDialog(BuildContext context, String barcode) async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // User must tap a button to dismiss the dialog
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('scanned_bar_code'.tr(context)),

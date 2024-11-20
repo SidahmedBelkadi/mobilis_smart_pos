@@ -28,7 +28,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -220,6 +222,10 @@ public class DzNfcModel {
     private String formatDate(String date) {
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyMMdd", Locale.US);
         SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+
+        // Set a custom pivot year to start from 1921
+        inputFormat.set2DigitYearStart(new GregorianCalendar(1924, Calendar.JANUARY, 1).getTime());
+
         try {
             Date parsedDate = inputFormat.parse(date);
             return outputFormat.format(parsedDate);
@@ -228,6 +234,7 @@ public class DzNfcModel {
             return date;
         }
     }
+
 
     private String formatDateOfDelivery(String date) {
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
