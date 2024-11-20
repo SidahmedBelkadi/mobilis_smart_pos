@@ -91,7 +91,7 @@ class _MyHomePageState extends State<MainScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text('update_available_instruction'.tr(context)),
-                LottieBuilder.asset(AppImages.update, height: 120.sp, width: 120.sp),
+                LottieBuilder.asset(AppImages.uploading, height: 120.sp, width: 120.sp),
               ],
             ),
             actions: <Widget>[
