@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:mobilis_smart_pos/src/core/utils/helpers/session_timeout.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/api/end_points.dart';
@@ -115,19 +116,21 @@ class _MyHomePageState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      child: Scaffold(
-        drawer: const HomeDrawer(),
-        bottomNavigationBar: CustomAppBottomNavBar(
-          currentIndex: screenIndex,
-          onTap: (index) => setState(
-            () {
-              screenIndex = index;
-            },
+    return SessionTimeout(
+      child: PopScope(
+        canPop: false,
+        child: Scaffold(
+          drawer: const HomeDrawer(),
+          bottomNavigationBar: CustomAppBottomNavBar(
+            currentIndex: screenIndex,
+            onTap: (index) => setState(
+              () {
+                screenIndex = index;
+              },
+            ),
           ),
+          body: screens[screenIndex],
         ),
-        body: screens[screenIndex],
       ),
     );
   }
