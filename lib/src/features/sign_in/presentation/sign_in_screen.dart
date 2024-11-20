@@ -157,7 +157,6 @@ class _SignInScreenState extends State<SignInScreen> {
                                   suffixIcon: cubit.isObsecure
                                       ? Icons.visibility_outlined
                                       : Icons.visibility_off_outlined,
-                                  validationType: InputType.STRONG_PASSWORD,
                                   isObsecure: cubit.isObsecure,
                                   onSuffixTap: () => cubit.onObsecureClicked(),
                                   textEditingController: cubit.passwordController,
