@@ -597,6 +597,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_zxing:
+    dependency: "direct main"
+    description:
+      name: flutter_zxing
+      sha256: "7ced1ebb196a5361964f03af37a8f51120271982698ff7befe34f7e35f0babbc"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.7.0"
   font_awesome_flutter:
     dependency: "direct main"
     description:

@@ -116,21 +116,19 @@ class _MyHomePageState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SessionTimeout(
-      child: PopScope(
-        canPop: false,
-        child: Scaffold(
-          drawer: const HomeDrawer(),
-          bottomNavigationBar: CustomAppBottomNavBar(
-            currentIndex: screenIndex,
-            onTap: (index) => setState(
-              () {
-                screenIndex = index;
-              },
-            ),
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        drawer: const HomeDrawer(),
+        bottomNavigationBar: CustomAppBottomNavBar(
+          currentIndex: screenIndex,
+          onTap: (index) => setState(
+            () {
+              screenIndex = index;
+            },
           ),
-          body: screens[screenIndex],
         ),
+        body: screens[screenIndex],
       ),
     );
   }

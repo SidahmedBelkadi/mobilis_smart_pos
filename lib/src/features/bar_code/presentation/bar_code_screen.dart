@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_zxing/flutter_zxing.dart';
 import 'package:lottie/lottie.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../config/routing/app_routes.dart';
 import '../../../core/commom/widgets/app_elevated_button_text.dart';
@@ -123,42 +123,23 @@ class SimScannerScreenState extends State<SimScannerScreen> {
                       context,
                       MaterialPageRoute(
                         builder: (context) {
-                          String barcode = '';
+                          return ReaderWidget(
+                            showGallery: false,
+                            showToggleCamera: false,
+                            onScan: (Code result) {
+                              debugPrint("====================== RESULT : ${result.text}");
 
-                          return MobileScanner(
-                            overlayBuilder: (context, constraints) {
-                              return Center(
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Container(
-                                      width: 300.w,
-                                      height: 150.h,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.green, width: 3),
-                                        borderRadius: BorderRadius.circular(16.sp),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                            onDetect: (barcodes) async {
-                              barcode = barcodes.barcodes.first.rawValue!;
-                              debugPrint("========== $barcode");
-                              RegExp regex = RegExp(r'\d{13}$');
-
-                              if (regex.hasMatch(barcode)) {
-                                if (barcode.startsWith("892130")) {
-                                  barcode = barcode.substring(6);
+                              if (result.text != null && result.text != '') {
+                                String barCodeScanRes = result.text!;
+                                if (barCodeScanRes.startsWith("892130")) {
+                                  barCodeScanRes = barCodeScanRes.substring(6);
                                 }
-                              } else {
-                                return;
-                              }
 
-                              Navigator.of(context).pop();
-                              _showBarcodeDialog(context, barcode);
+                                Navigator.of(context).pop();
+                                _showBarcodeDialog(context, barCodeScanRes);
+                              }
                             },
+                            scanDelay: const Duration(milliseconds: 500),
                           );
                         },
                       ),
