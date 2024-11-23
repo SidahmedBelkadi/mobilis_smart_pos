@@ -62,61 +62,6 @@ class MrzDetailsScreenState extends State<MrzDetailsScreen> {
     super.dispose();
   }
 
-  /*void _compareDates() {
-    final expirationDate = widget.dateOfExpiry;
-    final birthDate = widget.dateOfBirth;
-
-    final expirationDateParsed = _parseDate(expirationDate, true);
-    final currentDate = DateTime.now();
-
-    if (expirationDateParsed.isBefore(currentDate)) {
-      setState(() {
-        isExpired = true;
-      });
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        AppToasts.showErrorToast(
-          message: "card_expired".tr(context),
-          context: context,
-          onAutoCompleteCompleted: (p0) =>
-              Navigator.of(context).pushNamedAndRemoveUntil(
-            Routes.main,
-            (route) => false,
-          ),
-        );
-      });
-    }
-
-    final birthDateParsed = _parseDate(birthDate, false);
-    final age = currentDate.year - birthDateParsed.year;
-
-    if (age < 19 ||
-        (age == 19 &&
-            currentDate.isBefore(
-                birthDateParsed.add(const Duration(days: 365 * 19))))) {
-      setState(() {
-        isMinor = true;
-      });
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        AppDialog.showCustomAppDialog(
-          title: "client_is_minor_title".tr(context),
-          content: "client_is_minor_instruction".tr(context),
-          acceptName: "yes",
-          discardName: "no",
-          onPressed: () =>
-              Navigator.of(context).pushNamed(Routes.nfcReader, arguments: {
-            'documentNumber': widget.documentNumber,
-            'dateOfBirth': widget.dateOfBirth,
-            'dateOfExpiry': widget.dateOfExpiry,
-            'docType': widget.docType,
-            'isMinor': true
-          }),
-          context: context,
-        );
-      });
-    }
-  }*/
   void _compareDates() {
     try {
       final expirationDate = widget.dateOfExpiry;
@@ -174,17 +119,6 @@ class MrzDetailsScreenState extends State<MrzDetailsScreen> {
     }
   }
 
-  /* DateTime _parseDate(String date, bool isExpiryDate) {
-    final year = int.parse(date.substring(0, 2));
-    final month = int.parse(date.substring(2, 4));
-    final day = int.parse(date.substring(4, 6));
-
-    final currentYear = DateTime.now().year;
-    final century = (year + 2000 <= currentYear) ? 2000 : 1900;
-
-    return DateTime(isExpiryDate ? 2000 + year : century + year, month, day);
-  }*/
-
   DateTime _parseDate(String date, bool isExpiryDate) {
     if (RegExp(r'^\d{6}$').hasMatch(date)) {
       final year = int.parse(date.substring(0, 2));
@@ -195,6 +129,13 @@ class MrzDetailsScreenState extends State<MrzDetailsScreen> {
       final century = (year + 2000 <= currentYear) ? 2000 : 1900;
 
       return DateTime(isExpiryDate ? 2000 + year : century + year, month, day);
+    } else if (RegExp(r'^\d{2}<<<<').hasMatch(date)) {
+      final year = int.parse(date.substring(0, 2));
+
+      final currentYear = DateTime.now().year;
+      final century = (year + 2000 <= currentYear) ? 2000 : 1900;
+
+      return DateTime(century + year, 1, 1);
     }
 
     throw const FormatException("format exception");
