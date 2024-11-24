@@ -1,7 +1,9 @@
 package com.ai_univers.smart_point_of_sale;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.nfc.NfcAdapter;
@@ -14,14 +16,18 @@ import android.os.Debug;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.ai_univers.smart_point_of_sale.Reader.NFCResultCallback;
+import com.ai_univers.smart_point_of_sale.vision.BarcodeScannerActivity;
+import com.ai_univers.smart_point_of_sale.vision.ScanActivity;
 
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.HashMap;
 
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.plugin.common.MethodCall;
@@ -35,9 +41,13 @@ public class MainActivity extends FlutterActivity {
     private static final String SMS_CHANNEL = "sms/sms_receiver";
     private static final String OTP_CHANNEL = "otp_receiver";
     private NfcAdapter nfcAdapter;
-    private boolean isNfcReadCompleted = false;  // Flag to track if NFC reading is completed
+    private boolean isNfcReadCompleted = false;
 
     private boolean resultSent = false;
+    private static final int OCR_REQUEST_CODE = 1001;
+    private static final int BARCODE_REQUEST_CODE = 2002;
+    private MethodChannel.Result pendingResult;
+    private MethodChannel.Result barCodePendingResult;
 
 
     // Method to check if NFC is enabled on the device
@@ -89,6 +99,20 @@ public class MainActivity extends FlutterActivity {
 
                                 } else if (call.method.equals("isNfcEnabled")) {
                                     result.success(isNfcEnabled(MainActivity.this));
+                                }else if (call.method.equals("startOCR")) {
+                                    String documentType = call.argument("documentType");
+                                    pendingResult = result;
+                                    Intent intent = new Intent(MainActivity.this, ScanActivity.class);
+                                    intent.putExtra("documentType", documentType);
+                                    startActivityForResult(intent, OCR_REQUEST_CODE);
+
+                                }if (call.method.equals("startBarcodeScanner")) {
+                                    if (barCodePendingResult != null) {
+                                        result.error("ALREADY_ACTIVE", "A scan is already in progress", null);
+                                        return;
+                                    }
+                                    barCodePendingResult = result;
+                                    startBarcodeScanner();
                                 }
                             }
                         }
@@ -124,6 +148,51 @@ public class MainActivity extends FlutterActivity {
             }, 1);
         }
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == BARCODE_REQUEST_CODE) {
+            if (barCodePendingResult != null) {
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    String scannedData = data.getStringExtra("SCAN_RESULT");
+                    barCodePendingResult.success(scannedData); // Pass barcode data to Flutter
+                } else {
+                    barCodePendingResult.error("SCAN_ERROR", "Barcode scan failed or canceled", null);
+                }
+                barCodePendingResult = null; // Clear pendingResult
+            }
+        }
+
+
+
+        if (requestCode == OCR_REQUEST_CODE) {
+            if (pendingResult != null) {
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    String documentNumber = data.getStringExtra("documentNumber");
+                    String birthDate = data.getStringExtra("birthDate");
+                    String expiredDate = data.getStringExtra("expiredDate");
+
+                    // Pass the result back to Flutter
+                    pendingResult.success(new HashMap<String, String>() {{
+                        put("documentNumber", documentNumber);
+                        put("birthDate", birthDate);
+                        put("expiredDate", expiredDate);
+                    }});
+                } else {
+                    pendingResult.error("ERROR", "OCR failed or canceled", null);
+                }
+                pendingResult = null; // Clear the result to avoid duplicate replies
+            }
+        }
+    }
+
+    private void startBarcodeScanner() {
+        Intent intent = new Intent(this, BarcodeScannerActivity.class);
+        startActivityForResult(intent, BARCODE_REQUEST_CODE);
+    }
+
 
     private void startNfcReading(MethodChannel.Result result) {
         NfcAdapter.ReaderCallback readerCallback = new NfcAdapter.ReaderCallback() {

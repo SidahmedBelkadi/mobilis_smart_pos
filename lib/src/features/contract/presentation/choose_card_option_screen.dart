@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:mobilis_smart_pos/src/services/native_ocr.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../config/routing/app_routes.dart';
@@ -19,6 +20,11 @@ class ChooseCardOptionScreen extends StatefulWidget {
 }
 
 class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
+  late String documentNumber;
+  late String dateOfBirth;
+  late String dateOfExpiry;
+  late String docType;
+
   @override
   void initState() {
     super.initState();
@@ -27,6 +33,29 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  Future<void> startOCR({required String docType}) async {
+    final result = await NativeOCR.startOCR(docType: docType);
+    debugPrint("========== RESULT : $result");
+
+    if (result != null) {
+      debugPrint("================= DOCUMENT NUMBER : ${result['documentNumber']}");
+      debugPrint("================= BIRTH DATE : ${result['birthDate']}");
+      debugPrint("================= EXPIRY DATE : ${result['expiredDate']}");
+      setState(() {
+        documentNumber = result['documentNumber']!;
+        dateOfBirth = result['birthDate']!;
+        dateOfExpiry = result['expiredDate']!;
+      });
+
+      Navigator.of(context).pushNamed(Routes.mrzDetails, arguments: {
+        'documentNumber': documentNumber,
+        'dateOfBirth': dateOfBirth,
+        'dateOfExpiry': dateOfExpiry,
+        'docType': docType,
+      });
+    }
   }
 
   @override
@@ -54,9 +83,10 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
                     onPressed: () async {
                       bool hasPermission = await _requestCameraPermission();
                       if (hasPermission) {
-                        Navigator.of(context).pushNamed(Routes.mrzOcr, arguments: {
-                          'documentType': 'id_card',
+                        setState(() {
+                          docType = "id_card";
                         });
+                        await startOCR(docType: "id_card");
                       } else {
                         await _showPermissionDeniedDialog(context);
                       }
@@ -68,9 +98,10 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
                     onPressed: () async {
                       bool hasPermission = await _requestCameraPermission();
                       if (hasPermission) {
-                        Navigator.of(context).pushNamed(Routes.mrzOcr, arguments: {
-                          'documentType': 'passport',
+                        setState(() {
+                          docType = "passport";
                         });
+                        await startOCR(docType: "passport");
                       } else {
                         await _showPermissionDeniedDialog(context);
                       }

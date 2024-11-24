@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_zxing/flutter_zxing.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../../config/routing/app_routes.dart';
@@ -47,10 +47,21 @@ late ContractCubit cubit;
 late ContractRequestParamsEntitiy newContract;
 
 class SimScannerScreenState extends State<SimScannerScreen> {
+  static const platform = MethodChannel("channel");
+
   @override
   void initState() {
     cubit = context.read<ContractCubit>();
     super.initState();
+  }
+
+  Future<void> _startBarcodeScanner() async {
+    try {
+      final result = await platform.invokeMethod("startBarcodeScanner");
+      _showBarcodeDialog(context, result);
+    } on PlatformException catch (e) {
+      return;
+    }
   }
 
   @override
@@ -117,34 +128,7 @@ class SimScannerScreenState extends State<SimScannerScreen> {
                   );
                 }
                 return SimScannerBody(
-                  onPressed: () {
-                    // _scanBarCode(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return ReaderWidget(
-                            showGallery: false,
-                            showToggleCamera: false,
-                            onScan: (Code result) {
-                              debugPrint("====================== RESULT : ${result.text}");
-
-                              if (result.text != null && result.text != '') {
-                                String barCodeScanRes = result.text!;
-                                if (barCodeScanRes.startsWith("892130")) {
-                                  barCodeScanRes = barCodeScanRes.substring(6);
-                                }
-
-                                Navigator.of(context).pop();
-                                _showBarcodeDialog(context, barCodeScanRes);
-                              }
-                            },
-                            scanDelay: const Duration(milliseconds: 500),
-                          );
-                        },
-                      ),
-                    );
-                  },
+                  onPressed: _startBarcodeScanner,
                 );
               },
             ),
@@ -177,7 +161,7 @@ class SimScannerScreenState extends State<SimScannerScreen> {
             TextButton(
               child: Text('discard'.tr(context)),
               onPressed: () {
-                Navigator.of(context).pop(); // Dismiss the dialog
+                Navigator.of(context).pop(); // Dismiss the dialo
               },
             ),
             ElevatedButton(
