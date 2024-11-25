@@ -291,6 +291,7 @@
   "identity_card_or_passport": "Identity card or Passport",
   "signature_approve": "Please confirm your signature for the contract and general terms of sale",
   "justification": "Power Of Attorney",
+  "justification_invalide": "The image of the power of attorney is invalid.",
   "downloaded": "Downloaded",
   "incorrect_passport_image": "Invalid passport image.",
   "incorrect_front_id_card_image": "Invalid front ID image.",

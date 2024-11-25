@@ -24,8 +24,7 @@ class _SessionTimeoutState extends State<SessionTimeout> {
   int _remainingTime = 600; // 10 minutes
 
   void _startTimer() {
-    debugPrint(
-        "=============== ************************************ #########################  SESSION TIMER RESET");
+    debugPrint("===============   SESSION TIMER RESET");
 
     // Cancel any existing timers
     _timer?.cancel();
@@ -38,8 +37,7 @@ class _SessionTimeoutState extends State<SessionTimeout> {
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_remainingTime > 0) {
         _remainingTime--;
-        debugPrint(
-            "=================================================== *********************************** Time remaining: $_remainingTime seconds");
+        debugPrint("*********************************** Time remaining: $_remainingTime seconds");
       } else {
         timer.cancel(); // Cancel countdown timer when it reaches 0
       }
@@ -49,8 +47,7 @@ class _SessionTimeoutState extends State<SessionTimeout> {
     _timer = Timer(
       const Duration(seconds: 600),
       () {
-        debugPrint(
-            "=============== ************************************ ######################### SESSION TIMER ELAPSED");
+        debugPrint("===============  SESSION TIMER ELAPSED");
         context.read<SignOutCubit>().signOut(context);
       },
     );

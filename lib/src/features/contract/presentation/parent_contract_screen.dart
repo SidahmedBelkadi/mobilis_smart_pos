@@ -178,6 +178,47 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
             extractedNumber == widget.parentExtractedNFCData['personal_number'];
       }
       return false;
+    } else if (docType == DocumentsType.justificatif) {
+      final pattern18Digits = RegExp(r'\b\d{18}\b');
+      final pattern9Digits = RegExp(r'\b\d{9}\b');
+      final patternRh = RegExp(r'Rh');
+      final patternIdDza = RegExp(r'IDDZA');
+      final patternSymol = RegExp(r'<<<');
+      final patternP = RegExp(r'P<');
+      final patternDlDza = RegExp(r'DLDZA');
+      final patternDriving = RegExp(r'DRIVING');
+      final patternClient = RegExp(r'Client');
+      final patternInformationVentes = RegExp(r'Informations vente');
+      final patternInformationRelatives = RegExp(r'Informations relatives');
+      final patternMobilis = RegExp(r'mobilis');
+      final patternSiteWeb = RegExp(r'www.mobilis.dz');
+      final patternAchatPassInternet = RegExp(r'Achat Pass Internet');
+      final patternRechargement = RegExp(r'Rechargement');
+      final patternSIM = RegExp(r'SIM');
+      final patternActivation = RegExp(r'Activation');
+      final patternNProc = RegExp(r'N° de la procuration');
+      final patternNSticker = RegExp(r'Sticker');
+
+      return !pattern18Digits.hasMatch(text) &&
+          !patternIdDza.hasMatch(text) &&
+          !patternSymol.hasMatch(text) &&
+          !patternP.hasMatch(text) &&
+          !patternDlDza.hasMatch(text) &&
+          !patternDriving.hasMatch(text) &&
+          !patternClient.hasMatch(text) &&
+          !patternInformationVentes.hasMatch(text) &&
+          !patternMobilis.hasMatch(text) &&
+          !patternSiteWeb.hasMatch(text) &&
+          !patternAchatPassInternet.hasMatch(text) &&
+          !patternRechargement.hasMatch(text) &&
+          !patternInformationRelatives.hasMatch(text) &&
+          !patternSIM.hasMatch(text) &&
+          !patternSIM.hasMatch(text) &&
+          !patternNProc.hasMatch(text) &&
+          !patternNSticker.hasMatch(text) &&
+          !patternActivation.hasMatch(text) &&
+          !pattern9Digits.hasMatch(text) &&
+          !patternRh.hasMatch(text);
     } else {
       return true;
     }
@@ -189,6 +230,7 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
       required DocumentsType docType}) async {
     final document = InputImage.fromFile(file);
     final recognizedText = await recognizer.processImage(document);
+    debugPrint("============== Recognized Text : ${recognizedText.text}");
     final isDocumentRecognized = _isDocumentRecognizedText(recognizedText.text, docType);
     return isDocumentRecognized;
   }
@@ -254,8 +296,12 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
           case DocumentsType.backIdCard:
             message = "incorrect_back_id_card_image".tr(context);
             break;
+
+          case DocumentsType.justificatif:
+            message = "justification_invalide".tr(context);
+            break;
           default:
-            message = "incorrect_image".tr(context);
+            message = "justification_invalide".tr(context);
             break;
         }
         AppToasts.showWarningToast(message: message, context: context);

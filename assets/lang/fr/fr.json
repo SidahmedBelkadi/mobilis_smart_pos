@@ -291,6 +291,7 @@
   "identity_card_or_passport": "Carte d'identité ou Passeport",
   "signature_approve": "Veuillez confirmer votre signature pour le contrat et les conditions générales de vente",
   "justification": "Procuration",
+  "justification_invalide": "L'image de la procuration est invalide",
   "downloaded": "Téléchargé",
   "incorrect_passport_image": "Image du passeport invalide.",
   "incorrect_front_id_card_image": "Image du recto de la carte d'identité invalide.",
