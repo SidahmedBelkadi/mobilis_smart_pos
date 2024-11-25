@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
+import 'package:mobilis_smart_pos/src/core/utils/helpers/permissions_helper.dart';
 import '../../../core/commom/widgets/custom_app_bar.dart';
 import '../../sign_in/data/data_sources/smart_pos_local_storage.dart';
 import '../../../services/screenshot_service.dart';
@@ -85,7 +86,6 @@ class _SignatureScreenState extends State<SignatureScreen> {
   void initState() {
     super.initState();
     ScreenshotService.disableScreenshots();
-    requestSmsPermission();
     debugPrint(
       "======================== SIGNATURE : APN NUMBER : +${di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials()!.msisdn}",
     );
@@ -120,11 +120,14 @@ class _SignatureScreenState extends State<SignatureScreen> {
     super.dispose();
   }
 
-  Future<void> requestSmsPermission() async {
-    var status = await Permission.sms.status;
-    if (!status.isGranted) {
-      await Permission.sms.request();
+  Future<bool> _requestSmsPermission() async {
+    PermissionStatus status = await PermissionsUtil.checkPermissionStatus(Permission.sms);
+    if (status.isDenied || status.isRestricted) {
+      return await PermissionsUtil.requestPermission(Permission.sms);
+    } else if (status.isPermanentlyDenied) {
+      return false;
     }
+    return status.isGranted;
   }
 
   Future<void> setSenderPhoneNumber(String number) async {
@@ -460,7 +463,13 @@ class _SignatureScreenState extends State<SignatureScreen> {
                           SizedBox(height: 64.h),
                           AppElevatedButtonWithText(
                             text: "confrim_sell".tr(context),
-                            onPressed: () {
+                            onPressed: () async {
+                              bool hasPermission = await _requestSmsPermission();
+                              if (!hasPermission) {
+                                _showPermissionDeniedDialog(context);
+                                return;
+                              }
+
                               if (!isSignatureValidated) {
                                 AppToasts.showErrorToast(
                                   message: "required_signature".tr(context),
@@ -468,6 +477,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
                                 );
                                 return;
                               }
+
                               if (!_isConditionOfSignatureChecked) {
                                 AppToasts.showErrorToast(
                                   message: "signature_approve".tr(context),
