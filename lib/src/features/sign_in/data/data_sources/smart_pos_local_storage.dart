@@ -25,7 +25,11 @@ abstract class SmartPosLocalStorage {
   // ============ App Version update ========= //
   Future<void> saveCheckedUpdateDate(DateTime dateTime);
 
+  Future<void> saveCheckedUpdateVersion(String version);
+
   DateTime? getCheckedUpdatedDate();
+
+  String? getCheckedUpdatedversion();
 
   Future<void> clearCheckUpdateDate();
 
@@ -180,5 +184,16 @@ class SmartPosLocalStorageImpl implements SmartPosLocalStorage {
   @override
   saveTheme(AppThemes theme) async {
     await sharedPreferences.setString(AppKeys.theme, theme.name);
+  }
+
+  @override
+  String? getCheckedUpdatedversion() {
+    final String? number = sharedPreferences.getString(AppKeys.checkVersionNumber);
+    return number;
+  }
+
+  @override
+  Future<void> saveCheckedUpdateVersion(String version) async {
+    await sharedPreferences.setString(AppKeys.checkVersionNumber, version);
   }
 }

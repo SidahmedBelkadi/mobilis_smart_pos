@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/session_timeout.dart';
+import 'package:mobilis_smart_pos/src/core/utils/helpers/toast_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/api/end_points.dart';
@@ -54,6 +56,8 @@ List<Widget> screens = [
 late int screenIndex;
 
 class _MyHomePageState extends State<MainScreen> {
+  static const platform = MethodChannel("channel");
+
   @override
   void initState() {
     super.initState();
@@ -77,6 +81,14 @@ class _MyHomePageState extends State<MainScreen> {
     }
   }
 
+  static Future<void> openInBrowser() async {
+    try {
+      await platform.invokeMethod('openBrowser', {'downloadUrl': EndPoints.downloadApk});
+    } catch (e) {
+      debugPrint('Error opening browser: $e');
+    }
+  }
+
   void _showUpdateDialog() {
     showDialog(
       context: context,
@@ -90,21 +102,13 @@ class _MyHomePageState extends State<MainScreen> {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('update_available_instruction'.tr(context)),
                 LottieBuilder.asset(AppImages.uploading, height: 120.sp, width: 120.sp),
+                Text('update_available_instruction'.tr(context)),
               ],
             ),
             actions: <Widget>[
               TextButton(
-                onPressed: () async {
-                  final updateUrl = Uri.parse(EndPoints.downloadApk);
-                  if (await canLaunchUrl(updateUrl)) {
-                    await launchUrl(updateUrl);
-                    exit(0); // Exit the app after update is initiated
-                  } else {
-                    debugPrint("========= could not launch URL");
-                  }
-                },
+                onPressed: openInBrowser,
                 child: Text('update_now'.tr(context)),
               ),
             ],

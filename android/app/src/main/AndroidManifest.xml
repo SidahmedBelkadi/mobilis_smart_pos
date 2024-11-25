@@ -54,6 +54,7 @@
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="Mobilis Smart POS"
+        android:enableOnBackInvokedCallback="true"
         tools:replace="android:allowBackup">
 
         <provider

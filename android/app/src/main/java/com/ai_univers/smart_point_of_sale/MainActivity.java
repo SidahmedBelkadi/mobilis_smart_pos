@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
 import android.nfc.Tag;
@@ -46,6 +47,8 @@ public class MainActivity extends FlutterActivity {
     private boolean resultSent = false;
     private static final int OCR_REQUEST_CODE = 1001;
     private static final int BARCODE_REQUEST_CODE = 2002;
+
+
     private MethodChannel.Result pendingResult;
     private MethodChannel.Result barCodePendingResult;
 
@@ -106,13 +109,17 @@ public class MainActivity extends FlutterActivity {
                                     intent.putExtra("documentType", documentType);
                                     startActivityForResult(intent, OCR_REQUEST_CODE);
 
-                                }if (call.method.equals("startBarcodeScanner")) {
+                                }else if (call.method.equals("startBarcodeScanner")) {
                                     if (barCodePendingResult != null) {
                                         result.error("ALREADY_ACTIVE", "A scan is already in progress", null);
                                         return;
                                     }
                                     barCodePendingResult = result;
                                     startBarcodeScanner();
+                                }else if (call.method.equals("openBrowser")) {
+                                    String url = call.argument("downloadUrl");
+                                    openBrowser(url);
+                                    result.success(null);
                                 }
                             }
                         }
@@ -186,6 +193,12 @@ public class MainActivity extends FlutterActivity {
                 pendingResult = null; // Clear the result to avoid duplicate replies
             }
         }
+    }
+
+    private void openBrowser(String url) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     private void startBarcodeScanner() {

@@ -16,6 +16,18 @@ class UpgraderService {
   Future<bool> checkIfLastVersionUpdate() async {
     try {
       final storage = di.serviceLocator<SmartPosLocalStorage>();
+      // Get the current app version
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      String currentVersion = packageInfo.version;
+      final lastCheckedVersion = storage.getCheckedUpdatedversion();
+
+      // If the version has been updated, clear the flags
+      if (lastCheckedVersion != null && isCurrentVersionNewer(currentVersion, lastCheckedVersion)) {
+        debugPrint("======== TRUE");
+
+        final DateTime adjustedDate = DateTime.now().subtract(const Duration(minutes: 32));
+        storage.saveCheckedUpdateDate(adjustedDate);
+      }
 
       // Get the last checked update date
       final DateTime? lastCheckDate = storage.getCheckedUpdatedDate();
@@ -26,13 +38,15 @@ class UpgraderService {
         return false;
       }
 
-      // Get the current app version
-      PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      String currentVersion = packageInfo.version;
-
       // Fetch the latest version from the server
       final response = await dio.get(EndPoints.appVersion);
+      debugPrint("RESPONSE : $response");
       final serverVersion = jsonDecode(response)['version'];
+
+      debugPrint("SERVER VERSION $serverVersion");
+
+      // Save the server version
+      storage.saveCheckedUpdateVersion(serverVersion);
 
       // Compare the versions
       if (_isUpdateAvailable(currentVersion, serverVersion)) {
@@ -52,6 +66,24 @@ class UpgraderService {
       debugPrint('Error checking app version: $e');
       return false; // Return false if an error occurs
     }
+  }
+
+  bool isCurrentVersionNewer(String currentVersion, String lastCheckedVersion) {
+    List<String> currentParts = currentVersion.split('.');
+    List<String> lastCheckedParts = lastCheckedVersion.split('.');
+
+    for (int i = 0; i < currentParts.length; i++) {
+      int currentPart = int.parse(currentParts[i]);
+      int lastCheckedPart = int.parse(lastCheckedParts[i]);
+
+      if (currentPart > lastCheckedPart) {
+        return true; // Current version is newer
+      } else if (currentPart < lastCheckedPart) {
+        return false; // Last checked version is newer
+      }
+    }
+
+    return true; // Versions are identical
   }
 
   bool _isUpdateAvailable(String currentVersion, String serverVersion) {

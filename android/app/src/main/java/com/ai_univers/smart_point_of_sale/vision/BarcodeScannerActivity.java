@@ -2,6 +2,8 @@ package com.ai_univers.smart_point_of_sale.vision;
 
 import android.content.Intent;
 import android.graphics.Rect;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.util.Size;
 
@@ -113,6 +115,8 @@ public class BarcodeScannerActivity extends AppCompatActivity {
                     for (Barcode barcode : barcodes) {
                         String rawValue = barcode.getRawValue();
                         if (rawValue != null) {
+                            
+
                             // Check if the result starts with "892130" and modify it
                             if (rawValue.startsWith("892130")) {
                                 rawValue = rawValue.substring(6); // Remove the first 6 characters
@@ -130,6 +134,15 @@ public class BarcodeScannerActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     imageProxy.close(); // Release the image
                 });
+    }
+
+    private void playBeep() {
+        // Use ToneGenerator to play a simple beep sound
+        ToneGenerator toneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+        toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 150); // 150ms beep
+
+        // Release the ToneGenerator after the tone is played
+        new android.os.Handler().postDelayed(toneGenerator::release, 150);
     }
 
 

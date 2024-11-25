@@ -12,6 +12,7 @@ class AppKeys {
   static const String locale = 'W9X0Y1Z2A3B4';
   static const String scheduledNotification = 'C5D6E7F8G9H0';
   static const String checkVerionUpdate = 'X5554125G9H9';
+  static const String checkVersionNumber = 'X5554hqgdqt9H9';
   static const String isUpdatePening = 'Xytd5hshgsG9H9';
   static const String theme = '^pytdhggqgyG9H9';
 }
