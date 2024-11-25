@@ -192,7 +192,7 @@ public class DzNfcModel {
         resultJson.put("issuing_state", issuingState);
         resultJson.put("blood_group", bloodGroup);
         resultJson.put("date_of_delivery", formattedDateOfDelivery);
-        resultJson.put("issuing_authority", issuingAuthority);
+        resultJson.put("issuing_authority", issuingAuthority.substring(dg12File.getIssuingAuthority().indexOf("_") + 1));
         resultJson.put("facial_image", facialImageBytes != null ? new JSONArray(convertByteArrayToList(facialImageBytes)) : JSONObject.NULL);
         resultJson.put("signature_image", signatureImageBytes != null ? new JSONArray(convertByteArrayToList(signatureImageBytes)) : JSONObject.NULL);
 
