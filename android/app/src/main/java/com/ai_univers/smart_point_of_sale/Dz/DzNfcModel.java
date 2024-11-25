@@ -154,7 +154,7 @@ public class DzNfcModel {
         String documentNum = mrzInfo.getDocumentNumber();
         String nationality = mrzInfo.getNationality();
         String issuingState = mrzInfo.getIssuingState();
-        String birthDate = formatDate(mrzInfo.getDateOfBirth());
+        String birthDate = formatDateOfBirth(mrzInfo.getDateOfBirth());
         String expiryDate = formatDate(mrzInfo.getDateOfExpiry());
         String gender = String.valueOf(mrzInfo.getGender());
 
@@ -171,7 +171,7 @@ public class DzNfcModel {
         String bloodGroup = this.documentType.equals("passport") ? dg11File.getCustodyInformation() != null ? dg11File.getCustodyInformation() : "N/A" : dg11File.getPermanentAddress().get(2) != null ? dg11File.getPermanentAddress().get(2) : "N/A";   // Blood Group
         String issuingAuthority = this.documentType.equals("passport") ? dg12File.getIssuingAuthority() : dg12File.getIssuingAuthority().split("<<")[0];
         String rawDateOfDelivery = dg12File.getDateOfIssue() != null ? dg12File.getDateOfIssue().toString() : "N/A";
-        String formattedDateOfDelivery = formatDateOfDelivery(rawDateOfDelivery);
+        String formattedDateOfDelivery = formatDate(rawDateOfDelivery);
 
         JSONObject resultJson = new JSONObject();
         resultJson.put("document_type", this.documentType);
@@ -219,7 +219,7 @@ public class DzNfcModel {
         return rawName.replace("<", " ").trim().replaceAll("\\s+", " ");
     }
 
-    private String formatDate(String date) {
+    private String formatDateOfBirth(String date) {
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyMMdd", Locale.US);
         SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
@@ -236,7 +236,7 @@ public class DzNfcModel {
     }
 
 
-    private String formatDateOfDelivery(String date) {
+    private String formatDate(String date) {
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
         try {
