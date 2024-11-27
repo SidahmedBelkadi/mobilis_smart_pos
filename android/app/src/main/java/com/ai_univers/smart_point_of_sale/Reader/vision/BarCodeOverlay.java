@@ -1,4 +1,4 @@
-package com.ai_univers.smart_point_of_sale.vision;
+package com.ai_univers.smart_point_of_sale.Reader.vision;
 
 import android.content.Context;
 import android.content.res.TypedArray;

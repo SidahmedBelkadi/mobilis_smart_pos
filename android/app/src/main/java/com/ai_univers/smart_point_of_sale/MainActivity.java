@@ -17,13 +17,12 @@ import android.os.Debug;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.ai_univers.smart_point_of_sale.Reader.NFCResultCallback;
-import com.ai_univers.smart_point_of_sale.vision.BarcodeScannerActivity;
-import com.ai_univers.smart_point_of_sale.vision.ScanActivity;
+import com.ai_univers.smart_point_of_sale.Reader.vision.BarcodeScannerActivity;
+import com.ai_univers.smart_point_of_sale.Reader.vision.ScanActivity;
 
 import org.json.JSONObject;
 

@@ -131,12 +131,12 @@
         </activity>
 
         <activity
-            android:name="com.ai_univers.smart_point_of_sale.vision.ScanActivity"
+            android:name="com.ai_univers.smart_point_of_sale.Reader.vision.ScanActivity"
             android:screenOrientation="landscape"
             android:theme="@style/FullScreenTheme"
              />
 
-        <activity android:name="com.ai_univers.smart_point_of_sale.vision.BarcodeScannerActivity"
+        <activity android:name="com.ai_univers.smart_point_of_sale.Reader.vision.BarcodeScannerActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
 

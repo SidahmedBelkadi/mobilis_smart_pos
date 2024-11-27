@@ -1,16 +1,13 @@
-package com.ai_univers.smart_point_of_sale.vision;
+package com.ai_univers.smart_point_of_sale.Reader.vision;
 
 import android.content.Intent;
 import android.graphics.Rect;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
-import android.util.Size;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ExperimentalGetImage;
 import androidx.camera.core.ImageAnalysis;

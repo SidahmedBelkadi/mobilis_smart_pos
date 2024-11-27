@@ -22,7 +22,7 @@ class UpgraderService {
       final lastCheckedVersion = storage.getCheckedUpdatedversion();
 
       // If the version has been updated, clear the flags
-      if (lastCheckedVersion != null && isCurrentVersionNewer(currentVersion, lastCheckedVersion)) {
+      if (isCurrentVersionNewer(currentVersion, lastCheckedVersion)) {
         debugPrint("======== TRUE");
 
         final DateTime adjustedDate = DateTime.now().subtract(const Duration(minutes: 32));
@@ -68,22 +68,26 @@ class UpgraderService {
     }
   }
 
-  bool isCurrentVersionNewer(String currentVersion, String lastCheckedVersion) {
-    List<String> currentParts = currentVersion.split('.');
-    List<String> lastCheckedParts = lastCheckedVersion.split('.');
+  bool isCurrentVersionNewer(String currentVersion, String? lastCheckedVersion) {
+    if (lastCheckedVersion != null) {
+      List<String> currentParts = currentVersion.split('.');
+      List<String> lastCheckedParts = lastCheckedVersion.split('.');
 
-    for (int i = 0; i < currentParts.length; i++) {
-      int currentPart = int.parse(currentParts[i]);
-      int lastCheckedPart = int.parse(lastCheckedParts[i]);
+      for (int i = 0; i < currentParts.length; i++) {
+        int currentPart = int.parse(currentParts[i]);
+        int lastCheckedPart = int.parse(lastCheckedParts[i]);
 
-      if (currentPart > lastCheckedPart) {
-        return true; // Current version is newer
-      } else if (currentPart < lastCheckedPart) {
-        return false; // Last checked version is newer
+        if (currentPart > lastCheckedPart) {
+          return true; // Current version is newer
+        } else if (currentPart < lastCheckedPart) {
+          return false; // Last checked version is newer
+        }
       }
-    }
 
-    return true; // Versions are identical
+      return true; // Versions are identical
+    } else {
+      return true;
+    }
   }
 
   bool _isUpdateAvailable(String currentVersion, String serverVersion) {

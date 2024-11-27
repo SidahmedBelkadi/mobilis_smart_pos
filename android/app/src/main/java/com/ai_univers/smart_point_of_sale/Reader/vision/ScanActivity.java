@@ -1,4 +1,4 @@
-package com.ai_univers.smart_point_of_sale.vision;
+package com.ai_univers.smart_point_of_sale.Reader.vision;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -12,9 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
-import androidx.camera.core.ExperimentalGetImage;
 import androidx.camera.core.ImageAnalysis;
-import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
