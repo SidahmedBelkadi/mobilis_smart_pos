@@ -31,6 +31,15 @@ class Invoice extends StatelessWidget {
     }
   }
 
+  String _filterICCD(String iccd) {
+    if (iccd.contains("_")) {
+      debugPrint("=============== ${iccd.substring(iccd.indexOf("_") + 1)}");
+      return iccd.substring(iccd.indexOf("_") + 1);
+    } else {
+      return iccd;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -118,7 +127,7 @@ class Invoice extends StatelessWidget {
                       child: Text(
                         invoiceEntity.iccid == null
                             ? "notAvailable".tr(context)
-                            : invoiceEntity.iccid.toString(),
+                            : _filterICCD(invoiceEntity.iccid.toString()),
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
