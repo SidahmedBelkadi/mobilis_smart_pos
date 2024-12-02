@@ -23,6 +23,8 @@ class _TestSmsState extends State<TestSms> {
       "+${di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials()!.msisdn!}";
   Timer? _smsTimer;
 
+  int _preferedSlot = 0;
+
   Future<void> setSenderPhoneNumber(String number) async {
     try {
       await platform.invokeMethod('setSenderPhoneNumber', {'senderPhoneNumber': number});
@@ -31,12 +33,13 @@ class _TestSmsState extends State<TestSms> {
     }
   }
 
-  Future<void> sendSms(String message, String recipient) async {
+  Future<void> sendSms(String message, String recipient, int slot) async {
     try {
       setState(() {
         smsLoading = true;
       });
       final code = await platform.invokeMethod('sendSms', {
+        'slot': slot,
         'message': message,
         'recipient': recipient,
         'dealerNumber': senderPhoneNumber,
@@ -105,13 +108,30 @@ class _TestSmsState extends State<TestSms> {
     AppToasts.showErrorToast(message: errorMessage.tr(context), context: context);
   }
 
+  _getPreferedSlot() {
+    final slot = di.serviceLocator<SmartPosLocalStorage>().getPreferedSlot();
+    if (slot != null) {
+      setState(() {
+        _preferedSlot = slot;
+      });
+    } else {
+      _preferedSlot = 0;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getPreferedSlot();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: ElevatedButton(
-          onPressed: () {
-            sendSms("Hello", "444");
+          onPressed: () async {
+            sendSms("Hello", "444", _preferedSlot);
           },
           child: const Text("SMS"),
         ),

@@ -308,5 +308,6 @@
   "NO_SIM": "No active SIM card found. Please insert a SIM card.",
   "INVALID_OPERATOR": "Please use a Mobilis APN SIM card.",
   "SMS_FAILED": "Failed to send SMS. Please try again later.",
-  "UNKNOWN_ERROR": "Error occurred while sending activation sms."
+  "UNKNOWN_ERROR": "Error occurred while sending activation sms.",
+  "config_sim": "SIM SETUP"
 }

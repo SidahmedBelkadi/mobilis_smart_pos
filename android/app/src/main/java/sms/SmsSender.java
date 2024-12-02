@@ -32,6 +32,8 @@ public class SmsSender implements MethodChannel.MethodCallHandler {
         if (call.method.equals("sendSms")) {
             String message = call.argument("message");
             String recipient = call.argument("recipient");
+            int slot = call.argument("slot");
+
 
             // Check required permissions
             if (!hasRequiredPermissions()) {
@@ -71,16 +73,16 @@ public class SmsSender implements MethodChannel.MethodCallHandler {
                     return;
                 }
 
-                // Check SIM slot 1 and operator name
-                SubscriptionInfo simSlot1 = subscriptionInfoList.get(0);
-                String operatorName = simSlot1.getCarrierName().toString();
+                // Check SIM slot selected by user and operator name
+                SubscriptionInfo simSlot = subscriptionInfoList.get(slot);
+                String operatorName = simSlot.getCarrierName().toString();
                 if (!"Mobilis".equalsIgnoreCase(operatorName)) {
                     result.error("INVALID_OPERATOR", "Operator in slot 1 is not Mobilis", null);
                     return;
                 }
 
                 // Send SMS using the appropriate subscription
-                SmsManager smsManager = SmsManager.getSmsManagerForSubscriptionId(simSlot1.getSubscriptionId());
+                SmsManager smsManager = SmsManager.getSmsManagerForSubscriptionId(simSlot.getSubscriptionId());
                 smsManager.sendTextMessage(recipient, null, message, null, null);
                 result.success("SMS_SENT");
             } catch (Exception e) {

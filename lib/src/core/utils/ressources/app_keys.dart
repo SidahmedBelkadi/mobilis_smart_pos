@@ -15,4 +15,5 @@ class AppKeys {
   static const String checkVersionNumber = 'X5554hqgdqt9H9';
   static const String isUpdatePening = 'Xytd5hshgsG9H9';
   static const String theme = '^pytdhggqgyG9H9';
+  static const String slot = '^arfcvbdaytf5454H9';
 }

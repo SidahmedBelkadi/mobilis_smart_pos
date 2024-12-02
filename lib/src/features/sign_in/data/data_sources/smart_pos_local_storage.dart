@@ -41,6 +41,12 @@ abstract class SmartPosLocalStorage {
   saveTheme(AppThemes theme);
 
   AppThemes getCurrentTheme();
+
+  // =========== SIM Slot Config =========== //
+
+  Future<void> setPreferedSlot({required int slot});
+
+  int? getPreferedSlot();
 }
 
 class SmartPosLocalStorageImpl implements SmartPosLocalStorage {
@@ -195,5 +201,16 @@ class SmartPosLocalStorageImpl implements SmartPosLocalStorage {
   @override
   Future<void> saveCheckedUpdateVersion(String version) async {
     await sharedPreferences.setString(AppKeys.checkVersionNumber, version);
+  }
+
+  @override
+  int? getPreferedSlot() {
+    final int? number = sharedPreferences.getInt(AppKeys.slot);
+    return number;
+  }
+
+  @override
+  Future<void> setPreferedSlot({required int slot}) async {
+    await sharedPreferences.setInt(AppKeys.slot, slot);
   }
 }

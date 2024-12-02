@@ -14,6 +14,9 @@ import android.nfc.tech.IsoDep;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Debug;
+import android.telephony.SubscriptionInfo;
+import android.telephony.SubscriptionManager;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -27,7 +30,9 @@ import com.ai_univers.smart_point_of_sale.Reader.vision.ScanActivity;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.plugin.common.MethodCall;
@@ -119,6 +124,10 @@ public class MainActivity extends FlutterActivity {
                                     String url = call.argument("downloadUrl");
                                     openBrowser(url);
                                     result.success(null);
+                                }else if (call.method.equals("getSimOperators")) {
+                                    // Fetch SIM operators
+                                    List<String> simOperators = getSimOperators();
+                                    result.success(simOperators);
                                 }
                             }
                         }
@@ -192,6 +201,36 @@ public class MainActivity extends FlutterActivity {
                 pendingResult = null; // Clear the result to avoid duplicate replies
             }
         }
+    }
+
+    private List<String> getSimOperators() {
+        List<String> simOperators = new ArrayList<>();
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+            SubscriptionManager subscriptionManager = (SubscriptionManager) getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE);
+
+            if (subscriptionManager != null) {
+                List<SubscriptionInfo> subscriptionInfoList = subscriptionManager.getActiveSubscriptionInfoList();
+                if (subscriptionInfoList != null && !subscriptionInfoList.isEmpty()) {
+                    for (SubscriptionInfo subscriptionInfo : subscriptionInfoList) {
+                        int subscriptionId = subscriptionInfo.getSubscriptionId();
+                        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+                        TelephonyManager subscriptionTelephonyManager = telephonyManager.createForSubscriptionId(subscriptionId);
+
+                        String operatorName = subscriptionTelephonyManager.getNetworkOperatorName();
+                        if (operatorName != null && !operatorName.isEmpty()) {
+                            simOperators.add(operatorName);
+                        } else {
+                            simOperators.add(null);
+                        }
+                    }
+                }
+            }
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
+        }
+
+        return simOperators;
     }
 
     private void openBrowser(String url) {

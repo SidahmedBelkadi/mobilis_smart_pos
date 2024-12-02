@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:mobilis_smart_pos/src/app.dart';
 import 'package:mobilis_smart_pos/src/core/commom/widgets/version.dart';
+import 'package:mobilis_smart_pos/src/features/main/presentation/widgets/sim_card_slot_tile.dart';
+import 'package:mobilis_smart_pos/src/features/sign_in/data/data_sources/smart_pos_local_storage.dart';
+import '../../../../dependency_injection/injection_container.dart' as di;
 import '../../../../core/utils/enums/themes_enum.dart';
 import '../../../../core/utils/ressources/app_colors.dart';
 import '../cubits/cubit/theme_cubit.dart';
@@ -18,8 +23,57 @@ import '../../../sign_out/presentation/cubit/sign_out_cubit.dart';
 import '../cubits/cubit/locale_cubit.dart';
 import 'language_tile.dart';
 
-class HomeDrawer extends StatelessWidget {
+class HomeDrawer extends StatefulWidget {
   const HomeDrawer({super.key});
+
+  @override
+  State<HomeDrawer> createState() => _HomeDrawerState();
+}
+
+class _HomeDrawerState extends State<HomeDrawer> {
+  static const MethodChannel _platform = MethodChannel('channel');
+  List<String?> _simOperators = ["...", "..."];
+
+  int _preferedSlot = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchSimOperators();
+    _getPreferedSlot();
+  }
+
+  _getPreferedSlot() {
+    final slot = di.serviceLocator<SmartPosLocalStorage>().getPreferedSlot();
+    if (slot != null) {
+      setState(() {
+        _preferedSlot = slot;
+      });
+    } else {
+      _preferedSlot = 0;
+    }
+  }
+
+  Future<void> _setPreferedSlot({required int slot}) async {
+    setState(() {
+      _preferedSlot = slot;
+    });
+    await di.serviceLocator<SmartPosLocalStorage>().setPreferedSlot(slot: slot);
+  }
+
+  Future<void> _fetchSimOperators() async {
+    try {
+      final operators = await _platform.invokeMethod<List<dynamic>>('getSimOperators');
+      setState(() {
+        _simOperators = operators?.cast<String?>() ?? [];
+      });
+    } catch (e) {
+      debugPrint("===== $e");
+      setState(() {
+        _simOperators = [];
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,9 +92,30 @@ class HomeDrawer extends StatelessWidget {
               height: 8.sp,
             ),
             ExpansionTile(
+              title: ExpansionTileTitle(
+                title: "config_sim".tr(context),
+                icon: FontAwesomeIcons.gear,
+              ),
+              children: _simOperators
+                  .asMap()
+                  .entries
+                  .where((entry) => entry.value != null && entry.value!.isNotEmpty)
+                  .map(
+                    (entry) => SimCardSlotTile(
+                      onTap: () => _setPreferedSlot(slot: entry.key),
+                      isSelected: entry.key == _preferedSlot,
+                      title: entry.value ?? "N/A",
+                      icon: entry.key == 0 ? FontAwesomeIcons.one : FontAwesomeIcons.two,
+                    ),
+                  )
+                  .toList(),
+            ),
+            ExpansionTile(
               iconColor: AppColors.primary,
               title: ExpansionTileTitle(
-                  title: "preferences".tr(context), icon: FontAwesomeIcons.wrench),
+                title: "preferences".tr(context),
+                icon: FontAwesomeIcons.wrench,
+              ),
               children: [
                 BlocBuilder<LocaleCubit, ChangeLocalState>(
                   builder: (context, state) {
@@ -69,7 +144,9 @@ class HomeDrawer extends StatelessWidget {
             ),
             ExpansionTile(
               title: ExpansionTileTitle(
-                  title: "confidentiality".tr(context), icon: FontAwesomeIcons.lock),
+                title: "confidentiality".tr(context),
+                icon: FontAwesomeIcons.lock,
+              ),
               children: [
                 ChangePasswordTile(
                   onTap: () {
@@ -79,8 +156,10 @@ class HomeDrawer extends StatelessWidget {
               ],
             ),
             ExpansionTile(
-              title:
-                  ExpansionTileTitle(title: "my_folder".tr(context), icon: FontAwesomeIcons.folder),
+              title: ExpansionTileTitle(
+                title: "my_folder".tr(context),
+                icon: FontAwesomeIcons.folder,
+              ),
               children: [
                 Padding(
                   padding: EdgeInsets.only(left: 10.0.sp),
@@ -126,7 +205,10 @@ class HomeDrawer extends StatelessWidget {
                 }
                 if (state is SignOutUnSuccessful) {
                   AppToasts.showErrorToast(
-                      message: state.message, onAutoCompleteCompleted: (p0) {}, context: context);
+                    message: state.message,
+                    onAutoCompleteCompleted: (p0) {},
+                    context: context,
+                  );
                 }
               },
               builder: (context, state) {
