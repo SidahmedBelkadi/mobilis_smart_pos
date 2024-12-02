@@ -347,7 +347,8 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
 
           sendSms(sms, "444");
         }
-        if (state is GenerateContractSuccess) {
+        // TODO : Don't forget to refresh list in case of Error of generation because the invoice will be deleted
+        if (state is GenerateContractSuccess || state is GenerateContractFailed) {
           context.read<InvoicesCubit>().getInvoices(isFirstTime: true);
         }
       },
