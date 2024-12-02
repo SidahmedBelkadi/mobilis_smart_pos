@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/toast_helper.dart';
-import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/contract_cubit.dart';
+import 'package:mobilis_smart_pos/src/features/contract/presentation/parent_contract_screen.dart';
 import 'package:mobilis_smart_pos/src/features/sign_in/data/data_sources/smart_pos_local_storage.dart';
 import '../../../dependency_injection/injection_container.dart' as di;
 
@@ -79,30 +79,30 @@ class _TestSmsState extends State<TestSms> {
     String errorMessage;
     switch (code) {
       case 'PERMISSION_DENIED':
-        errorMessage = "Required permissions are not granted.";
+        errorMessage = "PERMISSION_DENIED";
         break;
       case 'SIM_NOT_READY':
-        errorMessage = "The SIM is not ready. Please check your SIM status.";
+        errorMessage = "SIM_NOT_READY";
         break;
       case 'AIRPLANE_MODE':
-        errorMessage = "Airplane mode is enabled. Please disable it to send SMS.";
+        errorMessage = "AIRPLANE_MODE";
         break;
       case 'NO_SMS_NETWORK':
-        errorMessage = "No network available for sending SMS. Please check your connection.";
+        errorMessage = "NO_SMS_NETWORK";
         break;
       case 'NO_SIM':
-        errorMessage = "No active SIM card found. Please insert a SIM card.";
+        errorMessage = "NO_SIM";
         break;
       case 'INVALID_OPERATOR':
-        errorMessage = "The operator in slot 1 is not Mobilis. Please use a Mobilis SIM card.";
+        errorMessage = "INVALID_OPERATOR";
         break;
       case 'SMS_FAILED':
-        errorMessage = "Failed to send SMS. Please try again later.";
+        errorMessage = "SMS_FAILED";
         break;
       default:
-        errorMessage = "An unknown error occurred.";
+        errorMessage = "UNKNOWN_ERROR";
     }
-    AppToasts.showErrorToast(message: errorMessage, context: context);
+    AppToasts.showErrorToast(message: errorMessage.tr(context), context: context);
   }
 
   @override

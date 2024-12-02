@@ -24,8 +24,6 @@ class _SessionTimeoutState extends State<SessionTimeout> {
   int _remainingTime = 600; // 10 minutes
 
   void _startTimer() {
-    debugPrint("===============   SESSION TIMER RESET");
-
     // Cancel any existing timers
     _timer?.cancel();
     _countdownTimer?.cancel();

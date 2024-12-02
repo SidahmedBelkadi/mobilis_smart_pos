@@ -300,5 +300,13 @@
   "try_scan_doc_again": "Please try scanning the document again",
   "enable_nfc": "Please enable NFC in your device settings to start scanning",
   "THIS_MINOR_IS_PRESUMING_TO_BE_ADULT": "Client is a minor. Please rescan the document in better lighting",
-  "pending": "Pending"
+  "pending": "Pending",
+  "PERMISSION_DENIED": "Required permissions are not granted.",
+  "SIM_NOT_READY": "Please check your SIM.",
+  "AIRPLANE_MODE": "Airplane mode is enabled.",
+  "NO_SMS_NETWORK": "No network available for sending SMS.",
+  "NO_SIM": "No active SIM card found. Please insert a SIM card.",
+  "INVALID_OPERATOR": "Please use a Mobilis APN SIM card.",
+  "SMS_FAILED": "Failed to send SMS. Please try again later.",
+  "UNKNOWN_ERROR": "Error occurred while sending activation sms."
 }

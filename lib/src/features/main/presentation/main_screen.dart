@@ -122,11 +122,12 @@ class _MyHomePageState extends State<MainScreen> {
         canPop: false,
         child: Scaffold(
           floatingActionButton: FloatingActionButton(
+            child: const Icon(Icons.sms),
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) {
-                    return TestSms();
+                    return const TestSms();
                   },
                 ),
               );
