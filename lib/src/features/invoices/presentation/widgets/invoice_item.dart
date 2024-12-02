@@ -283,75 +283,77 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<RetryActivationCubit, RetryActivationState>(
-      builder: (context, state) {
-        if ((state is RetryActivationLoading && state.id == widget.invoiceEntity.id) ||
-            smsLoading) {
-          return Container(
-            padding: EdgeInsets.all(5.sp),
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.all(Radius.circular(12.sp)),
-            ),
-            child: SizedBox(
-              height: 16.sp,
-              width: 16.sp,
-              child: const CircularProgressIndicator(
-                color: Colors.white,
-              ),
-            ),
-          );
-        }
-
-        return GestureDetector(
-          onTap: () {
-            context
-                .read<RetryActivationCubit>()
-                .retryActivation(id: widget.invoiceEntity.id.toString());
-          },
-          child: Container(
-            padding: EdgeInsets.all(5.sp),
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.all(Radius.circular(12.sp)),
-            ),
-            child: Icon(
-              FontAwesomeIcons.repeat,
-              size: 16.sp,
-              color: Colors.white,
-            ),
-          ),
-        );
-      },
-      listener: (BuildContext context, RetryActivationState state) {
-        if (state is RetryActivationSuccess) {
-          final url = state.responseEntity.generateContractUrl;
-          final sms = state.responseEntity.formattedStringSms;
-
-          final List<String> parts = url.split('/');
-
-          // Assign each part to a variable
-          final int clientId = int.parse(parts[0]);
-          final int invoiceId = int.parse(parts[1]);
-          final int subscriptionId = int.parse(parts[2]);
-
-          setState(() {
-            generateContractParamsEntity = GenerateContractParamsEntity(
-              clientId: clientId,
-              invoiceId: invoiceId,
-              subsId: subscriptionId,
-              contractCode: widget.invoiceEntity.contractCode,
-              dsaMessage: dsaMessage,
-            );
-          });
-
-          sendSms(sms, "444");
-        }
-        // TODO : Don't forget to refresh list in case of Error of generation because the invoice will be deleted
+    return BlocListener<ContractCubit, ContractState>(
+      listener: (context, state) {
         if (state is GenerateContractSuccess || state is GenerateContractFailed) {
           context.read<InvoicesCubit>().getInvoices(isFirstTime: true);
         }
       },
+      child: BlocConsumer<RetryActivationCubit, RetryActivationState>(
+        builder: (context, state) {
+          if ((state is RetryActivationLoading && state.id == widget.invoiceEntity.id) ||
+              smsLoading) {
+            return Container(
+              padding: EdgeInsets.all(5.sp),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.all(Radius.circular(12.sp)),
+              ),
+              child: SizedBox(
+                height: 16.sp,
+                width: 16.sp,
+                child: const CircularProgressIndicator(
+                  color: Colors.white,
+                ),
+              ),
+            );
+          }
+
+          return GestureDetector(
+            onTap: () {
+              context
+                  .read<RetryActivationCubit>()
+                  .retryActivation(id: widget.invoiceEntity.id.toString());
+            },
+            child: Container(
+              padding: EdgeInsets.all(5.sp),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.all(Radius.circular(12.sp)),
+              ),
+              child: Icon(
+                FontAwesomeIcons.repeat,
+                size: 16.sp,
+                color: Colors.white,
+              ),
+            ),
+          );
+        },
+        listener: (BuildContext context, RetryActivationState state) {
+          if (state is RetryActivationSuccess) {
+            final url = state.responseEntity.generateContractUrl;
+            final sms = state.responseEntity.formattedStringSms;
+
+            final List<String> parts = url.split('/');
+
+            // Assign each part to a variable
+            final int clientId = int.parse(parts[0]);
+            final int invoiceId = int.parse(parts[1]);
+            final int subscriptionId = int.parse(parts[2]);
+            sendSms(sms, "444");
+
+            setState(() {
+              generateContractParamsEntity = GenerateContractParamsEntity(
+                clientId: clientId,
+                invoiceId: invoiceId,
+                subsId: subscriptionId,
+                contractCode: widget.invoiceEntity.contractCode,
+                dsaMessage: dsaMessage,
+              );
+            });
+          }
+        },
+      ),
     );
   }
 }
