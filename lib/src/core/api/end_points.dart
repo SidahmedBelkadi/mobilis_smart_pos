@@ -28,6 +28,7 @@ class EndPoints {
   static const String updatePDV = "$baseUrl/employee";
   static const String uploadPDV = "$baseUrl/file/employee";
   static const String pdvFolder = "$baseUrl/folder/employee";
+  static const String retryActivation = "$baseUrl/retry/edit";
 
   // ================== CLIENT ================= //
   static const String checkBeforeEditContract = "$baseUrl/contract/check-before-edit";

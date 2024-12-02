@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:intl/intl.dart';
 
 class InvoiceEntity extends Equatable {
+  final int id;
   final String contractCode;
   final String invoiceDate;
   final int? amount;
@@ -10,6 +11,7 @@ class InvoiceEntity extends Equatable {
   final String? iccid;
 
   const InvoiceEntity({
+    required this.id,
     required this.contractCode,
     required this.invoiceDate,
     required this.amount,
@@ -19,7 +21,7 @@ class InvoiceEntity extends Equatable {
   });
 
   @override
-  List<Object?> get props => [contractCode, invoiceDate, amount, status, msisdn];
+  List<Object?> get props => [id, contractCode, invoiceDate, amount, status, msisdn];
 
   String get formattedInvoiceDate {
     final dateTime = DateTime.tryParse(invoiceDate);
