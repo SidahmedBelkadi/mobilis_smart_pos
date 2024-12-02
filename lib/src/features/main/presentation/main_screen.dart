@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/session_timeout.dart';
+import 'package:mobilis_smart_pos/src/features/main/presentation/test_sms.dart';
 
 import '../../../core/api/end_points.dart';
 import '../../../core/utils/helpers/app_localization_helper.dart';
@@ -120,6 +121,17 @@ class _MyHomePageState extends State<MainScreen> {
       child: PopScope(
         canPop: false,
         child: Scaffold(
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return TestSms();
+                  },
+                ),
+              );
+            },
+          ),
           drawer: const HomeDrawer(),
           bottomNavigationBar: CustomAppBottomNavBar(
             currentIndex: screenIndex,
