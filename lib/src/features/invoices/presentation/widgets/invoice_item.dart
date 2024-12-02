@@ -191,6 +191,7 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
   String senderPhoneNumber =
       "+${di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials()!.msisdn!}";
   Timer? _smsTimer;
+  int _preferedSlot = 0;
 
   static const platform = MethodChannel('sms/sms_receiver');
 
@@ -202,12 +203,13 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
     }
   }
 
-  Future<void> sendSms(String message, String recipient) async {
+  Future<void> sendSms(String message, String recipient, int slot) async {
     try {
       setState(() {
         smsLoading = true;
       });
       await platform.invokeMethod('sendSms', {
+        'slot': slot,
         'message': message,
         'recipient': recipient,
         'dealerNumber': senderPhoneNumber,
@@ -224,6 +226,7 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
             .attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
       });
     } on PlatformException catch (e) {
+      handleSmsError(e.code, context);
       debugPrint("${e.message} ");
     }
   }
@@ -263,6 +266,8 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
   void initState() {
     super.initState();
 
+    _getPreferedSlot();
+
     platform.setMethodCallHandler((call) async {
       if (call.method == "receivedSms") {
         // Cancel the timer when SMS is received
@@ -279,6 +284,47 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
 
     // Set the sender's phone number
     setSenderPhoneNumber(senderPhoneNumber);
+  }
+
+  void handleSmsError(String code, BuildContext context) {
+    String errorMessage;
+    switch (code) {
+      case 'PERMISSION_DENIED':
+        errorMessage = "PERMISSION_DENIED";
+        break;
+      case 'SIM_NOT_READY':
+        errorMessage = "SIM_NOT_READY";
+        break;
+      case 'AIRPLANE_MODE':
+        errorMessage = "AIRPLANE_MODE";
+        break;
+      case 'NO_SMS_NETWORK':
+        errorMessage = "NO_SMS_NETWORK";
+        break;
+      case 'NO_SIM':
+        errorMessage = "NO_SIM";
+        break;
+      case 'INVALID_OPERATOR':
+        errorMessage = "INVALID_OPERATOR";
+        break;
+      case 'SMS_FAILED':
+        errorMessage = "SMS_FAILED";
+        break;
+      default:
+        errorMessage = "UNKNOWN_ERROR";
+    }
+    AppToasts.showErrorToast(message: errorMessage.tr(context), context: context);
+  }
+
+  _getPreferedSlot() {
+    final slot = di.serviceLocator<SmartPosLocalStorage>().getPreferedSlot();
+    if (slot != null) {
+      setState(() {
+        _preferedSlot = slot;
+      });
+    } else {
+      _preferedSlot = 0;
+    }
   }
 
   @override
@@ -340,7 +386,7 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
             final int clientId = int.parse(parts[0]);
             final int invoiceId = int.parse(parts[1]);
             final int subscriptionId = int.parse(parts[2]);
-            sendSms(sms, "444");
+            sendSms(sms, "444", _preferedSlot);
 
             setState(() {
               generateContractParamsEntity = GenerateContractParamsEntity(
