@@ -73,6 +73,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
   String _smsMessage = "No message received yet.";
   String senderPhoneNumber =
       "+${di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials()!.msisdn!}";
+  int _preferedSlot = 0;
 
   String? signatureImagePath;
   bool isSignatureValidated = false;
@@ -86,15 +87,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
   void initState() {
     super.initState();
     ScreenshotService.disableScreenshots();
-    debugPrint(
-      "======================== SIGNATURE : APN NUMBER : +${di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials()!.msisdn}",
-    );
-    debugPrint("======================== SIGNATURE : RECTO : ${widget.recto}");
-    debugPrint("======================== SIGNATURE : VERSO : ${widget.verso}");
-    debugPrint("======================== SIGNATURE : JUSTIFICATIF : ${widget.justificatif}");
-    debugPrint("======================== SIGNATURE : ISPASSPORT : ${widget.isPassport}");
-    debugPrint("======================== SIGNATURE : SMS : ${widget.formattedSmsCode}");
-    debugPrint("======================== SIGNATURE : CONTRACT : ${widget.contract}");
+    _getPreferedSlot();
 
     platform.setMethodCallHandler((call) async {
       if (call.method == "receivedSms") {
@@ -120,6 +113,17 @@ class _SignatureScreenState extends State<SignatureScreen> {
     super.dispose();
   }
 
+  _getPreferedSlot() {
+    final slot = di.serviceLocator<SmartPosLocalStorage>().getPreferedSlot();
+    if (slot != null) {
+      setState(() {
+        _preferedSlot = slot;
+      });
+    } else {
+      _preferedSlot = 0;
+    }
+  }
+
   Future<bool> _requestSmsPermission() async {
     PermissionStatus status = await PermissionsUtil.checkPermissionStatus(Permission.sms);
     if (status.isDenied || status.isRestricted) {
@@ -138,12 +142,13 @@ class _SignatureScreenState extends State<SignatureScreen> {
     }
   }
 
-  Future<void> sendSms(String message, String recipient) async {
+  Future<void> sendSms(String message, String recipient, int slot) async {
     try {
       setState(() {
         smsLoading = true;
       });
       await platform.invokeMethod('sendSms', {
+        'slot': slot,
         'message': message,
         'recipient': recipient,
         'dealerNumber': senderPhoneNumber,
@@ -160,8 +165,38 @@ class _SignatureScreenState extends State<SignatureScreen> {
             .attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
       });
     } on PlatformException catch (e) {
-      debugPrint("${e.message} ");
+      handleSmsError(e.code, context);
     }
+  }
+
+  void handleSmsError(String code, BuildContext context) {
+    String errorMessage;
+    switch (code) {
+      case 'PERMISSION_DENIED':
+        errorMessage = "PERMISSION_DENIED";
+        break;
+      case 'SIM_NOT_READY':
+        errorMessage = "SIM_NOT_READY";
+        break;
+      case 'AIRPLANE_MODE':
+        errorMessage = "AIRPLANE_MODE";
+        break;
+      case 'NO_SMS_NETWORK':
+        errorMessage = "NO_SMS_NETWORK";
+        break;
+      case 'NO_SIM':
+        errorMessage = "NO_SIM";
+        break;
+      case 'INVALID_OPERATOR':
+        errorMessage = "INVALID_OPERATOR";
+        break;
+      case 'SMS_FAILED':
+        errorMessage = "SMS_FAILED";
+        break;
+      default:
+        errorMessage = "UNKNOWN_ERROR";
+    }
+    AppToasts.showErrorToast(message: errorMessage.tr(context), context: context);
   }
 
   void checkSmsSuccess(String message, BuildContext context) {
@@ -345,7 +380,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
                   final sms = CivilsInformationsConverterHelper.activationSerialNumberPrefix +
                       widget.contract.serialNumber.toString() +
                       widget.formattedSmsCode;
-                  sendSms(sms, "444");
+                  sendSms(sms, "444", _preferedSlot);
                   // Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
                 }
               },

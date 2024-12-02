@@ -38,7 +38,7 @@ class _TestSmsState extends State<TestSms> {
       setState(() {
         smsLoading = true;
       });
-      final code = await platform.invokeMethod('sendSms', {
+      await platform.invokeMethod('sendSms', {
         'slot': slot,
         'message': message,
         'recipient': recipient,
