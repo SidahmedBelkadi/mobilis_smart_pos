@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobilis_smart_pos/src/features/invoices/presentation/cubit/retry_activation/retry_activation_cubit.dart';
 import '../../features/contract/presentation/parent_contract_screen.dart';
 import '../../features/contract/presentation/parent_preparation_screen.dart';
 import '../../features/profile/presentation/cubit/profile_cubit.dart';
@@ -318,8 +319,18 @@ class AppRoutes {
       case Routes.invoices:
         return RoutesAnimationManager.slideFromRightTransition(
           args: args,
-          BlocProvider(
-            create: (_) => serviceLocator<InvoicesCubit>()..getInvoices(isFirstTime: true),
+          MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) => serviceLocator<InvoicesCubit>()..getInvoices(isFirstTime: true),
+              ),
+              BlocProvider(
+                create: (context) => serviceLocator<RetryActivationCubit>(),
+              ),
+              BlocProvider(
+                create: (context) => serviceLocator<ContractCubit>(),
+              ),
+            ],
             child: const InvoicesScreen(),
           ),
         );

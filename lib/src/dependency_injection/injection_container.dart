@@ -2,6 +2,8 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
+import 'package:mobilis_smart_pos/src/features/invoices/domain/use_cases/retry_activation_use_case.dart';
+import 'package:mobilis_smart_pos/src/features/invoices/presentation/cubit/retry_activation/retry_activation_cubit.dart';
 import '../features/profile/domain/user_cases/get_pdv_images_use_case.dart';
 import '../features/sign_in/domain/use_cases/approve_contract_use_case.dart';
 import '../services/upgrader_service.dart';
@@ -183,6 +185,7 @@ Future<void> initializeAppDependencies() async {
   serviceLocator.registerLazySingleton(() => ResetPasswordUseCase(repository: serviceLocator()));
   serviceLocator.registerLazySingleton(() => ResetPasswordOTPUseCase(repository: serviceLocator()));
   serviceLocator.registerLazySingleton(() => GetInvoicesUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(() => RetryActivationUseCase(repository: serviceLocator()));
   serviceLocator.registerLazySingleton(() => GetProfileInfoUseCase(repository: serviceLocator()));
   serviceLocator.registerLazySingleton(() => ProcessIdCardUseCase(repository: serviceLocator()));
   serviceLocator.registerLazySingleton(() => ProcessPassportUseCase(repository: serviceLocator()));
@@ -212,8 +215,18 @@ Future<void> initializeAppDependencies() async {
         resetPasswordUseCase: serviceLocator(),
         authenticationLocalDataSource: serviceLocator(),
       ));
-  serviceLocator.registerFactory(() =>
-      InvoicesCubit(useCase: serviceLocator(), authenticationLocalDataSource: serviceLocator()));
+  serviceLocator.registerFactory(
+    () => InvoicesCubit(
+      useCase: serviceLocator(),
+      authenticationLocalDataSource: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory(
+    () => RetryActivationCubit(
+      useCase: serviceLocator(),
+    ),
+  );
   serviceLocator.registerFactory(
     () => ProfileCubit(
       useCase: serviceLocator(),

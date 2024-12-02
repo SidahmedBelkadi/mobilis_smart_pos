@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:pretty_bloc_observer/pretty_bloc_observer.dart';
 import 'src/core/utils/helpers/insecure_device_checker.dart';
 import 'src/core/utils/helpers/security_helper.dart';
 import 'src/services/notification_service.dart';
@@ -22,6 +24,8 @@ void main() async {
   final bool isNotSafeDevice = await SecurityCheck.checkSecurity();
 
   FlutterNativeSplash.remove();
+
+  Bloc.observer = PrettyBlocObserver();
 
   if (isNotSafeDevice) {
     runApp(const InsecureDevice());

@@ -2,6 +2,7 @@ import '../../domain/entities/invoice_entity.dart';
 
 class InvoiceModel extends InvoiceEntity {
   const InvoiceModel({
+    required super.id,
     required super.contractCode,
     required super.invoiceDate,
     required super.amount,
@@ -12,6 +13,7 @@ class InvoiceModel extends InvoiceEntity {
 
   factory InvoiceModel.fromJson(Map<String, dynamic> json) {
     return InvoiceModel(
+      id: json['id'],
       contractCode: json['contract_code'],
       invoiceDate: json['invoice_date'],
       amount: json['amount'],

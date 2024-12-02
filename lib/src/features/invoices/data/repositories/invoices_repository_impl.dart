@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:mobilis_smart_pos/src/features/invoices/domain/entities/retry_activation_response_entity.dart';
 
 import '../../../../core/error/exception.dart';
 import '../../../../core/error/failure.dart';
@@ -12,23 +13,42 @@ class InvoicesRepositoryImpl implements InvoicesRepository {
   final NetworkInfo networkInfo;
   final InvoicesRemoteDataSource remoteDataSource;
 
-  InvoicesRepositoryImpl(
-      {required this.networkInfo, required this.remoteDataSource});
+  InvoicesRepositoryImpl({required this.networkInfo, required this.remoteDataSource});
 
   @override
-  Future<Either<Failure, List<InvoiceEntity>>> getInvoices(
-      {required int pdvId, required int page, String? query}) async {
+  Future<Either<Failure, List<InvoiceEntity>>> getInvoices({
+    required int pdvId,
+    required int page,
+    String? query,
+  }) async {
     if (await networkInfo.isConnected) {
       try {
-        final List<InvoiceEntity> invoices = await remoteDataSource.getInvoices(
-            pdvId: pdvId, page: page, query: query);
+        final List<InvoiceEntity> invoices =
+            await remoteDataSource.getInvoices(pdvId: pdvId, page: page, query: query);
         return Right(invoices);
       } on ServerException catch (e) {
         return Left(ServerFailure(message: ErrorHandler.getErrorMessage(e)));
       }
     } else {
-      return const Left(
-          NoInternetConnectionFailure(message: 'noInternetConnection'));
+      return const Left(NoInternetConnectionFailure(message: 'noInternetConnection'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, RetryActivationResponseEntity>> retryActivation({
+    required String id,
+  }) async {
+    if (await networkInfo.isConnected) {
+      try {
+        final RetryActivationResponseEntity response =
+            await remoteDataSource.retryActivation(id: id);
+
+        return Right(response);
+      } on ServerException catch (e) {
+        return Left(ServerFailure(message: ErrorHandler.getErrorMessage(e)));
+      }
+    } else {
+      return const Left(NoInternetConnectionFailure(message: 'noInternetConnection'));
     }
   }
 }
