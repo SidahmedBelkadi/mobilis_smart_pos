@@ -36,21 +36,17 @@ class _TestSmsState extends State<TestSms> {
       setState(() {
         smsLoading = true;
       });
-      await platform.invokeMethod('sendSms', {
+      final code = await platform.invokeMethod('sendSms', {
         'message': message,
         'recipient': recipient,
         'dealerNumber': senderPhoneNumber,
       });
-      debugPrint("=========== SMS SENT ===============");
-
-      // Start the timer after SMS is sent
       _smsTimer = Timer(const Duration(seconds: 30), () {
         debugPrint("==================== TIMER FOR SMS STARTED");
-        // AppToasts.showWarningToast(message: "DSA Timeout", context: context);
         debugPrint("============== Cases of timeout =====>  sms MSISDN will be sent as NULL");
       });
     } on PlatformException catch (e) {
-      debugPrint("${e.message} ");
+      handleSmsError(e.code, context);
     }
   }
 
@@ -77,6 +73,36 @@ class _TestSmsState extends State<TestSms> {
         Navigator.of(context).pop();
       }
     }
+  }
+
+  void handleSmsError(String code, BuildContext context) {
+    String errorMessage;
+    switch (code) {
+      case 'PERMISSION_DENIED':
+        errorMessage = "Required permissions are not granted.";
+        break;
+      case 'SIM_NOT_READY':
+        errorMessage = "The SIM is not ready. Please check your SIM status.";
+        break;
+      case 'AIRPLANE_MODE':
+        errorMessage = "Airplane mode is enabled. Please disable it to send SMS.";
+        break;
+      case 'NO_SMS_NETWORK':
+        errorMessage = "No network available for sending SMS. Please check your connection.";
+        break;
+      case 'NO_SIM':
+        errorMessage = "No active SIM card found. Please insert a SIM card.";
+        break;
+      case 'INVALID_OPERATOR':
+        errorMessage = "The operator in slot 1 is not Mobilis. Please use a Mobilis SIM card.";
+        break;
+      case 'SMS_FAILED':
+        errorMessage = "Failed to send SMS. Please try again later.";
+        break;
+      default:
+        errorMessage = "An unknown error occurred.";
+    }
+    AppToasts.showErrorToast(message: errorMessage, context: context);
   }
 
   @override
