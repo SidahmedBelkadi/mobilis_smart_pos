@@ -148,13 +148,12 @@ public class DzNfcModel {
 
         passportService.close();
 
-
         String rawLastName = mrzInfo.getPrimaryIdentifier();
         String rawFirstName = mrzInfo.getSecondaryIdentifier();
         String documentNum = mrzInfo.getDocumentNumber();
         String nationality = mrzInfo.getNationality();
         String issuingState = mrzInfo.getIssuingState();
-        String birthDate = formatDateOfBirth(mrzInfo.getDateOfBirth());
+        String birthDate = formatDateOfBirth(dg11File.getFullDateOfBirth());
         String expiryDate = formatDate(mrzInfo.getDateOfExpiry());
         String gender = String.valueOf(mrzInfo.getGender());
 
@@ -179,12 +178,7 @@ public class DzNfcModel {
         resultJson.put("last_name", lastName);
         resultJson.put("document_number", documentNum);
         resultJson.put("Nationality", nationality);
-        if (birthDate.length() == 6) {
-            birthDate = birthDate.replace("<", "");
-            resultJson.put("date_of_birth", "19" + birthDate + "-01-01");
-        } else {
-            resultJson.put("date_of_birth", birthDate);
-        }
+        resultJson.put("date_of_birth", birthDate);
         resultJson.put("gender", gender);
         resultJson.put("date_of_expiry", expiryDate);
         resultJson.put("place_of_birth", placeOfBirth);
@@ -220,11 +214,8 @@ public class DzNfcModel {
     }
 
     private String formatDateOfBirth(String date) {
-        SimpleDateFormat inputFormat = new SimpleDateFormat("yyMMdd", Locale.US);
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-
-        // Set a custom pivot year to start from 1921
-        inputFormat.set2DigitYearStart(new GregorianCalendar(1924, Calendar.JANUARY, 1).getTime());
 
         try {
             Date parsedDate = inputFormat.parse(date);

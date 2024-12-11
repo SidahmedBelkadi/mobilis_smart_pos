@@ -309,5 +309,6 @@
   "INVALID_OPERATOR": "Veuillez utiliser une carte SIM APN Mobilis.",
   "SMS_FAILED": "Échec de l'envoi du SMS. Veuillez réessayer plus tard.",
   "UNKNOWN_ERROR": "Une erreur s'est produite lors de l'envoi du SMS d'activation.",
-  "config_sim": "Configuration SIM"
+  "config_sim": "Configuration SIM",
+  "another_slot": "Autre operateur"
 }

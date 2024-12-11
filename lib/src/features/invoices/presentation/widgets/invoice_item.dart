@@ -9,7 +9,6 @@ import 'package:mobilis_smart_pos/src/core/utils/helpers/toast_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/ressources/app_colors.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/generate_contract_params_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/contract_cubit.dart';
-import 'package:mobilis_smart_pos/src/features/contract/presentation/signature_screen.dart';
 import 'package:mobilis_smart_pos/src/features/invoices/presentation/cubit/invoices_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/invoices/presentation/cubit/retry_activation/retry_activation_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/sign_in/data/data_sources/smart_pos_local_storage.dart';
@@ -30,18 +29,26 @@ class Invoice extends StatelessWidget {
   final InvoiceEntity invoiceEntity;
 
   InvoiceStatusEnum _filterInvoiceStatus(String status, String? msisdn) {
-    if (status.toLowerCase() == "dsa timeout" && msisdn == null) {
-      return InvoiceStatusEnum.failed;
-    } else if (status.toLowerCase() == "network_failure_treated" && msisdn == null) {
-      return InvoiceStatusEnum.failed;
-    } else if (status.toLowerCase() == "dsa Retrieval" && msisdn != null) {
-      return InvoiceStatusEnum.success;
-    } else if (status.toLowerCase() == "success" && msisdn != null) {
-      return InvoiceStatusEnum.success;
-    } else if (status.toLowerCase() == "pending" && msisdn == null) {
-      return InvoiceStatusEnum.pending;
+    String normalizedStatus = status.toLowerCase();
+
+    if (msisdn == null) {
+      switch (normalizedStatus) {
+        case 'dsa timeout':
+        case 'network_failure_treated':
+          return InvoiceStatusEnum.failed;
+        case 'pending':
+          return InvoiceStatusEnum.pending;
+        default:
+          return InvoiceStatusEnum.failed;
+      }
     } else {
-      return InvoiceStatusEnum.failed;
+      switch (normalizedStatus) {
+        case 'dsa retrieval':
+        case 'success':
+          return InvoiceStatusEnum.success;
+        default:
+          return InvoiceStatusEnum.success;
+      }
     }
   }
 
@@ -154,13 +161,13 @@ class Invoice extends StatelessWidget {
                         ],
                       ),
                     ),
-                    SizedBox(width: 12.sp),
-                    _filterInvoiceStatus(invoiceEntity.status, invoiceEntity.msisdn) ==
-                            InvoiceStatusEnum.pending
-                        ? RetryActivationWidget(
-                            invoiceEntity: invoiceEntity,
-                          )
-                        : const SizedBox.shrink()
+                    // SizedBox(width: 12.sp),
+                    // _filterInvoiceStatus(invoiceEntity.status, invoiceEntity.msisdn) ==
+                    //         InvoiceStatusEnum.pending
+                    //     ? RetryActivationWidget(
+                    //         invoiceEntity: invoiceEntity,
+                    //       )
+                    //     : const SizedBox.shrink()
                   ],
                 ),
               ],
@@ -185,28 +192,31 @@ class RetryActivationWidget extends StatefulWidget {
 }
 
 class _RetryActivationWidgetState extends State<RetryActivationWidget> {
+  Map<int, bool> _loadingInvoices = {};
   String _smsMessage = "No message received yet.";
-  bool smsLoading = false;
+  // bool smsLoading = false;
   late GenerateContractParamsEntity generateContractParamsEntity;
   String senderPhoneNumber =
       "+${di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials()!.msisdn!}";
   Timer? _smsTimer;
   int _preferedSlot = 0;
+  bool _smsSent = false;
 
   static const platform = MethodChannel('sms/sms_receiver');
 
-  Future<void> setSenderPhoneNumber(String number) async {
-    try {
-      await platform.invokeMethod('setSenderPhoneNumber', {'senderPhoneNumber': number});
-    } on PlatformException catch (e) {
-      debugPrint("Failed to set sender phone number: '${e.message}'.");
-    }
+  @override
+  void dispose() {
+    _smsTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> sendSms(String message, String recipient, int slot) async {
+    if (_smsSent) return;
+
     try {
       setState(() {
-        smsLoading = true;
+        _smsSent = true;
+        _loadingInvoices[widget.invoiceEntity.id] = true;
       });
       await platform.invokeMethod('sendSms', {
         'slot': slot,
@@ -217,17 +227,26 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
       debugPrint("=========== SMS SENT ===============");
 
       // Start the timer after SMS is sent
-      _smsTimer = Timer(const Duration(seconds: 30), () {
+      if (mounted) {
         debugPrint("==================== TIMER FOR SMS STARTED");
-        // AppToasts.showWarningToast(message: "DSA Timeout", context: context);
-        generateContractParamsEntity.msisdn = "";
-        context
-            .read<ContractCubit>()
-            .attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
-      });
+        context.read<ContractCubit>().attributeMsisdnAndGenerateContract(
+              params: GenerateContractParamsEntity(
+                msisdn: "FAILED",
+                contractCode: widget.invoiceEntity.contractCode,
+                clientId: 0,
+                invoiceId: widget.invoiceEntity.id,
+                subsId: 0,
+                dsaMessage: '',
+              ),
+            );
+      }
     } on PlatformException catch (e) {
       handleSmsError(e.code, context);
       debugPrint("${e.message} ");
+    } finally {
+      setState(() {
+        _loadingInvoices[widget.invoiceEntity.id] = false;
+      });
     }
   }
 
@@ -275,15 +294,14 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
         debugPrint("=================== TIMER FOR SMS STOPPED");
 
         setState(() {
-          smsLoading = false;
+          setState(() {
+            _loadingInvoices[widget.invoiceEntity.id] = false;
+          });
           _smsMessage = call.arguments;
           checkSmsSuccess(_smsMessage, context);
         });
       }
     });
-
-    // Set the sender's phone number
-    setSenderPhoneNumber(senderPhoneNumber);
   }
 
   void handleSmsError(String code, BuildContext context) {
@@ -337,8 +355,10 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
       },
       child: BlocConsumer<RetryActivationCubit, RetryActivationState>(
         builder: (context, state) {
-          if ((state is RetryActivationLoading && state.id == widget.invoiceEntity.id) ||
-              smsLoading) {
+          final isLoadingState =
+              state is RetryActivationLoading && state.id == widget.invoiceEntity.id;
+          final isLoading = _loadingInvoices[widget.invoiceEntity.id] ?? false;
+          if (isLoading || isLoadingState) {
             return Container(
               padding: EdgeInsets.all(5.sp),
               decoration: BoxDecoration(
@@ -356,6 +376,7 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
           }
 
           return GestureDetector(
+            key: Key(widget.invoiceEntity.id.toString()),
             onTap: () {
               context
                   .read<RetryActivationCubit>()
@@ -386,6 +407,7 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
             final int clientId = int.parse(parts[0]);
             final int invoiceId = int.parse(parts[1]);
             final int subscriptionId = int.parse(parts[2]);
+
             sendSms(sms, "444", _preferedSlot);
 
             setState(() {
@@ -394,7 +416,7 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
                 invoiceId: invoiceId,
                 subsId: subscriptionId,
                 contractCode: widget.invoiceEntity.contractCode,
-                dsaMessage: dsaMessage,
+                dsaMessage: '',
               );
             });
           }

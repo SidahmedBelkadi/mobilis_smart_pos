@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mobilis_smart_pos/src/app.dart';
 import 'package:mobilis_smart_pos/src/core/commom/widgets/version.dart';
 import 'package:mobilis_smart_pos/src/features/main/presentation/widgets/sim_card_slot_tile.dart';
 import 'package:mobilis_smart_pos/src/features/sign_in/data/data_sources/smart_pos_local_storage.dart';
@@ -75,6 +74,18 @@ class _HomeDrawerState extends State<HomeDrawer> {
     }
   }
 
+  _getSlotName(String value, BuildContext context) {
+    if (value.toLowerCase() == "mobilis") {
+      if (context.isArabicLocale) {
+        return "موبيليس";
+      } else {
+        return "Mobilis";
+      }
+    } else {
+      return "another_slot".tr(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -104,7 +115,9 @@ class _HomeDrawerState extends State<HomeDrawer> {
                     (entry) => SimCardSlotTile(
                       onTap: () => _setPreferedSlot(slot: entry.key),
                       isSelected: entry.key == _preferedSlot,
-                      title: entry.value ?? "N/A",
+                      title: entry.value == "Mobilis"
+                          ? _getSlotName(entry.value.toString(), context) ?? "..."
+                          : _getSlotName("Other", context),
                       icon: entry.key == 0 ? FontAwesomeIcons.one : FontAwesomeIcons.two,
                     ),
                   )
