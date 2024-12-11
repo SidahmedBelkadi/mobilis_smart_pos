@@ -154,6 +154,7 @@ public class DzNfcModel {
         String nationality = mrzInfo.getNationality();
         String issuingState = mrzInfo.getIssuingState();
         String birthDate = formatDateOfBirth(dg11File.getFullDateOfBirth());
+        Log.d("DATE_FORMAT", formatDateOfBirth("2006"));
         String expiryDate = formatDate(mrzInfo.getDateOfExpiry());
         String gender = String.valueOf(mrzInfo.getGender());
 
@@ -214,17 +215,50 @@ public class DzNfcModel {
     }
 
     private String formatDateOfBirth(String date) {
-        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
         try {
-            Date parsedDate = inputFormat.parse(date);
+            String normalizedDate = normalizeDate(date);
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+            Date parsedDate = inputFormat.parse(normalizedDate);
             return outputFormat.format(parsedDate);
         } catch (Exception e) {
             e.printStackTrace();
-            return date;
+            return date; // Return the original input if parsing fails
         }
     }
+
+    private String normalizeDate(String date) {
+        String year = date.substring(0, 4); // Always take the first 4 characters as year
+        String month = "01";               // Default month
+        String day = "01";                 // Default day
+
+        if (date.length() >= 6) {
+            String monthPart = date.substring(4, 6);
+            if (isNumeric(monthPart)) {
+                month = String.format("%02d", Integer.parseInt(monthPart)); // Ensure 2 digits
+            }
+        }
+
+        if (date.length() == 8) {
+            String dayPart = date.substring(6, 8);
+            if (isNumeric(dayPart)) {
+                day = String.format("%02d", Integer.parseInt(dayPart)); // Ensure 2 digits
+            }
+        }
+
+        return year + "-" + month + "-" + day;
+    }
+
+    private boolean isNumeric(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
 
 
     private String formatDate(String date) {

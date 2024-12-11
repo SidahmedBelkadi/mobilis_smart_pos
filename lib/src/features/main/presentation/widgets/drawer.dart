@@ -103,27 +103,6 @@ class _HomeDrawerState extends State<HomeDrawer> {
               height: 8.sp,
             ),
             ExpansionTile(
-              title: ExpansionTileTitle(
-                title: "config_sim".tr(context),
-                icon: FontAwesomeIcons.gear,
-              ),
-              children: _simOperators
-                  .asMap()
-                  .entries
-                  .where((entry) => entry.value != null && entry.value!.isNotEmpty)
-                  .map(
-                    (entry) => SimCardSlotTile(
-                      onTap: () => _setPreferedSlot(slot: entry.key),
-                      isSelected: entry.key == _preferedSlot,
-                      title: entry.value == "Mobilis"
-                          ? _getSlotName(entry.value.toString(), context) ?? "..."
-                          : _getSlotName("Other", context),
-                      icon: entry.key == 0 ? FontAwesomeIcons.one : FontAwesomeIcons.two,
-                    ),
-                  )
-                  .toList(),
-            ),
-            ExpansionTile(
               iconColor: AppColors.primary,
               title: ExpansionTileTitle(
                 title: "preferences".tr(context),

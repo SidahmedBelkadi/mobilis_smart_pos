@@ -310,5 +310,6 @@
   "SMS_FAILED": "Failed to send SMS. Please try again later.",
   "UNKNOWN_ERROR": "Error occurred while sending activation sms.",
   "config_sim": "SIM SETUP",
-  "another_slot": "Other operator"
+  "another_slot": "Other operator",
+  "no_search_result": "We couldn’t find any results for your search"
 }
