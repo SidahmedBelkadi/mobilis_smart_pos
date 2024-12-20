@@ -37,6 +37,7 @@ class EndPoints {
   static const String uploadClient = "$baseUrl/file/client";
   static const String getAllOffers = "http://192.168.1.12:3002/api2/subscription-type/all";
   static const String retriveCGV = "http://192.1.12:3002/api2/subscription-type";
+  static const String triggerSms = "$baseUrl/contract/triggerSMS";
 
   // ================== OCR =================== //
   static const String processId = "$ocrBaseUrl/process_id";

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobilis_smart_pos/src/features/bar_code/presentation/cubit/offers_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/bar_code/presentation/offers_page.dart';
+import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/sms_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/invoices/presentation/cubit/retry_activation/retry_activation_cubit.dart';
 import '../../features/contract/presentation/parent_contract_screen.dart';
 import '../../features/contract/presentation/parent_preparation_screen.dart';
@@ -407,8 +408,15 @@ class AppRoutes {
 
         return RoutesAnimationManager.slideFromRightTransition(
           args: args,
-          BlocProvider(
-            create: (_) => serviceLocator<ContractCubit>(),
+          MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) => serviceLocator<ContractCubit>(),
+              ),
+              BlocProvider(
+                create: (context) => serviceLocator<SmsCubit>(),
+              ),
+            ],
             child: SignatureScreen(
               contract: params['contract'] as ContractRequestParamsEntitiy,
               formattedSmsCode: params['formattedSmsCode'] as String,

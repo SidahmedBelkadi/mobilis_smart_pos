@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/entities/trigger_sms_params_entity.dart';
 
 import '../../../../core/api/dio_consumer.dart';
 import '../../../../core/api/end_points.dart';
@@ -13,6 +14,8 @@ import '../models/edit_contract_response_model.dart';
 import '../models/generate_contract_response_model.dart';
 
 abstract class ContractRemoteDataSource {
+  Future<void> triggerSms({required TriggerSmsParamsEntity triggerSmsParams});
+
   Future<CheckBeforeEditContractResponseModel> checkBeforeEditContract({
     required ContractRequestParamsEntitiy contract,
   });
@@ -85,8 +88,7 @@ class ContractRemoteDataSourceImpl implements ContractRemoteDataSource {
           contentType: MediaType('image', 'png'),
         ),
       if (parentRecto != null)
-        isPassport ? 'pr_passport' : 'pr_card_id_recto':
-            await MultipartFile.fromFile(
+        isPassport ? 'pr_passport' : 'pr_card_id_recto': await MultipartFile.fromFile(
           parentRecto.path,
           filename: 'pr_card_id_recto.jpg',
           contentType: MediaType('image', 'jpeg'),
@@ -139,5 +141,12 @@ class ContractRemoteDataSourceImpl implements ContractRemoteDataSource {
     );
 
     return GenerateContractResponseModel.fromJson(json: jsonDecode(response));
+  }
+
+  @override
+  Future<void> triggerSms({
+    required TriggerSmsParamsEntity triggerSmsParams,
+  }) async {
+    await dioConsumer.post(EndPoints.triggerSms, body: triggerSmsParams.toJson());
   }
 }

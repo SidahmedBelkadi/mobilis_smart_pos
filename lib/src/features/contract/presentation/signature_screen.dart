@@ -9,6 +9,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/permissions_helper.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/entities/trigger_sms_params_entity.dart';
+import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/sms_cubit.dart';
 import '../../../core/commom/widgets/custom_app_bar.dart';
 import '../../sign_in/data/data_sources/smart_pos_local_storage.dart';
 import '../../../services/screenshot_service.dart';
@@ -72,7 +74,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
 
   String _smsMessage = "No message received yet.";
   String senderPhoneNumber =
-      "+${di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials()!.msisdn!}";
+      di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials()!.msisdn!;
   int _preferedSlot = 0;
 
   String? signatureImagePath;
@@ -102,9 +104,6 @@ class _SignatureScreenState extends State<SignatureScreen> {
         });
       }
     });
-
-    // Set the sender's phone number
-    setSenderPhoneNumber(senderPhoneNumber);
   }
 
   @override
@@ -343,188 +342,209 @@ class _SignatureScreenState extends State<SignatureScreen> {
           child: Container(
             width: context.width,
             padding: EdgeInsets.all(32.sp),
-            child: BlocConsumer<ContractCubit, ContractState>(
+            child: BlocConsumer<SmsCubit, SmsState>(
               listener: (context, state) {
-                if (state is EditContractFailed) {
-                  AppToasts.showErrorToast(message: state.message.tr(context), context: context);
-                  Navigator.of(context).pop();
-                }
-                if (state is GenerateContractFailed) {
-                  AppToasts.showErrorToast(message: state.message.tr(context), context: context);
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                      Routes.main, arguments: {'index': 1, 'fromSignin': true}, (route) => false);
-                }
-                if (state is GenerateContractSuccess) {
-                  // String message = state.generateContractResponseEntity.contractMessage +
-                  //     state.generateContractResponseEntity.message;
-                  // AppToasts.showSuccessToast(message: message, context: context);
-                  Navigator.of(context).pushReplacementNamed(Routes.contractGenerated);
-                }
-
-                if (state is EditContractSuccess) {
-                  final response = state.editContractResponseEntity;
+                if (state is TriggerSmsFailure) {
                   setState(() {
-                    generateContractParamsEntity = GenerateContractParamsEntity(
-                      clientId: response.clientId,
-                      invoiceId: response.invoiceId,
-                      subsId: response.subscriptionId,
-                      contractCode: response.contractCode,
-                      dsaMessage: dsaMessage,
-                    );
+                    smsLoading = false;
                   });
-                  debugPrint("================ STATE IS SUCCESS ==============================  ");
-                  // AppToasts.showSuccessToast(
-                  //     message: "generated_success".tr(context), context: context);
-
-                  // Now send the SMS after API call success
-                  final sms = CivilsInformationsConverterHelper.activationSerialNumberPrefix +
-                      widget.contract.serialNumber.toString() +
-                      widget.formattedSmsCode;
-                  sendSms(sms, "444", _preferedSlot);
-                  // Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
+                  AppToasts.showErrorToast(message: state.message, context: context);
                 }
               },
               builder: (context, state) {
-                if (state is EditContractLoading) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(
-                          height: 32.sp,
-                          width: 32.sp,
-                          child: const CircularProgressIndicator(),
-                        ),
-                        SizedBox(height: 16.sp),
-                        Text(
-                          "generating".tr(context),
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium!
-                              .copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-                if (state is GenerateContractLoading) {
-                  return SizedBox(
-                    height: context.height - 100.sp,
-                    child: Center(
-                      child: SizedBox(
-                        height: 32.sp,
-                        width: 32.sp,
-                        child: const CircularProgressIndicator(),
-                      ),
-                    ),
-                  );
-                }
-                return smsLoading
-                    ? SizedBox(
-                        height: context.height,
-                        width: context.width,
-                        child: Center(
-                          child: Column(
-                            children: [
-                              LottieBuilder.asset(
-                                AppImages.smsAnim1,
-                                height: 350.sp,
-                                width: 350.sp,
-                              )
-                            ],
-                          ),
-                        ),
-                      )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Column(
-                            children: [
-                              const ConditionsOfUse(
-                                desc: AppStrings.arabicAgrement,
-                              ),
-                              SizedBox(height: 12.sp),
-                              Text(
-                                "الجزائر، في $currentDateAr\nأنا، الممضي أسفله، أؤكد أنني قرأت و وافقت على كامل شروط البيع العامة",
-                                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                    color: AppColors.primary, fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(height: 32.h),
-                              Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(width: 1, color: AppColors.secondary),
-                                ),
-                                height: 200.h,
-                                width: 300.w,
-                                child: SfSignaturePad(
-                                  key: _signaturePadKey,
-                                  minimumStrokeWidth: 5,
-                                  maximumStrokeWidth: 6,
-                                  strokeColor: Colors.black,
-                                  backgroundColor: Colors.white,
-                                  onDrawStart: () {
-                                    setState(() {
-                                      isSignatureValidated = true;
-                                    });
-                                    return false;
-                                  },
-                                ),
-                              ),
-                              EraseSignatureButton(
-                                onPressed: () {
-                                  setState(() {
-                                    isSignatureValidated = false;
-                                  });
-                                  _signaturePadKey.currentState!.clear();
-                                },
-                              ),
-                              SizedBox(height: 24.sp),
-                              CheckboxListTile(
-                                title: Text(
-                                  "أوافق على إدراج توقيعي في العقد الخاص بي و كذلك في وثيقة الشروط العامة للبيع",
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
-                                value: _isConditionOfSignatureChecked,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _isConditionOfSignatureChecked = true;
-                                  });
-                                },
-                              ),
-                              // SizedBox(height: 24.sp),
-                            ],
-                          ),
-                          SizedBox(height: 64.h),
-                          AppElevatedButtonWithText(
-                            text: "confrim_sell".tr(context),
-                            onPressed: () async {
-                              bool hasPermission = await _requestSmsPermission();
-                              if (!hasPermission) {
-                                _showPermissionDeniedDialog(context);
-                                return;
-                              }
+                return BlocConsumer<ContractCubit, ContractState>(
+                  listener: (context, state) {
+                    if (state is EditContractFailed) {
+                      AppToasts.showErrorToast(
+                          message: state.message.tr(context), context: context);
+                      Navigator.of(context).pop();
+                    }
+                    if (state is GenerateContractFailed) {
+                      AppToasts.showErrorToast(
+                          message: state.message.tr(context), context: context);
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                          Routes.main,
+                          arguments: {'index': 1, 'fromSignin': true},
+                          (route) => false);
+                    }
+                    if (state is GenerateContractSuccess) {
+                      // String message = state.generateContractResponseEntity.contractMessage +
+                      //     state.generateContractResponseEntity.message;
+                      // AppToasts.showSuccessToast(message: message, context: context);
+                      Navigator.of(context).pushReplacementNamed(Routes.contractGenerated);
+                    }
 
-                              if (!isSignatureValidated) {
-                                AppToasts.showErrorToast(
-                                  message: "required_signature".tr(context),
-                                  context: context,
-                                );
-                                return;
-                              }
+                    if (state is EditContractSuccess) {
+                      final response = state.editContractResponseEntity;
+                      setState(() {
+                        generateContractParamsEntity = GenerateContractParamsEntity(
+                          clientId: response.clientId,
+                          invoiceId: response.invoiceId,
+                          subsId: response.subscriptionId,
+                          contractCode: response.contractCode,
+                          dsaMessage: dsaMessage,
+                        );
+                      });
+                      debugPrint(
+                          "================ STATE IS SUCCESS ==============================  ");
 
-                              if (!_isConditionOfSignatureChecked) {
-                                AppToasts.showErrorToast(
-                                  message: "signature_approve".tr(context),
-                                  context: context,
-                                );
-                                return;
-                              }
-                              _checkPermissionsAndShowDialog(context, cubit);
-                            },
-                          ),
-                        ],
+                      // final sms = CivilsInformationsConverterHelper.activationSerialNumberPrefix +
+                      //     widget.contract.serialNumber.toString() +
+                      //     widget.formattedSmsCode;
+                      // sendSms(sms, "444", _preferedSlot);
+                      // Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
+                      final smsParams = TriggerSmsParamsEntity(
+                          msisdnAPN: senderPhoneNumber,
+                          formattedSmsString: widget.formattedSmsCode);
+                      context.read<SmsCubit>().triggerSms(smsParams: smsParams);
+                      setState(() {
+                        smsLoading = true;
+                      });
+                    }
+                  },
+                  builder: (context, state) {
+                    if (state is EditContractLoading) {
+                      return Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              height: 32.sp,
+                              width: 32.sp,
+                              child: const CircularProgressIndicator(),
+                            ),
+                            SizedBox(height: 16.sp),
+                            Text(
+                              "generating".tr(context),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
                       );
+                    }
+                    if (state is GenerateContractLoading) {
+                      return SizedBox(
+                        height: context.height - 100.sp,
+                        child: Center(
+                          child: SizedBox(
+                            height: 32.sp,
+                            width: 32.sp,
+                            child: const CircularProgressIndicator(),
+                          ),
+                        ),
+                      );
+                    }
+                    return smsLoading
+                        ? SizedBox(
+                            height: context.height,
+                            width: context.width,
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  LottieBuilder.asset(
+                                    AppImages.smsAnim1,
+                                    height: 350.sp,
+                                    width: 350.sp,
+                                  )
+                                ],
+                              ),
+                            ),
+                          )
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Column(
+                                children: [
+                                  const ConditionsOfUse(
+                                    desc: AppStrings.arabicAgrement,
+                                  ),
+                                  SizedBox(height: 12.sp),
+                                  Text(
+                                    "الجزائر، في $currentDateAr\nأنا، الممضي أسفله، أؤكد أنني قرأت و وافقت على كامل شروط البيع العامة",
+                                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                        color: AppColors.primary, fontWeight: FontWeight.bold),
+                                  ),
+                                  SizedBox(height: 32.h),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(width: 1, color: AppColors.secondary),
+                                    ),
+                                    height: 200.h,
+                                    width: 300.w,
+                                    child: SfSignaturePad(
+                                      key: _signaturePadKey,
+                                      minimumStrokeWidth: 5,
+                                      maximumStrokeWidth: 6,
+                                      strokeColor: Colors.black,
+                                      backgroundColor: Colors.white,
+                                      onDrawStart: () {
+                                        setState(() {
+                                          isSignatureValidated = true;
+                                        });
+                                        return false;
+                                      },
+                                    ),
+                                  ),
+                                  EraseSignatureButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        isSignatureValidated = false;
+                                      });
+                                      _signaturePadKey.currentState!.clear();
+                                    },
+                                  ),
+                                  SizedBox(height: 24.sp),
+                                  CheckboxListTile(
+                                    title: Text(
+                                      "أوافق على إدراج توقيعي في العقد الخاص بي و كذلك في وثيقة الشروط العامة للبيع",
+                                      style: Theme.of(context).textTheme.bodySmall,
+                                    ),
+                                    value: _isConditionOfSignatureChecked,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _isConditionOfSignatureChecked = true;
+                                      });
+                                    },
+                                  ),
+                                  // SizedBox(height: 24.sp),
+                                ],
+                              ),
+                              SizedBox(height: 64.h),
+                              ElevatedButton(
+                                child: Text("confrim_sell".tr(context)),
+                                onPressed: () async {
+                                  bool hasPermission = await _requestSmsPermission();
+                                  if (!hasPermission) {
+                                    _showPermissionDeniedDialog(context);
+                                    return;
+                                  }
+
+                                  if (!isSignatureValidated) {
+                                    AppToasts.showErrorToast(
+                                      message: "required_signature".tr(context),
+                                      context: context,
+                                    );
+                                    return;
+                                  }
+
+                                  if (!_isConditionOfSignatureChecked) {
+                                    AppToasts.showErrorToast(
+                                      message: "signature_approve".tr(context),
+                                      context: context,
+                                    );
+                                    return;
+                                  }
+                                  _checkPermissionsAndShowDialog(context, cubit);
+                                },
+                              ),
+                            ],
+                          );
+                  },
+                );
               },
             ),
           ),

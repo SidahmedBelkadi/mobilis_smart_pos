@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/entities/trigger_sms_params_entity.dart';
 
 import '../../../../core/error/exception.dart';
 import '../../../../core/error/failure.dart';
@@ -20,18 +21,15 @@ class ContractRepositoryImpl implements ContractRepository {
   final NetworkInfo networkInfo;
   final ContractRemoteDataSource remoteDataSource;
 
-  ContractRepositoryImpl(
-      {required this.networkInfo, required this.remoteDataSource});
+  ContractRepositoryImpl({required this.networkInfo, required this.remoteDataSource});
 
   @override
-  Future<Either<Failure, CheckBeforeEditContractResponseEntity>>
-      checkBeforeEditContract({
+  Future<Either<Failure, CheckBeforeEditContractResponseEntity>> checkBeforeEditContract({
     required ContractRequestParamsEntitiy contract,
   }) async {
     if (await networkInfo.isConnected) {
       try {
-        final CheckBeforeEditContractResponseModel
-            checkBeforeEditContractResponseModel =
+        final CheckBeforeEditContractResponseModel checkBeforeEditContractResponseModel =
             await remoteDataSource.checkBeforeEditContract(
           contract: contract,
         );
@@ -40,8 +38,8 @@ class ContractRepositoryImpl implements ContractRepository {
         return Left(ServerFailure(message: ErrorHandler.getErrorMessage(e)));
       }
     } else {
-      return const Left(NoInternetConnectionFailure(
-          message: AppApiResponsesMessages.noInternetConnection));
+      return const Left(
+          NoInternetConnectionFailure(message: AppApiResponsesMessages.noInternetConnection));
     }
   }
 
@@ -77,8 +75,8 @@ class ContractRepositoryImpl implements ContractRepository {
         return Left(ServerFailure(message: ErrorHandler.getErrorMessage(e)));
       }
     } else {
-      return const Left(NoInternetConnectionFailure(
-          message: AppApiResponsesMessages.noInternetConnection));
+      return const Left(
+          NoInternetConnectionFailure(message: AppApiResponsesMessages.noInternetConnection));
     }
   }
 
@@ -88,15 +86,30 @@ class ContractRepositoryImpl implements ContractRepository {
   }) async {
     if (await networkInfo.isConnected) {
       try {
-        final generateContractResponseModel = await remoteDataSource
-            .generateContrat(generateContractParams: generateContractParams);
+        final generateContractResponseModel =
+            await remoteDataSource.generateContrat(generateContractParams: generateContractParams);
         return Right(generateContractResponseModel);
       } on ServerException catch (e) {
         return Left(ServerFailure(message: ErrorHandler.getErrorMessage(e)));
       }
     } else {
-      return const Left(NoInternetConnectionFailure(
-          message: AppApiResponsesMessages.noInternetConnection));
+      return const Left(
+          NoInternetConnectionFailure(message: AppApiResponsesMessages.noInternetConnection));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> triggerSms({required TriggerSmsParamsEntity params}) async {
+    if (await networkInfo.isConnected) {
+      try {
+        remoteDataSource.triggerSms(triggerSmsParams: params);
+        return const Right(unit);
+      } on ServerException catch (e) {
+        return Left(ServerFailure(message: ErrorHandler.getErrorMessage(e)));
+      }
+    } else {
+      return const Left(
+          NoInternetConnectionFailure(message: AppApiResponsesMessages.noInternetConnection));
     }
   }
 }

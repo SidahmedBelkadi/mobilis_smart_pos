@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/entities/trigger_sms_params_entity.dart';
 
 import '../../../../core/error/failure.dart';
 import '../entities/check_before_edit_contract_response_entity.dart';
@@ -10,8 +11,9 @@ import '../entities/generate_contract_params_entity.dart';
 import '../entities/generate_contract_response_entity.dart';
 
 abstract class ContractRepository {
-  Future<Either<Failure, CheckBeforeEditContractResponseEntity>>
-      checkBeforeEditContract({
+  Future<Either<Failure, Unit>> triggerSms({required TriggerSmsParamsEntity params});
+
+  Future<Either<Failure, CheckBeforeEditContractResponseEntity>> checkBeforeEditContract({
     required ContractRequestParamsEntitiy contract,
   });
 

@@ -7,6 +7,8 @@ import 'package:mobilis_smart_pos/src/features/bar_code/data/repositories/offers
 import 'package:mobilis_smart_pos/src/features/bar_code/domain/repositories/offers_repository.dart';
 import 'package:mobilis_smart_pos/src/features/bar_code/domain/use_cases/get_all_offers_use_case.dart';
 import 'package:mobilis_smart_pos/src/features/bar_code/presentation/cubit/offers_cubit.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/use_cases/trigger_sms_use_case.dart';
+import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/sms_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/invoices/domain/use_cases/retry_activation_use_case.dart';
 import 'package:mobilis_smart_pos/src/features/invoices/presentation/cubit/retry_activation/retry_activation_cubit.dart';
 import '../features/profile/domain/user_cases/get_pdv_images_use_case.dart';
@@ -207,6 +209,7 @@ Future<void> initializeAppDependencies() async {
   serviceLocator.registerLazySingleton(() => UpdateProfileUseCase(repository: serviceLocator()));
   serviceLocator.registerLazySingleton(() => GetPdvImagesUseCase(repository: serviceLocator()));
   serviceLocator.registerLazySingleton(() => GetAllOffersUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(() => TrigggerSmsUseCase(repository: serviceLocator()));
   // ================ BLOCS ================ //
 
   serviceLocator.registerFactory(() => SignInCubit(
@@ -255,4 +258,5 @@ Future<void> initializeAppDependencies() async {
       () => OcrCubit(idCardUseCase: serviceLocator(), passportUseCase: serviceLocator()));
 
   serviceLocator.registerFactory(() => OffersCubit(offersUseCase: serviceLocator()));
+  serviceLocator.registerFactory(() => SmsCubit(useCase: serviceLocator()));
 }
