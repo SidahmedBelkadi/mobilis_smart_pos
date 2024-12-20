@@ -297,34 +297,27 @@ class _ContractScreenState extends State<ContractScreen> {
 
   bool _isDocumentRecognizedText(String text, DocumentsType docType) {
     if (docType == DocumentsType.frontIdCard) {
-      final pattern18Digits = RegExp(r'\b\d{18}\b');
-      final has18Digits = pattern18Digits.hasMatch(text);
-      final match = pattern18Digits.firstMatch(text);
+      final pattern9Digits = RegExp(r'\b\d{9}\b');
+      final has9Digits = pattern9Digits.hasMatch(text);
+      final match = pattern9Digits.firstMatch(text);
       if (match != null) {
         final extractedNumber = match.group(0);
-        return has18Digits && extractedNumber == widget.metaData['personal_number'];
+        return has9Digits && extractedNumber == widget.metaData['document_number'];
       }
       return false;
     } else if (docType == DocumentsType.backIdCard) {
       final patternIdDza = RegExp(r'IDDZA');
-      final patternName = RegExp(r'Nom');
-      final patternSymol = RegExp(r'<<<');
-
       final hasIdDza = patternIdDza.hasMatch(text);
-      final hasName = patternName.hasMatch(text);
-      final hasSymbols = patternSymol.hasMatch(text);
-      return (hasIdDza && hasName && hasSymbols);
+      return hasIdDza;
     } else {
       final patternP = RegExp(r'P<');
-      final pattern9Digits = RegExp(r'\b\d{9}\b');
 
       final hasP = patternP.hasMatch(text);
-      final has9Digits = pattern9Digits.hasMatch(text);
       final pattern18Digits = RegExp(r'\b\d{18}\b');
       final match = pattern18Digits.firstMatch(text);
       if (match != null) {
         final extractedNumber = match.group(0);
-        return hasP & has9Digits && extractedNumber == widget.metaData['personal_number'];
+        return hasP && extractedNumber == widget.metaData['personal_number'];
       }
       return false;
     }
