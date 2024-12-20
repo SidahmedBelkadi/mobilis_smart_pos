@@ -20,9 +20,7 @@ import 'package:readmore/readmore.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 
 import '../../../config/routing/app_routes.dart';
-import '../../../core/commom/widgets/app_elevated_button_text.dart';
 import '../../../core/utils/helpers/app_localization_helper.dart';
-import '../../../core/utils/helpers/civils_informations_converter_helper.dart';
 import '../../../core/utils/helpers/media_query_values.dart';
 import '../../../core/utils/helpers/toast_helper.dart';
 import '../../../core/utils/ressources/app_colors.dart';
@@ -75,7 +73,6 @@ class _SignatureScreenState extends State<SignatureScreen> {
   String _smsMessage = "No message received yet.";
   String senderPhoneNumber =
       di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials()!.msisdn!;
-  int _preferedSlot = 0;
 
   String? signatureImagePath;
   bool isSignatureValidated = false;
@@ -89,7 +86,6 @@ class _SignatureScreenState extends State<SignatureScreen> {
   void initState() {
     super.initState();
     ScreenshotService.disableScreenshots();
-    _getPreferedSlot();
 
     platform.setMethodCallHandler((call) async {
       if (call.method == "receivedSms") {
@@ -112,17 +108,6 @@ class _SignatureScreenState extends State<SignatureScreen> {
     super.dispose();
   }
 
-  _getPreferedSlot() {
-    final slot = di.serviceLocator<SmartPosLocalStorage>().getPreferedSlot();
-    if (slot != null) {
-      setState(() {
-        _preferedSlot = slot;
-      });
-    } else {
-      _preferedSlot = 0;
-    }
-  }
-
   Future<bool> _requestSmsPermission() async {
     PermissionStatus status = await PermissionsUtil.checkPermissionStatus(Permission.sms);
     if (status.isDenied || status.isRestricted) {
@@ -133,39 +118,13 @@ class _SignatureScreenState extends State<SignatureScreen> {
     return status.isGranted;
   }
 
-  Future<void> setSenderPhoneNumber(String number) async {
-    try {
-      await platform.invokeMethod('setSenderPhoneNumber', {'senderPhoneNumber': number});
-    } on PlatformException catch (e) {
-      debugPrint("Failed to set sender phone number: '${e.message}'.");
-    }
-  }
-
-  Future<void> sendSms(String message, String recipient, int slot) async {
-    try {
-      setState(() {
-        smsLoading = true;
-      });
-      await platform.invokeMethod('sendSms', {
-        'slot': slot,
-        'message': message,
-        'recipient': recipient,
-        'dealerNumber': senderPhoneNumber,
-      });
-      debugPrint("=========== SMS SENT ===============");
-
-      // Start the timer after SMS is sent
-      _smsTimer = Timer(const Duration(seconds: 30), () {
-        debugPrint("==================== TIMER FOR SMS STARTED");
-        // AppToasts.showWarningToast(message: "DSA Timeout", context: context);
-        generateContractParamsEntity.msisdn = "";
-        context
-            .read<ContractCubit>()
-            .attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
-      });
-    } on PlatformException catch (e) {
-      handleSmsError(e.code, context);
-    }
+  _startSmsTimer() {
+    _smsTimer = Timer(const Duration(seconds: 30), () {
+      generateContractParamsEntity.msisdn = "";
+      context
+          .read<ContractCubit>()
+          .attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
+    });
   }
 
   void handleSmsError(String code, BuildContext context) {
@@ -387,12 +346,6 @@ class _SignatureScreenState extends State<SignatureScreen> {
                       });
                       debugPrint(
                           "================ STATE IS SUCCESS ==============================  ");
-
-                      // final sms = CivilsInformationsConverterHelper.activationSerialNumberPrefix +
-                      //     widget.contract.serialNumber.toString() +
-                      //     widget.formattedSmsCode;
-                      // sendSms(sms, "444", _preferedSlot);
-                      // Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
                       final smsParams = TriggerSmsParamsEntity(
                           msisdnAPN: senderPhoneNumber,
                           formattedSmsString: widget.formattedSmsCode);
@@ -400,6 +353,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
                       setState(() {
                         smsLoading = true;
                       });
+                      _startSmsTimer();
                     }
                   },
                   builder: (context, state) {
