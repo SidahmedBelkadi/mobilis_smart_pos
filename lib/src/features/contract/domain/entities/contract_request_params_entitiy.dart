@@ -15,6 +15,9 @@ class ContractRequestParamsEntitiy {
   String? email;
   final int? employeeId;
 
+  // Subscription
+  int? subscriptionId;
+
   // ==== Client Civils Info === //
   final String nin;
   final String documentType;
@@ -73,6 +76,10 @@ class ContractRequestParamsEntitiy {
     this.email,
     this.employeeId,
 
+    // Subscription
+
+    this.subscriptionId,
+
     // =========== //
 
     this.parentFirstName,
@@ -106,7 +113,7 @@ class ContractRequestParamsEntitiy {
       "Issue_place": issuingPlace
     };
     final Map<String, dynamic> subscription = {
-      "Subscription_type_ID": 1,
+      "Subscription_type_ID": subscriptionId ?? 1,
       "Start_date": DateTime.now().toIso8601String(),
       "End_date": DateTime.now()
           .add(
@@ -260,6 +267,7 @@ class ContractRequestParamsEntitiy {
     int? pdvId,
     int? serialNumber,
     int? employeeId,
+    int? subscriptionId,
     String? parentFirstName,
     String? parentLastName,
     String? parentGender,
@@ -300,6 +308,7 @@ class ContractRequestParamsEntitiy {
       pdvId: pdvId ?? this.pdvId,
       serialNumber: serialNumber ?? this.serialNumber,
       employeeId: employeeId ?? this.employeeId,
+      subscriptionId: subscriptionId ?? this.subscriptionId,
       parentFirstName: parentFirstName ?? this.parentFirstName,
       parentLastName: parentLastName ?? this.parentLastName,
       parentGender: parentGender ?? this.parentGender,

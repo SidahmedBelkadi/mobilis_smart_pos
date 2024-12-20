@@ -1,11 +1,11 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lottie/lottie.dart';
-
+import 'package:skeletonizer/skeletonizer.dart';
 import '../../../config/routing/app_routes.dart';
 import '../../../core/commom/widgets/app_elevated_button_text.dart';
 import '../../../core/commom/widgets/custom_appbar_with_deny_contract.dart';
@@ -45,6 +45,7 @@ class SimScannerScreen extends StatefulWidget {
 
 late ContractCubit cubit;
 late ContractRequestParamsEntitiy newContract;
+String? selectedOfferName;
 
 class SimScannerScreenState extends State<SimScannerScreen> {
   static const platform = MethodChannel("channel");
@@ -161,14 +162,22 @@ class SimScannerScreenState extends State<SimScannerScreen> {
             TextButton(
               child: Text('discard'.tr(context)),
               onPressed: () {
-                Navigator.of(context).pop(); // Dismiss the dialo
+                Navigator.of(context).pop();
               },
             ),
             ElevatedButton(
               child: Text('yes'.tr(context)),
-              onPressed: () {
-                Navigator.of(context).pop(); // Dismiss the dialog
-                _continueWithBarcode(context, barcode); // Continue with the operation
+              onPressed: () async {
+                Navigator.of(context).pop();
+                final Map? selectedOffer =
+                    await Navigator.of(context).pushNamed(Routes.offers) as Map?;
+
+                if (selectedOffer != null) {
+                  debugPrint("======= SELECTED OFFER ID : ${selectedOffer['offerId']}");
+                  debugPrint("======= SELECTED OFFER NAME : ${selectedOffer['offerName']}");
+                  // Use the selected offer name to continue
+                  _continueWithBarcode(context, barcode, selectedOffer['offerId']);
+                }
               },
             ),
           ],
@@ -177,13 +186,118 @@ class SimScannerScreenState extends State<SimScannerScreen> {
     );
   }
 
-  void _continueWithBarcode(BuildContext context, String barcode) {
+  void _continueWithBarcode(BuildContext context, String barcode, int selectedOfferId) {
     setState(() {
-      newContract = widget.contract.copyWith(serialNumber: int.parse(barcode));
+      newContract = widget.contract.copyWith(
+        serialNumber: int.parse(barcode),
+        subscriptionId: selectedOfferId,
+      );
     });
 
     cubit.checkBeforeEditContract(
       contract: newContract,
+    );
+  }
+}
+
+class OffersSkeleton extends StatelessWidget {
+  const OffersSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Skeletonizer(
+      child: Container(
+        padding: EdgeInsets.all(16.0.sp),
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+          children: [
+            Text(
+              "Available Offers",
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            SizedBox(height: 24.sp),
+            Expanded(
+              child: ListView.builder(
+                itemCount: 7,
+                itemBuilder: (context, index) => OfferItem(
+                  title: "Offer Name",
+                  price: '2000 DA',
+                  onTap: () {},
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class OfferItem extends StatelessWidget {
+  const OfferItem({
+    super.key,
+    required this.title,
+    required this.price,
+    this.onTap,
+    this.isSelected = false,
+  });
+
+  final String title;
+  final String price;
+  final void Function()? onTap;
+  final bool isSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 5.sp),
+        padding: EdgeInsets.symmetric(vertical: 10.sp),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: AppColors.primary,
+            width: isSelected ? 2 : 1,
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(10.sp),
+          ),
+        ),
+        child: ListTile(
+          title: Text(title),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                price,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              if (isSelected)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: 8.sp,
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(5.sp),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.all(Radius.circular(12.sp)),
+                      ),
+                      child: Icon(
+                        FontAwesomeIcons.check,
+                        size: 16.sp,
+                        color: Colors.white,
+                      ),
+                    )
+                  ],
+                )
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

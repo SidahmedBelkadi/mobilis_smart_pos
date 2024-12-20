@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobilis_smart_pos/src/features/bar_code/presentation/cubit/offers_cubit.dart';
+import 'package:mobilis_smart_pos/src/features/bar_code/presentation/offers_page.dart';
 import 'package:mobilis_smart_pos/src/features/invoices/presentation/cubit/retry_activation/retry_activation_cubit.dart';
 import '../../features/contract/presentation/parent_contract_screen.dart';
 import '../../features/contract/presentation/parent_preparation_screen.dart';
@@ -82,6 +84,7 @@ class Routes {
   static const String contract = "/contract";
   static const String contractOcr = "/contract_ocr";
   static const String barCode = "/bar_code";
+  static const String offers = "/offers";
   static const String signatureScreen = "/signature";
   static const String test = "/test";
   static const String contractGenerated = "/contract_generated";
@@ -367,8 +370,12 @@ class AppRoutes {
 
         return RoutesAnimationManager.slideFromRightTransition(
           args: args,
-          BlocProvider(
-            create: (context) => serviceLocator<ContractCubit>(),
+          MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => serviceLocator<ContractCubit>(),
+              ),
+            ],
             child: SimScannerScreen(
               contract: params['contract'] as ContractRequestParamsEntitiy,
               recto: params['recto'] as File?,
@@ -379,6 +386,19 @@ class AppRoutes {
               justificatif: params['justificatif'],
               parentIsPassport: params['parentIsPassport'],
             ),
+          ),
+        );
+
+      case Routes.offers:
+        return RoutesAnimationManager.slideFromBottomTransition(
+          args: args,
+          MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => serviceLocator<OffersCubit>(),
+              ),
+            ],
+            child: const OffersPage(),
           ),
         );
 

@@ -1,6 +1,6 @@
 {
   "welcomeTitle": "Bienvenue dans l'application Mobilis Smart POS",
-  "welcomeParagraph": "L'application Mobilis Smart POS est conçue pour transformer les points de vente (PDV) en intégrant la digitalisation et l'automatisation dans le processus de vente. Grâce à cette application, vous pouvez gérer les vérifications d'identité de manière efficace et sécurisée, simplifiant ainsi les opérations et améliorant l'expérience client.",
+  "welcomeParagraph": "L'application Mobilis smart pos a pour objectif de révolutionner l'expérience des points de vente en offrant une solution de numérisation avancée alliant fiabilité, sécurité et rapidité",
   "presentationTitle": "Présentation de l'Application",
   "primaryFunctionalitiesTitle": "Fonctionnalités principales :",
   "primaryFunctionalities": "- Enregistrement Rapide et Sécurisé\n- Automatisation des Données\n- Suivi en Temps Réel\n- Sécurité Renforcée",
@@ -16,7 +16,7 @@
   "condition9": "Les utilisateurs sont responsables de toutes les activités menées sous leur compte. Ils doivent s'assurer que leurs identifiants de connexion sont sécurisés et ne sont pas partagés avec des tiers.",
   "condition10": "5. Mises à Jour et Maintenance",
   "condition11": "Mobilis se réserve le droit de mettre à jour ou de modifier l'application à tout moment pour améliorer ses fonctionnalités et sa sécurité. Les utilisateurs seront informés de toute mise à jour importante.",
-  "conditionOfPDV": "En acceptant ce document, vous confirmez avoir lu et compris les termes et conditions du contrat d'engagement. Cette action est irréversible et vous oblige à respecter l'ensemble des clauses mentionnées dans le contrat. Assurez-vous d'avoir pris en compte toutes les implications avant de valider définitivement.",
+  "conditionOfPDV": "En acceptant ce contrat d'engagement, vous confirmez avoir pris connaissance et compris les termes et conditions de travail. Par conséquent, vous êtes tenu de respecter les clauses de ce contrat d'engagement.",
   "acceptConditionOfUse": "Accepter les conditions d'utilisation",
   "email": "Email",
   "password": "Mot de passe",
@@ -221,7 +221,7 @@
   "scanned_toast": "Numéro de série scanné avec succès : ",
   "pdv_contract": "Contrat d’engagement",
   "discard_activation": "Annuler le contrat",
-  "code_has_been_sent": "Un code de vérification a été envoyé à votre numéro de téléphone",
+  "code_has_been_sent": "Veuillez introduire le code OTP pour confirmer votre identification",
   "password_updated": "Votre mot de passe a été mis à jour avec succès",
   "no_more_operations": "Plus d'opérations",
   "scan_sim": "Scanner la carte SIM",
@@ -241,7 +241,7 @@
   "mrz_result_instruction": "Veuillez vérifier attentivement les résultats et vous assurer que toutes les informations extraites du document sont correctes et précises. Si vous remarquez des erreurs, veuillez réessayer.",
   "reading": "Veuillez maintenir le document fermement. Lecture en cours...",
   "client_is_minor_title": "Le client est mineur",
-  "client_is_minor_instruction": "Le client a été identifié comme étant mineur. Veuillez noter que cette opération ne peut être complétée qu'en présence du tuteur légal du client. En tant que point de vente, il est de votre responsabilité de vous assurer que toutes les exigences légales sont respectées.\nLe tuteur du client est-il présent ?\nVeuillez confirmer pour continuer.",
+  "client_is_minor_instruction": "Le client a été identifié comme mineur , cette activation ne peut être finalisée qu'en présence du tuteur légale , veuillez passer à l'étape suivante si le tuteur légal est présent.",
   "step02_parent": "Étape 02 : Tuteur",
   "step02_parent_mrz_result": "Résultat du scan MRZ du tuteur",
   "step02_parent_contract": "Information du Tuteur",
@@ -260,7 +260,7 @@
   "Location_services": "Les services de localisation sont désactivés",
   "USER_NOT_FOUND": "Veuillez vérifier vos identifiants.",
   "update_available": "Mise à jour disponible",
-  "update_available_instruction": "Une nouvelle version de l'application est disponible. Veuillez mettre à jour vers la dernière version.",
+  "update_available_instruction": "Une nouvelle mise a jours et disponible veuillez mettre ajours votre application",
   "update_now": "Mettre à jour maintenant",
   "update_my_folder": "Mettre à jour mon dossier",
   "uploading": "Téléversement en cours .....",
@@ -311,5 +311,7 @@
   "UNKNOWN_ERROR": "Une erreur s'est produite lors de l'envoi du SMS d'activation.",
   "config_sim": "Configuration SIM",
   "another_slot": "Autre operateur",
-  "no_search_result": "Nous n'avons trouvé aucun résultat pour votre recherche"
+  "no_search_result": "Nous n'avons trouvé aucun résultat pour votre recherche",
+  "offers": "Offres",
+  "error_getting_offers": "Erreur lors de la récupération des offres"
 }

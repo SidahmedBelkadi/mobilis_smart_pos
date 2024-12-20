@@ -2,6 +2,11 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
+import 'package:mobilis_smart_pos/src/features/bar_code/data/data_sources/offers_remote_data_source.dart';
+import 'package:mobilis_smart_pos/src/features/bar_code/data/repositories/offers_repository_impl.dart';
+import 'package:mobilis_smart_pos/src/features/bar_code/domain/repositories/offers_repository.dart';
+import 'package:mobilis_smart_pos/src/features/bar_code/domain/use_cases/get_all_offers_use_case.dart';
+import 'package:mobilis_smart_pos/src/features/bar_code/presentation/cubit/offers_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/invoices/domain/use_cases/retry_activation_use_case.dart';
 import 'package:mobilis_smart_pos/src/features/invoices/presentation/cubit/retry_activation/retry_activation_cubit.dart';
 import '../features/profile/domain/user_cases/get_pdv_images_use_case.dart';
@@ -123,6 +128,9 @@ Future<void> initializeAppDependencies() async {
   serviceLocator.registerLazySingleton<ProfileDataSource>(
       () => ProfileDataSourceImpl(dioConsumer: serviceLocator()));
 
+  serviceLocator.registerLazySingleton<OffersRemoteDataSource>(
+      () => OffersRemoteDataSourceImpl(dio: serviceLocator()));
+
   // ================ REPOSITORIES ================ //
 
   serviceLocator.registerLazySingleton<SignInRepository>(
@@ -172,6 +180,13 @@ Future<void> initializeAppDependencies() async {
     ),
   );
 
+  serviceLocator.registerLazySingleton<OffersRepository>(
+    () => OffersRepositoryImpl(
+      networkInfo: serviceLocator(),
+      remoteDataSource: serviceLocator(),
+    ),
+  );
+
   // ================ USE CASES ================ //
 
   serviceLocator.registerLazySingleton(() => SignInUseCase(repository: serviceLocator()));
@@ -191,6 +206,7 @@ Future<void> initializeAppDependencies() async {
   serviceLocator.registerLazySingleton(() => ProcessPassportUseCase(repository: serviceLocator()));
   serviceLocator.registerLazySingleton(() => UpdateProfileUseCase(repository: serviceLocator()));
   serviceLocator.registerLazySingleton(() => GetPdvImagesUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(() => GetAllOffersUseCase(repository: serviceLocator()));
   // ================ BLOCS ================ //
 
   serviceLocator.registerFactory(() => SignInCubit(
@@ -237,4 +253,6 @@ Future<void> initializeAppDependencies() async {
   );
   serviceLocator.registerFactory(
       () => OcrCubit(idCardUseCase: serviceLocator(), passportUseCase: serviceLocator()));
+
+  serviceLocator.registerFactory(() => OffersCubit(offersUseCase: serviceLocator()));
 }

@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:mobilis_smart_pos/src/features/invoices/data/models/retry_activation_response_model.dart';
-import 'package:mobilis_smart_pos/src/features/invoices/domain/entities/retry_activation_response_entity.dart';
 
 import '../../../../core/api/dio_consumer.dart';
 import '../../../../core/api/end_points.dart';

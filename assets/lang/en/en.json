@@ -1,6 +1,6 @@
 {
   "welcomeTitle": "Welcome to Mobilis Smart POS",
-  "welcomeParagraph": "The Mobilis Smart POS app is designed to transform sales points (POS) by integrating digitization and automation into the sales process. With this app, you can manage identity verifications efficiently and securely, simplifying operations and enhancing customer experience.",
+  "welcomeParagraph": "The Mobilis smart pos application aims to revolutionize the point of sale experience by offering an advanced digitalization solution combining reliability, security and speed.",
   "presentationTitle": "Application Presentation",
   "primaryFunctionalitiesTitle": "Main Features:",
   "primaryFunctionalities": "- Fast and Secure Registration\n- Data Automation\n- Real-time Tracking\n- Enhanced Security",
@@ -311,5 +311,7 @@
   "UNKNOWN_ERROR": "Error occurred while sending activation sms.",
   "config_sim": "SIM SETUP",
   "another_slot": "Other operator",
-  "no_search_result": "We couldn’t find any results for your search"
+  "no_search_result": "We couldn’t find any results for your search",
+  "offers": "Offers",
+  "error_getting_offers": "Error while getting offers"
 }
