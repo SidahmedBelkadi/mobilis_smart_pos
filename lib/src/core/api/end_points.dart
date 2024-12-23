@@ -5,9 +5,9 @@ class EndPoints {
 
   static const String ocrBaseUrl = String.fromEnvironment("OCR_BASE_URL");
 
-  //static const String baseUrl = "https://ms-pos.mobilis.dz/api2/app";
+  static const String baseUrl = "https://ms-pos.mobilis.dz/api";
 
-  static const String baseUrl = "http://192.168.1.12:3002/api2/app";
+  // static const String baseUrl = "http://172.20.10.5:3002/api2/app";
 
   // ============== APK ================== //
   static const String downloadApk = "https://ms-pos.mobilis.dz/apk";
@@ -35,9 +35,10 @@ class EndPoints {
   static const String editContract = "$baseUrl/contract/edit";
   static const String generateContrcat = "$baseUrl/contract/attributeMSISDN";
   static const String uploadClient = "$baseUrl/file/client";
-  static const String getAllOffers = "http://192.168.1.12:3002/api2/subscription-type/all";
-  static const String retriveCGV = "http://192.1.12:3002/api2/subscription-type";
+  static const String getAllOffers = "$baseUrl/subscription-type/all";
   static const String triggerSms = "$baseUrl/contract/triggerSMS";
+
+  static const String retriveCGV = "http://172.20.10.5:3002/api2/subscription-type";
 
   // ================== OCR =================== //
   static const String processId = "$ocrBaseUrl/process_id";

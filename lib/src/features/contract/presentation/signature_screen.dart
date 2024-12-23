@@ -120,7 +120,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
 
   _startSmsTimer() {
     _smsTimer = Timer(const Duration(seconds: 30), () {
-      generateContractParamsEntity.msisdn = "";
+      generateContractParamsEntity.msisdn = "FAILED";
       context
           .read<ContractCubit>()
           .attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
@@ -348,7 +348,8 @@ class _SignatureScreenState extends State<SignatureScreen> {
                           "================ STATE IS SUCCESS ==============================  ");
                       final smsParams = TriggerSmsParamsEntity(
                           msisdnAPN: senderPhoneNumber,
-                          formattedSmsString: widget.formattedSmsCode);
+                          formattedSmsString:
+                              '892130${widget.contract.serialNumber}${widget.formattedSmsCode}');
                       context.read<SmsCubit>().triggerSms(smsParams: smsParams);
                       setState(() {
                         smsLoading = true;
