@@ -37,6 +37,7 @@ class OTPCustomWidget extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.ltr,
       child: Pinput(
+        readOnly: true,
         controller: controller,
         length: 6,
         obscureText: false,
