@@ -269,10 +269,10 @@ class OfferItem extends StatelessWidget {
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                price,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
+              // Text(
+              //   price,
+              //   style: Theme.of(context).textTheme.bodyMedium,
+              // ),
               if (isSelected)
                 Row(
                   mainAxisSize: MainAxisSize.min,

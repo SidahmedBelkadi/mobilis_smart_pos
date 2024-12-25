@@ -22,7 +22,7 @@ class ScreenshotService {
   }
 
   static Future<void> preventScreenshotOn() async {
-    await ScreenProtector.preventScreenshotOff();
+    await ScreenProtector.preventScreenshotOn();
   }
 
   static Future<void> preventScreenshotOff() async {
