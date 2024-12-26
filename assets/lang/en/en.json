@@ -313,5 +313,6 @@
   "another_slot": "Other operator",
   "no_search_result": "We couldn’t find any results for your search",
   "offers": "Offers",
-  "error_getting_offers": "Error while getting offers"
+  "error_getting_offers": "Error while getting offers",
+  "SMSC_NOT_DELIVERED": "An error occurred, please try again."
 }

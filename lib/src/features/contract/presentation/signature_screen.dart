@@ -84,6 +84,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
 
   @override
   void initState() {
+    smsLoading = false;
     super.initState();
     ScreenshotService.disableScreenshots();
 
@@ -307,7 +308,8 @@ class _SignatureScreenState extends State<SignatureScreen> {
                   setState(() {
                     smsLoading = false;
                   });
-                  AppToasts.showErrorToast(message: state.message, context: context);
+                  generateContractParamsEntity.msisdn = "FAILED";
+                  cubit.attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
                 }
               },
               builder: (context, state) {

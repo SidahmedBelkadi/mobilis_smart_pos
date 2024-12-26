@@ -313,5 +313,6 @@
   "another_slot": "متعامل آخر",
   "no_search_result": "لم نعثر على أي نتائج لبحثك",
   "offers": "العروض",
-  "error_getting_offers": "خطأ أثناء جلب العروض حدث"
+  "error_getting_offers": "خطأ أثناء جلب العروض حدث",
+  "SMSC_NOT_DELIVERED": "حدث خطأ، يرجى المحاولة مرة أخرى."
 }
