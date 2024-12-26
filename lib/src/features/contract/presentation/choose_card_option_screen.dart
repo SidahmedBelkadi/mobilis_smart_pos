@@ -35,26 +35,25 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
     super.dispose();
   }
 
+  /// ------ Methode channel of OCR
   Future<void> startOCR({required String docType}) async {
     final result = await NativeOCR.startOCR(docType: docType);
-    debugPrint("========== RESULT : $result");
 
     if (result != null) {
-      debugPrint("================= DOCUMENT NUMBER : ${result['documentNumber']}");
-      debugPrint("================= BIRTH DATE : ${result['birthDate']}");
-      debugPrint("================= EXPIRY DATE : ${result['expiredDate']}");
       setState(() {
         documentNumber = result['documentNumber']!;
         dateOfBirth = result['birthDate']!;
         dateOfExpiry = result['expiredDate']!;
       });
 
-      Navigator.of(context).pushNamed(Routes.mrzDetails, arguments: {
-        'documentNumber': documentNumber,
-        'dateOfBirth': dateOfBirth,
-        'dateOfExpiry': dateOfExpiry,
-        'docType': docType,
-      });
+      if (mounted) {
+        Navigator.of(context).pushNamed(Routes.mrzDetails, arguments: {
+          'documentNumber': documentNumber,
+          'dateOfBirth': dateOfBirth,
+          'dateOfExpiry': dateOfExpiry,
+          'docType': docType,
+        });
+      }
     }
   }
 
@@ -69,15 +68,22 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              /// ----- Title
               Text(
                 "chooseCard".tr(context),
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(color: AppColors.primary),
                 textAlign: TextAlign.center,
               ),
+
+              /// ------ Animation
               Lottie.asset(AppImages.chooseScanAnimation, height: 320.h, width: 320.w),
+
               SizedBox(height: 32.h),
+
+              /// ------ Buttons
               Column(
                 children: [
+                  /// ----------- ID CARD
                   AppElevatedButtonWithText(
                     text: "identityCard".tr(context),
                     onPressed: () async {
@@ -88,11 +94,14 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
                         });
                         await startOCR(docType: "id_card");
                       } else {
-                        await _showPermissionDeniedDialog(context);
+                        await _showPermissionDeniedDialog();
                       }
                     },
                   ),
                   SizedBox(height: 16.h),
+
+                  /// ----------- Passport
+
                   AppElevatedButtonWithText(
                     text: "passport".tr(context),
                     onPressed: () async {
@@ -103,7 +112,7 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
                         });
                         await startOCR(docType: "passport");
                       } else {
-                        await _showPermissionDeniedDialog(context);
+                        await _showPermissionDeniedDialog();
                       }
                     },
                   ),
@@ -116,7 +125,8 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
     );
   }
 
-  Future<void> _showPermissionDeniedDialog(BuildContext context) async {
+  /// ------ Required Permission of camera dialog
+  Future<void> _showPermissionDeniedDialog() async {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -142,6 +152,7 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
     );
   }
 
+  /// ------ Request permission methode
   Future<bool> _requestCameraPermission() async {
     PermissionStatus status = await PermissionsUtil.checkPermissionStatus(Permission.camera);
     if (status.isDenied || status.isRestricted) {
