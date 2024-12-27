@@ -120,7 +120,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
   }
 
   _startSmsTimer() {
-    _smsTimer = Timer(const Duration(seconds: 30), () {
+    _smsTimer = Timer(const Duration(seconds: 60), () {
       generateContractParamsEntity.msisdn = "FAILED";
       context
           .read<ContractCubit>()
