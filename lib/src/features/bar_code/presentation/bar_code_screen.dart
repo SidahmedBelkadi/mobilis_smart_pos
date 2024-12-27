@@ -3,17 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:lottie/lottie.dart';
-import 'package:skeletonizer/skeletonizer.dart';
+import 'package:mobilis_smart_pos/src/features/bar_code/presentation/loading_barier.dart';
+import 'package:mobilis_smart_pos/src/features/bar_code/presentation/ui.dart';
 import '../../../config/routing/app_routes.dart';
-import '../../../core/commom/widgets/app_elevated_button_text.dart';
 import '../../../core/commom/widgets/custom_appbar_with_deny_contract.dart';
 import '../../../core/utils/helpers/app_localization_helper.dart';
 import '../../../core/utils/helpers/media_query_values.dart';
 import '../../../core/utils/helpers/toast_helper.dart';
-import '../../../core/utils/ressources/app_colors.dart';
-import '../../../core/utils/ressources/app_images.dart';
 import '../../contract/domain/entities/contract_request_params_entitiy.dart';
 import '../../contract/presentation/cubit/contract_cubit.dart';
 
@@ -56,25 +52,11 @@ class SimScannerScreenState extends State<SimScannerScreen> {
     super.initState();
   }
 
-  Future<void> _startBarcodeScanner() async {
-    try {
-      final result = await platform.invokeMethod("startBarcodeScanner");
-      _showBarcodeDialog(context, result);
-    } on PlatformException catch (e) {
-      return;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: CustomAppbarWithDenyContract(
-          title: "scan_sim".tr(context),
-          showProgressIndicator: true,
-          currentStep: widget.parentRecto != null ? 7 : 4,
-          allSteps: widget.parentRecto != null ? 8 : 5,
-        ),
+        appBar: _buildBarCodeScreenAppBar(context),
         body: SingleChildScrollView(
           child: SizedBox(
             height: context.height - 56.sp,
@@ -106,30 +88,11 @@ class SimScannerScreenState extends State<SimScannerScreen> {
               },
               builder: (context, state) {
                 if (state is CheckBeforeEditContractLoading) {
-                  return Stack(
-                    children: [
-                      SimScannerBody(onPressed: () {}),
-                      ModalBarrier(
-                        color: Colors.black.withOpacity(0.3),
-                        dismissible: false,
-                      ),
-                      Center(
-                        child: Container(
-                          height: 56.sp,
-                          width: 56.sp,
-                          padding: EdgeInsets.all(12.sp),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(12.sp),
-                          ),
-                          child: LottieBuilder.asset(AppImages.loading),
-                        ),
-                      ),
-                    ],
-                  );
+                  return const LoadingBarrier();
                 }
-                return SimScannerBody(
-                  onPressed: _startBarcodeScanner,
+
+                return SimScannerUI(
+                  onPressed: () => _startBarcodeScanner(context),
                 );
               },
             ),
@@ -137,6 +100,27 @@ class SimScannerScreenState extends State<SimScannerScreen> {
         ),
       ),
     );
+  }
+
+  CustomAppbarWithDenyContract _buildBarCodeScreenAppBar(BuildContext context) {
+    return CustomAppbarWithDenyContract(
+      title: "scan_sim".tr(context),
+      showProgressIndicator: true,
+      currentStep: widget.parentRecto != null ? 7 : 4,
+      allSteps: widget.parentRecto != null ? 8 : 5,
+    );
+  }
+
+  Future<void> _startBarcodeScanner(BuildContext context) async {
+    try {
+      final result = await platform.invokeMethod("startBarcodeScanner");
+      if (context.mounted) {
+        _showBarcodeDialog(context, result);
+      }
+    } on PlatformException catch (e) {
+      debugPrint("Bar code exception : $e");
+      return;
+    }
   }
 
   Future<void> _showBarcodeDialog(BuildContext context, String barcode) async {
@@ -173,9 +157,7 @@ class SimScannerScreenState extends State<SimScannerScreen> {
                     await Navigator.of(context).pushNamed(Routes.offers) as Map?;
 
                 if (selectedOffer != null) {
-                  debugPrint("======= SELECTED OFFER ID : ${selectedOffer['offerId']}");
-                  debugPrint("======= SELECTED OFFER NAME : ${selectedOffer['offerName']}");
-                  // Use the selected offer name to continue
+                  // ignore: use_build_context_synchronously
                   _continueWithBarcode(context, barcode, selectedOffer['offerId']);
                 }
               },
@@ -196,142 +178,6 @@ class SimScannerScreenState extends State<SimScannerScreen> {
 
     cubit.checkBeforeEditContract(
       contract: newContract,
-    );
-  }
-}
-
-class OffersSkeleton extends StatelessWidget {
-  const OffersSkeleton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Skeletonizer(
-      child: Container(
-        padding: EdgeInsets.all(16.0.sp),
-        width: MediaQuery.of(context).size.width,
-        child: Column(
-          children: [
-            Text(
-              "Available Offers",
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            SizedBox(height: 24.sp),
-            Expanded(
-              child: ListView.builder(
-                itemCount: 7,
-                itemBuilder: (context, index) => OfferItem(
-                  title: "Offer Name",
-                  price: '2000 DA',
-                  onTap: () {},
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class OfferItem extends StatelessWidget {
-  const OfferItem({
-    super.key,
-    required this.title,
-    required this.price,
-    this.onTap,
-    this.isSelected = false,
-  });
-
-  final String title;
-  final String price;
-  final void Function()? onTap;
-  final bool isSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: EdgeInsets.symmetric(vertical: 5.sp),
-        padding: EdgeInsets.symmetric(vertical: 10.sp),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: AppColors.primary,
-            width: isSelected ? 2 : 1,
-          ),
-          borderRadius: BorderRadius.all(
-            Radius.circular(10.sp),
-          ),
-        ),
-        child: ListTile(
-          title: Text(title),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Text(
-              //   price,
-              //   style: Theme.of(context).textTheme.bodyMedium,
-              // ),
-              if (isSelected)
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      width: 8.sp,
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(5.sp),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.all(Radius.circular(12.sp)),
-                      ),
-                      child: Icon(
-                        FontAwesomeIcons.check,
-                        size: 16.sp,
-                        color: Colors.white,
-                      ),
-                    )
-                  ],
-                )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class SimScannerBody extends StatelessWidget {
-  const SimScannerBody({super.key, this.onPressed});
-
-  final void Function()? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: context.height,
-      width: context.width,
-      padding: EdgeInsets.all(32.sp),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Lottie.asset(AppImages.barCodeAnimation5, height: 200.h, width: 200.w),
-          SizedBox(height: 32.h),
-          Text(
-            "bar_code_instruction".tr(context),
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: AppColors.primary,
-                ),
-          ),
-          SizedBox(height: 64.h),
-          AppElevatedButtonWithText(
-            text: "start_button".tr(context),
-            onPressed: onPressed,
-          )
-        ],
-      ),
     );
   }
 }

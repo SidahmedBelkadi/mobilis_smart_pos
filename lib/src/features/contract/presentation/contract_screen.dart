@@ -251,11 +251,11 @@ class _ContractScreenState extends State<ContractScreen> {
       gender: CivilsInformationsConverterHelper.getToSubmitGenderValue(
         gender: widget.metaData['gender'],
       ),
-      birthDate: CivilsInformationsConverterHelper.convertToIso8601WithTiret(
+      birthDate: CivilsInformationsConverterHelper.convertToIso8601(
         widget.metaData['date_of_birth'],
       ),
       presumedBirthDate: widget.isPresumed != null
-          ? CivilsInformationsConverterHelper.convertToIso8601WithTiret(
+          ? CivilsInformationsConverterHelper.convertToIso8601(
               widget.metaData['date_of_birth'],
             )
           : null,

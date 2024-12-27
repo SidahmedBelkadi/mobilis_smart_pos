@@ -49,8 +49,6 @@ class CivilsInformationsConverterHelper {
     required String date,
     required BuildContext context,
   }) {
-    debugPrint("============ format to display DATE : $date");
-
     try {
       DateTime parsedDate = parseDate(date);
       if (context.isArabicLocale) {
@@ -74,8 +72,13 @@ class CivilsInformationsConverterHelper {
 
   // Convert date from 'dd/MM/yyyy' to ISO 8601 format
   static String convertToIso8601(String dateStr) {
+    debugPrint("=================== ISO date : $dateStr");
     try {
-      DateTime parsedDate = DateFormat('yyyyMMdd').parse(dateStr);
+      String year = dateStr.substring(0, 4);
+      String month = dateStr.substring(4, 6);
+      String day = dateStr.substring(6, 8);
+      DateTime parsedDate = DateFormat('yyyy-MM-dd').parseStrict('$year-$month-$day');
+      debugPrint("===================HEY : ${parsedDate.toIso8601String()}");
       return parsedDate.toIso8601String();
     } catch (e) {
       return 'Invalid Date';
@@ -95,7 +98,6 @@ class CivilsInformationsConverterHelper {
 
   // Helper method to parse dates in various formats
   static DateTime parseDate(String date) {
-    debugPrint("============ parse DATE : $date");
     try {
       if (date.contains('-')) {
         return DateFormat('yyyy-MM-dd').parse(date);

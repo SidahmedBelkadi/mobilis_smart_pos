@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,8 +6,10 @@ import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_floating_action
 import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
 import 'package:mobilis_smart_pos/src/features/bar_code/domain/entities/offer_entity.dart';
-import 'package:mobilis_smart_pos/src/features/bar_code/presentation/bar_code_screen.dart';
 import 'package:mobilis_smart_pos/src/features/bar_code/presentation/cubit/offers_cubit.dart';
+import 'package:mobilis_smart_pos/src/features/bar_code/presentation/offers_error.dart';
+import 'package:mobilis_smart_pos/src/features/bar_code/presentation/offers_item.dart';
+import 'package:mobilis_smart_pos/src/features/bar_code/presentation/offers_skeleton.dart';
 
 class OffersPage extends StatefulWidget {
   const OffersPage({super.key});
@@ -53,26 +54,7 @@ class _OffersPageState extends State<OffersPage> {
                 return const OffersSkeleton();
               }
               if (state is GetAllOffersFailure) {
-                return SizedBox(
-                  height: context.height,
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "error_getting_offers".tr(context),
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                        SizedBox(height: 18.sp),
-                        ElevatedButton(
-                            onPressed: () {
-                              context.read<OffersCubit>().getAllOffers();
-                            },
-                            child: const Icon(FontAwesomeIcons.repeat))
-                      ],
-                    ),
-                  ),
-                );
+                return const ErrorGettingOffers();
               }
               if (state is GetAllOffersSuccess) {
                 final offers = state.offers;
