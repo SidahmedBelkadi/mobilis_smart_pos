@@ -98,7 +98,7 @@ class _ContractScreenState extends State<ContractScreen> {
   void initState() {
     super.initState();
 
-    final String isoBirthDate = CivilsInformationsConverterHelper.convertToIso8601WithTiret(
+    final String isoBirthDate = CivilsInformationsConverterHelper.convertToIso8601(
       widget.metaData['date_of_birth'],
     );
 

@@ -7,6 +7,7 @@ import android.nfc.tech.IsoDep;
 import android.util.Log;
 
 import com.ai_univers.smart_point_of_sale.utils.ImageUtil;
+import com.google.android.datatransport.runtime.logging.Logging;
 
 import net.sf.scuba.smartcards.CardService;
 
@@ -153,10 +154,11 @@ public class DzNfcModel {
         String documentNum = mrzInfo.getDocumentNumber();
         String nationality = mrzInfo.getNationality();
         String issuingState = mrzInfo.getIssuingState();
-        String birthDate = formatDateOfBirth(dg11File.getFullDateOfBirth());
+        String birthDate = dg11File.getFullDateOfBirth();
         Log.d("DATE_FORMAT", formatDateOfBirth("2006"));
-        String expiryDate = formatDate(mrzInfo.getDateOfExpiry());
+        String expiryDate = mrzInfo.getDateOfExpiry();
         String gender = String.valueOf(mrzInfo.getGender());
+
 
         String firstName = cleanUpName(rawFirstName);
         String lastName = cleanUpName(rawLastName);

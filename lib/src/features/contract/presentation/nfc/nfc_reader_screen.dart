@@ -98,7 +98,7 @@ class _NfcReaderScreenState extends State<NfcReaderScreen> {
         );
       } else {
         _nfcData = result;
-        debugPrint("NFC DATA : ${_nfcData}");
+        debugPrint("NFC DATA : $_nfcData");
         widget.minorContract != null
             ? _navigateToParentContract()
             : Navigator.of(context).pushNamed(Routes.contract, arguments: {

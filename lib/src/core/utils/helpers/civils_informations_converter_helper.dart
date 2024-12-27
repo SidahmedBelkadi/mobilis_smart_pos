@@ -49,8 +49,10 @@ class CivilsInformationsConverterHelper {
     required String date,
     required BuildContext context,
   }) {
+    debugPrint("============ format to display DATE : $date");
+
     try {
-      DateTime parsedDate = _parseDate(date);
+      DateTime parsedDate = parseDate(date);
       if (context.isArabicLocale) {
         return DateFormat('yyyy-MM-dd').format(parsedDate);
       }
@@ -73,7 +75,7 @@ class CivilsInformationsConverterHelper {
   // Convert date from 'dd/MM/yyyy' to ISO 8601 format
   static String convertToIso8601(String dateStr) {
     try {
-      DateTime parsedDate = DateFormat('dd/MM/yyyy').parse(dateStr);
+      DateTime parsedDate = DateFormat('yyyyMMdd').parse(dateStr);
       return parsedDate.toIso8601String();
     } catch (e) {
       return 'Invalid Date';
@@ -86,24 +88,44 @@ class CivilsInformationsConverterHelper {
       DateTime parsedDate = DateFormat('yyyy-MM-dd').parse(dateStr);
       return parsedDate.toIso8601String();
     } catch (e) {
+      debugPrint("============ ERROR : $e");
       return 'Invalid Date';
     }
   }
 
   // Helper method to parse dates in various formats
-  static DateTime _parseDate(String date) {
+  static DateTime parseDate(String date) {
+    debugPrint("============ parse DATE : $date");
     try {
       if (date.contains('-')) {
         return DateFormat('yyyy-MM-dd').parse(date);
       } else if (date.contains('/')) {
         return DateFormat('yyyy/MM/dd').parse(date);
       } else if (date.length == 8) {
-        return DateFormat('yyyyMMdd').parse(date);
+        // Handle special cases where month or day is "00"
+        String year = date.substring(0, 4);
+        String month = date.substring(4, 6);
+        String day = date.substring(6, 8);
+
+        if (month == '00' || day == '00') {
+          // Replace invalid month or day with "01"
+          month = month == '00' ? '01' : month;
+          day = day == '00' ? '01' : day;
+
+          // Construct a valid date
+          String fixedDate = '$year-$month-$day';
+          DateTime parsedDate = DateFormat('yyyy-MM-dd').parse(fixedDate);
+          return parsedDate;
+        }
+
+        String fixedDate = '$year-$month-$day';
+        DateTime parsedDate = DateFormat('yyyy-MM-dd').parse(fixedDate);
+        return parsedDate;
       } else {
-        throw FormatException('Unknown date format');
+        throw const FormatException('Unknown date format');
       }
     } catch (e) {
-      throw FormatException('Error parsing date: $e');
+      throw FormatException('============ Error parsing date: $e');
     }
   }
 
