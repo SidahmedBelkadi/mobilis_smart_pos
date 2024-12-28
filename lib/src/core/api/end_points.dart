@@ -7,7 +7,7 @@ class EndPoints {
 
   static const String baseUrl = "https://ms-pos.mobilis.dz/api2/app";
 
-  // static const String baseUrl = "http://172.20.10.5:3002/api2/app";
+  //static const String baseUrl = "http://192.168.1.12:3002/api2/app";
 
   // ============== APK ================== //
   static const String downloadApk = "https://ms-pos.mobilis.dz/apk";

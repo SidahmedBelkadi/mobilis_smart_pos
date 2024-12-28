@@ -314,5 +314,6 @@
   "no_search_result": "لم نعثر على أي نتائج لبحثك",
   "offers": "العروض",
   "error_getting_offers": "خطأ أثناء جلب العروض حدث",
-  "SMSC_NOT_DELIVERED": "حدث خطأ، يرجى المحاولة مرة أخرى."
+  "SMSC_NOT_DELIVERED": "حدث خطأ، يرجى المحاولة مرة أخرى.",
+  "please_wait": "يرجى الانتظار"
 }

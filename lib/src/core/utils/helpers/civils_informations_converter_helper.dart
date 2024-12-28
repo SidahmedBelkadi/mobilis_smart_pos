@@ -77,6 +77,12 @@ class CivilsInformationsConverterHelper {
       String year = dateStr.substring(0, 4);
       String month = dateStr.substring(4, 6);
       String day = dateStr.substring(6, 8);
+
+      if (month == '00' || day == '00') {
+        // Replace invalid month or day with "01"
+        month = month == '00' ? '01' : month;
+        day = day == '00' ? '01' : day;
+      }
       DateTime parsedDate = DateFormat('yyyy-MM-dd').parseStrict('$year-$month-$day');
       debugPrint("===================HEY : ${parsedDate.toIso8601String()}");
       return parsedDate.toIso8601String();

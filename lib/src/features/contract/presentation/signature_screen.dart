@@ -120,42 +120,12 @@ class _SignatureScreenState extends State<SignatureScreen> {
   }
 
   _startSmsTimer() {
-    _smsTimer = Timer(const Duration(seconds: 60), () {
-      generateContractParamsEntity.msisdn = "FAILED";
+    _smsTimer = Timer(const Duration(seconds: 45), () {
+      generateContractParamsEntity.msisdn = "";
       context
           .read<ContractCubit>()
           .attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
     });
-  }
-
-  void handleSmsError(String code, BuildContext context) {
-    String errorMessage;
-    switch (code) {
-      case 'PERMISSION_DENIED':
-        errorMessage = "PERMISSION_DENIED";
-        break;
-      case 'SIM_NOT_READY':
-        errorMessage = "SIM_NOT_READY";
-        break;
-      case 'AIRPLANE_MODE':
-        errorMessage = "AIRPLANE_MODE";
-        break;
-      case 'NO_SMS_NETWORK':
-        errorMessage = "NO_SMS_NETWORK";
-        break;
-      case 'NO_SIM':
-        errorMessage = "NO_SIM";
-        break;
-      case 'INVALID_OPERATOR':
-        errorMessage = "INVALID_OPERATOR";
-        break;
-      case 'SMS_FAILED':
-        errorMessage = "SMS_FAILED";
-        break;
-      default:
-        errorMessage = "UNKNOWN_ERROR";
-    }
-    AppToasts.showErrorToast(message: errorMessage.tr(context), context: context);
   }
 
   void checkSmsSuccess(String message, BuildContext context) {
@@ -195,8 +165,10 @@ class _SignatureScreenState extends State<SignatureScreen> {
     final phoneStatus = await Permission.phone.request();
 
     if (smsStatus.isGranted && phoneStatus.isGranted) {
+      // ignore: use_build_context_synchronously
       _showConfirmationDialog(context, cubit);
     } else {
+      // ignore: use_build_context_synchronously
       _showPermissionDeniedDialog(context);
     }
   }
@@ -329,9 +301,6 @@ class _SignatureScreenState extends State<SignatureScreen> {
                           (route) => false);
                     }
                     if (state is GenerateContractSuccess) {
-                      // String message = state.generateContractResponseEntity.contractMessage +
-                      //     state.generateContractResponseEntity.message;
-                      // AppToasts.showSuccessToast(message: message, context: context);
                       Navigator.of(context).pushReplacementNamed(Routes.contractGenerated);
                     }
 
@@ -401,6 +370,11 @@ class _SignatureScreenState extends State<SignatureScreen> {
                             child: Center(
                               child: Column(
                                 children: [
+                                  Text(
+                                    "please_wait".tr(context),
+                                    style: Theme.of(context).textTheme.bodyLarge,
+                                  ),
+                                  SizedBox(height: 12.sp),
                                   LottieBuilder.asset(
                                     AppImages.smsAnim1,
                                     height: 350.sp,
