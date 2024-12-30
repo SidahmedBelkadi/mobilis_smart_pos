@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:mobilis_smart_pos/src/core/commom/widgets/version.dart';
 import 'widgets/theme_switcher.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -232,9 +233,16 @@ class _SignInScreenState extends State<SignInScreen> {
                             return const LoadingButton();
                           }
 
-                          return Button(
-                            cubit: cubit,
-                            formKey: formKey,
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Button(
+                                cubit: cubit,
+                                formKey: formKey,
+                              ),
+                              SizedBox(height: 8.h),
+                              const VersionWidget(),
+                            ],
                           );
                         },
                       ),

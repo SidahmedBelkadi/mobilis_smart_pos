@@ -89,9 +89,19 @@ public class BarcodeScannerActivity extends AppCompatActivity {
         }, ContextCompat.getMainExecutor(this));
     }
 
+    private long lastScanTime = 0; // Track the time of the last successful scan
+    private static final long SCAN_DELAY_MS = 1000; // Set delay to 1 second (1000 milliseconds)
+
 
     @OptIn(markerClass = ExperimentalGetImage.class)
     private void processImageProxy(ImageProxy imageProxy) {
+
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastScanTime < SCAN_DELAY_MS) {
+            // Skip this scan if it occurs within the delay period
+            return;
+        }
+
         // Convert the image to ML Kit's InputImage format
         InputImage inputImage =
                 InputImage.fromMediaImage(Objects.requireNonNull(imageProxy.getImage()), imageProxy.getImageInfo().getRotationDegrees());
@@ -119,11 +129,20 @@ public class BarcodeScannerActivity extends AppCompatActivity {
                                 rawValue = rawValue.substring(6); // Remove the first 6 characters
                             }
 
-                            // Pass the modified result to the main activity
-                            Intent resultIntent = new Intent();
-                            resultIntent.putExtra("SCAN_RESULT", rawValue);
-                            setResult(RESULT_OK, resultIntent);
-                            finish();
+                            // Apply the regex to check if the remaining value is a 13-digit number
+                            if (rawValue.matches("\\d{13}")) {
+                                lastScanTime = currentTime;
+
+                                // Pass the valid result to the main activity
+                                Intent resultIntent = new Intent();
+                                resultIntent.putExtra("SCAN_RESULT", rawValue);
+                                setResult(RESULT_OK, resultIntent);
+
+                                // Optionally play a beep sound
+                                playBeep();
+
+                                finish();
+                            }
                         }
                     }
                 })
@@ -136,7 +155,7 @@ public class BarcodeScannerActivity extends AppCompatActivity {
     private void playBeep() {
         // Use ToneGenerator to play a simple beep sound
         ToneGenerator toneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
-        toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 150); // 150ms beep
+        toneGenerator.startTone(ToneGenerator.TONE_CDMA_ALERT_AUTOREDIAL_LITE, 150); // 150ms beep
 
         // Release the ToneGenerator after the tone is played
         new android.os.Handler().postDelayed(toneGenerator::release, 150);

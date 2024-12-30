@@ -2,7 +2,7 @@ name: mobilis_smart_pos
 description: "Enabling Mobile Sales Channels through Digitalization and Automation"
 publish_to: "none"
 
-version: 1.8.0+1
+version: 1.9.0+1
 
 environment:
   sdk: ">=3.2.6 <4.0.0"
