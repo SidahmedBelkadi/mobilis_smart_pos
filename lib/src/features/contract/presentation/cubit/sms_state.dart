@@ -21,3 +21,16 @@ final class TriggerSmsFailure extends SmsInitial {
   @override
   List<Object> get props => [message];
 }
+
+final class RetryTriggerSmsSuccess extends SmsInitial {}
+
+final class RetryTriggerSmsLoading extends SmsInitial {}
+
+final class RetryTriggerSmsFailure extends SmsInitial {
+  final String message;
+
+  RetryTriggerSmsFailure({required this.message});
+
+  @override
+  List<Object> get props => [message];
+}

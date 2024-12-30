@@ -315,5 +315,7 @@
   "offers": "العروض",
   "error_getting_offers": "خطأ أثناء جلب العروض حدث",
   "SMSC_NOT_DELIVERED": "حدث خطأ، يرجى المحاولة مرة أخرى.",
-  "please_wait": "يرجى الانتظار"
+  "please_wait": "يرجى الانتظار",
+  "NO_CONTRACT_PROVIDED": "المحاولة فشلت",
+  "DSA_ERROR": "المحاولة فشلت"
 }

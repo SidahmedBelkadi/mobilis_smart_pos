@@ -22,4 +22,18 @@ class SmsCubit extends Cubit<SmsState> {
       },
     );
   }
+
+  Future<void> retryTriggerSms({required TriggerSmsParamsEntity smsParams}) async {
+    emit(RetryTriggerSmsLoading());
+
+    final failureOrUnit = await useCase(trigggerSmsParams: smsParams);
+    failureOrUnit.fold(
+      (error) {
+        emit(RetryTriggerSmsFailure(message: error.message));
+      },
+      (_) {
+        emit(RetryTriggerSmsSuccess());
+      },
+    );
+  }
 }

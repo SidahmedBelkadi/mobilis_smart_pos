@@ -112,4 +112,19 @@ class ContractRepositoryImpl implements ContractRepository {
           NoInternetConnectionFailure(message: AppApiResponsesMessages.noInternetConnection));
     }
   }
+
+  @override
+  Future<Either<Failure, Unit>> retryTriggerSms({required TriggerSmsParamsEntity params}) async {
+    if (await networkInfo.isConnected) {
+      try {
+        remoteDataSource.retryTriggerSms(triggerSmsParams: params);
+        return const Right(unit);
+      } on ServerException catch (e) {
+        return Left(ServerFailure(message: ErrorHandler.getErrorMessage(e)));
+      }
+    } else {
+      return const Left(
+          NoInternetConnectionFailure(message: AppApiResponsesMessages.noInternetConnection));
+    }
+  }
 }

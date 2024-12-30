@@ -16,6 +16,8 @@ import '../models/generate_contract_response_model.dart';
 abstract class ContractRemoteDataSource {
   Future<void> triggerSms({required TriggerSmsParamsEntity triggerSmsParams});
 
+  Future<void> retryTriggerSms({required TriggerSmsParamsEntity triggerSmsParams});
+
   Future<CheckBeforeEditContractResponseModel> checkBeforeEditContract({
     required ContractRequestParamsEntitiy contract,
   });
@@ -148,5 +150,10 @@ class ContractRemoteDataSourceImpl implements ContractRemoteDataSource {
     required TriggerSmsParamsEntity triggerSmsParams,
   }) async {
     await dioConsumer.post(EndPoints.triggerSms, body: triggerSmsParams.toJson());
+  }
+
+  @override
+  Future<void> retryTriggerSms({required TriggerSmsParamsEntity triggerSmsParams}) async {
+    await dioConsumer.post(EndPoints.retryTriggerSms, body: triggerSmsParams.toJson());
   }
 }

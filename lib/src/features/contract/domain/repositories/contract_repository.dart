@@ -33,4 +33,6 @@ abstract class ContractRepository {
   Future<Either<Failure, GenerateContractResponseEntity>> generateContract({
     required GenerateContractParamsEntity generateContractParams,
   });
+
+  Future<Either<Failure, Unit>> retryTriggerSms({required TriggerSmsParamsEntity params});
 }

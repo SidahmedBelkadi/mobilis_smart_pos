@@ -315,5 +315,7 @@
   "offers": "Offres",
   "error_getting_offers": "Erreur lors de la récupération des offres",
   "SMSC_NOT_DELIVERED": "Une erreur s'est produite, Veuillez réessayer.",
-  "please_wait": "Veuillez patienter"
+  "please_wait": "Veuillez patienter",
+  "NO_CONTRACT_PROVIDED": "Tentative échouée",
+  "DSA_ERROR": "Tentative échouée"
 }

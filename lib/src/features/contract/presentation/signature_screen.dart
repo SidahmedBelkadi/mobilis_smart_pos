@@ -318,6 +318,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
                       debugPrint(
                           "================ STATE IS SUCCESS ==============================  ");
                       final smsParams = TriggerSmsParamsEntity(
+                          id: generateContractParamsEntity.invoiceId,
                           msisdnAPN: senderPhoneNumber,
                           formattedSmsString:
                               '892130${widget.contract.serialNumber}${widget.formattedSmsCode}');
