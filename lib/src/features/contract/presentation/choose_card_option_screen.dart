@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
-import 'package:mobilis_smart_pos/src/features/rasd_test/rasd_test.dart';
+import 'package:mobilis_smart_pos/src/features/contract/presentation/rasd_ocr_screen.dart';
 import 'package:mobilis_smart_pos/src/services/native_ocr.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -117,7 +117,7 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
                               // ignore: use_build_context_synchronously
                               Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) {
-                                  return const RasdTest();
+                                  return const RasdOcrScreen();
                                 },
                               ));
                             } else {

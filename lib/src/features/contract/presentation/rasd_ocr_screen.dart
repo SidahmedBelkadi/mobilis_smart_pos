@@ -14,21 +14,20 @@ import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart
 import 'package:mobilis_smart_pos/src/core/utils/helpers/toast_helper.dart';
 import 'package:mobilis_smart_pos/src/features/profile/presentation/widget/upload_image_field.dart';
 
-class RasdTest extends StatefulWidget {
-  const RasdTest({super.key});
+class RasdOcrScreen extends StatefulWidget {
+  const RasdOcrScreen({super.key});
 
   @override
-  State<RasdTest> createState() => _RasdTestState();
+  State<RasdOcrScreen> createState() => _RasdOcrScreenState();
 }
 
-class _RasdTestState extends State<RasdTest> {
+class _RasdOcrScreenState extends State<RasdOcrScreen> {
   late TextRecognizer _textRecognizer;
 
   File? rectoImage;
   File? versoImage;
   bool isCaptureDone = false;
 
-  // Separate variables for storing extracted data
   String name = '';
   String dateOfBirth = '';
   String placeOfBirth = '';
@@ -70,47 +69,55 @@ class _RasdTestState extends State<RasdTest> {
                     ),
                     SizedBox(height: 16.sp),
                     AppTextFormField(
-                      enabled: false,
+                      enabled: true,
                       label: 'Name',
                       textEditingController: TextEditingController(text: name),
                     ),
+                    SizedBox(height: 16.sp),
                     AppTextFormField(
-                      enabled: false,
+                      enabled: true,
                       label: 'Date of Birth',
                       textEditingController: TextEditingController(text: dateOfBirth),
                     ),
+                    SizedBox(height: 16.sp),
                     AppTextFormField(
-                      enabled: false,
+                      enabled: true,
                       label: 'Place of Birth',
                       textEditingController: TextEditingController(text: placeOfBirth),
                     ),
+                    SizedBox(height: 16.sp),
                     AppTextFormField(
-                      enabled: false,
+                      enabled: true,
                       label: 'Document Number',
                       textEditingController: TextEditingController(text: documentNumber),
                     ),
+                    SizedBox(height: 16.sp),
                     AppTextFormField(
-                      enabled: false,
+                      enabled: true,
                       label: 'Sexo',
                       textEditingController: TextEditingController(text: sexo),
                     ),
+                    SizedBox(height: 16.sp),
                     AppTextFormField(
-                      enabled: false,
+                      enabled: true,
                       label: 'Father\'s Name',
                       textEditingController: TextEditingController(text: fatherName),
                     ),
+                    SizedBox(height: 16.sp),
                     AppTextFormField(
-                      enabled: false,
+                      enabled: true,
                       label: 'Mother\'s Name',
                       textEditingController: TextEditingController(text: motherName),
                     ),
+                    SizedBox(height: 16.sp),
                     AppTextFormField(
-                      enabled: false,
+                      enabled: true,
                       label: 'Domicilio',
                       textEditingController: TextEditingController(text: domicilio),
                     ),
+                    SizedBox(height: 16.sp),
                     AppTextFormField(
-                      enabled: false,
+                      enabled: true,
                       label: 'Expiry date',
                       textEditingController: TextEditingController(text: fechaDeExpedicion),
                     ),
@@ -162,6 +169,9 @@ class _RasdTestState extends State<RasdTest> {
                               if (result != null) {
                                 setState(() {
                                   rectoImage = result;
+                                  if (rectoImage != null && versoImage != null) {
+                                    isCaptureDone = true;
+                                  }
                                 });
                               }
                             },
@@ -181,7 +191,9 @@ class _RasdTestState extends State<RasdTest> {
                               if (result != null) {
                                 setState(() {
                                   versoImage = result;
-                                  isCaptureDone = true;
+                                  if (rectoImage != null && versoImage != null) {
+                                    isCaptureDone = true;
+                                  }
                                 });
                               }
                             },
@@ -291,16 +303,39 @@ class _RasdTestState extends State<RasdTest> {
   }
 
   bool _isDocumentRecognized(String text, DocumentsType docType) {
+    // Normalize text for consistent matching
+    final normalizedText = text.toLowerCase().replaceAll('\n', ' ').replaceAll(RegExp(r'\s+'), ' ');
+
     if (docType == DocumentsType.rasdFrontIdCard) {
-      final pattern9Digits = RegExp(r'\b\d{8}\b');
-      final has9Digits = pattern9Digits.hasMatch(text);
-      final patternIdRepublica = RegExp(r'REPUBLICA', caseSensitive: false);
-      final hasRepublica = patternIdRepublica.hasMatch(text);
-      return has9Digits && hasRepublica;
+      // Front ID Card: Check for multiple relaxed indicators
+      final patterns = [
+        RegExp(r'republica', caseSensitive: false), // Look for "REPUBLICA"
+        RegExp(r'árabe saharaui democrática',
+            caseSensitive: false), // Look for "ÁRABE SAHARAUI DEMOCRÁTICA"
+        RegExp(r'\b\d{8,9}\b'), // Look for an 8 or 9-digit document number
+      ];
+
+      // Count the number of matches
+      int matchCount = patterns.where((pattern) => pattern.hasMatch(normalizedText)).length;
+
+      // Return true if at least 2 key patterns match
+      return matchCount >= 2;
     } else if (docType == DocumentsType.rasdBackIdCard) {
-      final patternIdMinisterio = RegExp(r'ministerio del interior', caseSensitive: false);
-      return patternIdMinisterio.hasMatch(text);
+      // Back ID Card: Check for multiple relaxed indicators
+      final patterns = [
+        RegExp(r'ministerio del interior',
+            caseSensitive: false), // Look for "MINISTERIO DEL INTERIOR"
+        RegExp(r'sexo', caseSensitive: false), // Look for "SEXO"
+        RegExp(r'(\d{2}/\d{2}/\d{4})'), // Look for a date in DD/MM/YYYY format
+      ];
+
+      // Count the number of matches
+      int matchCount = patterns.where((pattern) => pattern.hasMatch(normalizedText)).length;
+
+      // Return true if at least 2 key patterns match
+      return matchCount >= 2;
     }
+
     return false;
   }
 }
