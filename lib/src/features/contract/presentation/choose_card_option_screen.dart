@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:mobilis_smart_pos/src/features/rasd_test/rasd_test.dart';
 import 'package:mobilis_smart_pos/src/services/native_ocr.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -24,6 +25,9 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
   late String dateOfBirth;
   late String dateOfExpiry;
   late String docType;
+
+  String nationality = 'DZ';
+  List<String> nationalitiesValues = ['DZ', 'RASD'];
 
   @override
   void initState() {
@@ -61,9 +65,35 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: AppColors.darkGrey,
+        actions: [
+          DropdownButton<String>(
+            value: nationalitiesValues.contains(nationality)
+                ? nationality
+                : null, // Validate selected value
+            items: nationalitiesValues.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value, // Assign unique value for each item
+                child: Text(
+                  value == 'DZ' ? 'Algérien' : 'Sahraoui', // Properly map value to display text
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              );
+            }).toList(),
+            onChanged: (String? newValue) {
+              if (newValue != null) {
+                setState(() {
+                  nationality = newValue; // Update the selected value
+                });
+              }
+            },
+          )
+        ],
+      ),
       body: SingleChildScrollView(
         child: Container(
-          height: context.height,
+          height: context.height - 80.sp,
           width: context.width,
           padding: EdgeInsets.all(20.sp),
           child: Column(
@@ -76,39 +106,61 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
               ),
               Lottie.asset(AppImages.chooseScanAnimation, height: 320.h, width: 320.w),
               SizedBox(height: 32.h),
-              Column(
-                children: [
-                  AppElevatedButtonWithText(
-                    text: "identityCard".tr(context),
-                    onPressed: () async {
-                      bool hasPermission = await _requestCameraPermission();
-                      if (hasPermission) {
-                        setState(() {
-                          docType = "id_card";
-                        });
-                        await startOCR(docType: "id_card");
-                      } else {
-                        await _showPermissionDeniedDialog(context);
-                      }
-                    },
-                  ),
-                  SizedBox(height: 16.h),
-                  AppElevatedButtonWithText(
-                    text: "passport".tr(context),
-                    onPressed: () async {
-                      bool hasPermission = await _requestCameraPermission();
-                      if (hasPermission) {
-                        setState(() {
-                          docType = "passport";
-                        });
-                        await startOCR(docType: "passport");
-                      } else {
-                        await _showPermissionDeniedDialog(context);
-                      }
-                    },
-                  ),
-                ],
-              )
+              nationality == 'RASD'
+                  ? Column(
+                      children: [
+                        AppElevatedButtonWithText(
+                          text: "identityCard".tr(context),
+                          onPressed: () async {
+                            bool hasPermission = await _requestCameraPermission();
+                            if (hasPermission) {
+                              // ignore: use_build_context_synchronously
+                              Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) {
+                                  return const RasdTest();
+                                },
+                              ));
+                            } else {
+                              // ignore: use_build_context_synchronously
+                              await _showPermissionDeniedDialog(context);
+                            }
+                          },
+                        ),
+                      ],
+                    )
+                  : Column(
+                      children: [
+                        AppElevatedButtonWithText(
+                          text: "identityCard".tr(context),
+                          onPressed: () async {
+                            bool hasPermission = await _requestCameraPermission();
+                            if (hasPermission) {
+                              setState(() {
+                                docType = "id_card";
+                              });
+                              await startOCR(docType: "id_card");
+                            } else {
+                              await _showPermissionDeniedDialog(context);
+                            }
+                          },
+                        ),
+                        SizedBox(height: 16.h),
+                        AppElevatedButtonWithText(
+                          text: "passport".tr(context),
+                          onPressed: () async {
+                            bool hasPermission = await _requestCameraPermission();
+                            if (hasPermission) {
+                              setState(() {
+                                docType = "passport";
+                              });
+                              await startOCR(docType: "passport");
+                            } else {
+                              await _showPermissionDeniedDialog(context);
+                            }
+                          },
+                        ),
+                      ],
+                    )
             ],
           ),
         ),
