@@ -12,6 +12,7 @@ import 'package:mobilis_smart_pos/src/core/utils/enums/documents_type.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/toast_helper.dart';
+import 'package:mobilis_smart_pos/src/core/utils/ressources/app_colors.dart';
 import 'package:mobilis_smart_pos/src/features/profile/presentation/widget/upload_image_field.dart';
 
 class RasdOcrScreen extends StatefulWidget {
@@ -27,16 +28,25 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
   File? rectoImage;
   File? versoImage;
   bool isCaptureDone = false;
+  bool isConfirmed = false;
 
-  String name = '';
-  String dateOfBirth = '';
-  String placeOfBirth = '';
-  String documentNumber = '';
-  String sexo = '';
-  String fatherName = '';
-  String motherName = '';
-  String domicilio = '';
-  String fechaDeExpedicion = '';
+  // TextEditingControllers for editable fields
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController dateOfBirthController = TextEditingController();
+  final TextEditingController placeOfBirthController = TextEditingController();
+  final TextEditingController documentNumberController = TextEditingController();
+  final TextEditingController sexoController = TextEditingController();
+  final TextEditingController fatherNameController = TextEditingController();
+  final TextEditingController motherNameController = TextEditingController();
+  final TextEditingController domicilioController = TextEditingController();
+  final TextEditingController fechaDeExpedicionController = TextEditingController();
+
+  // Dropdown for Sexo
+  String? selectedSexo;
+  String? selectedPlaceOfBirth;
+
+  // Predefined list of valid Place of Birth values
+  final List<String> validPlacesOfBirth = ['LAIUN', 'AOUSERD', 'SMARA', 'DAJLA', 'BOJDUR'];
 
   @override
   void initState() {
@@ -47,7 +57,39 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
   @override
   void dispose() {
     _textRecognizer.close();
+    nameController.dispose();
+    dateOfBirthController.dispose();
+    placeOfBirthController.dispose();
+    documentNumberController.dispose();
+    sexoController.dispose();
+    fatherNameController.dispose();
+    motherNameController.dispose();
+    domicilioController.dispose();
+    fechaDeExpedicionController.dispose();
     super.dispose();
+  }
+
+  Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
+    DateTime initialDate = DateTime.now();
+    if (controller.text.isNotEmpty) {
+      try {
+        initialDate = DateTime.parse(controller.text.split('/').reversed.join('-'));
+      } catch (e) {
+        // Ignore parsing errors, default to current date
+      }
+    }
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(1900),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null && picked != initialDate) {
+      setState(() {
+        controller.text =
+            "${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}";
+      });
+    }
   }
 
   @override
@@ -64,62 +106,123 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Extracted Informations",
+                      "Extracted Information",
                       style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 16.sp),
                     AppTextFormField(
                       enabled: true,
                       label: 'Name',
-                      textEditingController: TextEditingController(text: name),
+                      textEditingController: nameController,
                     ),
                     SizedBox(height: 16.sp),
-                    AppTextFormField(
-                      enabled: true,
-                      label: 'Date of Birth',
-                      textEditingController: TextEditingController(text: dateOfBirth),
+                    GestureDetector(
+                      onTap: () => _selectDate(context, dateOfBirthController),
+                      child: AbsorbPointer(
+                        child: AppTextFormField(
+                          enabled: true,
+                          label: 'Date of Birth',
+                          textEditingController: dateOfBirthController,
+                        ),
+                      ),
                     ),
                     SizedBox(height: 16.sp),
-                    AppTextFormField(
-                      enabled: true,
-                      label: 'Place of Birth',
-                      textEditingController: TextEditingController(text: placeOfBirth),
+                    DropdownButtonFormField<String>(
+                      value: selectedPlaceOfBirth,
+                      items: validPlacesOfBirth
+                          .map((place) => DropdownMenuItem(
+                                value: place,
+                                child: Text(place),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedPlaceOfBirth = value;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Place of Birth',
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0.r),
+                          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                        ),
+                      ),
                     ),
                     SizedBox(height: 16.sp),
                     AppTextFormField(
                       enabled: true,
                       label: 'Document Number',
-                      textEditingController: TextEditingController(text: documentNumber),
+                      textEditingController: documentNumberController,
                     ),
                     SizedBox(height: 16.sp),
-                    AppTextFormField(
-                      enabled: true,
-                      label: 'Sexo',
-                      textEditingController: TextEditingController(text: sexo),
+                    DropdownButtonFormField<String>(
+                      value: selectedSexo, // Preselect based on extraction result
+                      items: ['M', 'F']
+                          .map((sexo) => DropdownMenuItem(
+                                value: sexo,
+                                child: Text(sexo),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedSexo = value;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Sexo',
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0.r),
+                          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                        ),
+                      ),
                     ),
                     SizedBox(height: 16.sp),
                     AppTextFormField(
                       enabled: true,
                       label: 'Father\'s Name',
-                      textEditingController: TextEditingController(text: fatherName),
+                      textEditingController: fatherNameController,
                     ),
                     SizedBox(height: 16.sp),
                     AppTextFormField(
                       enabled: true,
                       label: 'Mother\'s Name',
-                      textEditingController: TextEditingController(text: motherName),
+                      textEditingController: motherNameController,
                     ),
                     SizedBox(height: 16.sp),
                     AppTextFormField(
                       enabled: true,
                       label: 'Domicilio',
-                      textEditingController: TextEditingController(text: domicilio),
+                      textEditingController: domicilioController,
                     ),
                     SizedBox(height: 16.sp),
-                    AppTextFormField(
-                      enabled: true,
-                      label: 'Expiry date',
-                      textEditingController: TextEditingController(text: fechaDeExpedicion),
+                    GestureDetector(
+                      onTap: () => _selectDate(context, fechaDeExpedicionController),
+                      child: AbsorbPointer(
+                        child: AppTextFormField(
+                          enabled: true,
+                          label: 'Expiry Date',
+                          textEditingController: fechaDeExpedicionController,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 16.sp),
+                    Row(
+                      children: [
+                        Checkbox.adaptive(
+                          value: isConfirmed,
+                          onChanged: (value) {
+                            setState(() {
+                              isConfirmed = value ?? false;
+                            });
+                          },
+                        ),
+                        const Flexible(
+                          child: Text(
+                            "I confirm that the information is correct and verified.",
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(height: 16.sp),
                     Text(
@@ -252,87 +355,106 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
 
   void extractAndStoreData(String text, DocumentsType documentType) {
     if (documentType == DocumentsType.rasdFrontIdCard) {
-      // Extract data for the front of the ID card
       final namePattern = RegExp(r'NOMBRE\s+(.+?)\n');
       final birthDatePattern = RegExp(r'FECHA DE NACIMIENTO\s+(\d{2}/\d{2}/\d{4})');
       final placeOfBirthPattern = RegExp(r'\bW\.\s+([^\n]+)'); // Matches 'W.' followed by text
       final documentNumberPattern = RegExp(r'(\d{8,})'); // Look for 8+ digit numbers
 
       final nameMatch = namePattern.firstMatch(text);
-      if (nameMatch != null) name = nameMatch.group(1)!.trim();
+      if (nameMatch != null) nameController.text = nameMatch.group(1)!.trim();
 
       final birthDateMatch = birthDatePattern.firstMatch(text);
-      if (birthDateMatch != null) dateOfBirth = birthDateMatch.group(1)!.trim();
+      if (birthDateMatch != null) dateOfBirthController.text = birthDateMatch.group(1)!.trim();
 
       final placeOfBirthMatch = placeOfBirthPattern.firstMatch(text);
-      if (placeOfBirthMatch != null) placeOfBirth = placeOfBirthMatch.group(0)!.trim();
+      if (placeOfBirthMatch != null) {
+        final extractedPlaceOfBirth = placeOfBirthMatch.group(0)!.trim().toUpperCase();
+
+        // Match with predefined list
+        final match = validPlacesOfBirth.firstWhere(
+          (place) => extractedPlaceOfBirth.contains(place),
+          orElse: () => '',
+        );
+
+        setState(() {
+          selectedPlaceOfBirth = match.isNotEmpty ? match : null;
+        });
+      } else {
+        selectedPlaceOfBirth = null; // No match found
+      }
 
       final documentNumberMatch = documentNumberPattern.firstMatch(text);
-      if (documentNumberMatch != null) documentNumber = documentNumberMatch.group(1)!.trim();
+      if (documentNumberMatch != null) {
+        documentNumberController.text = documentNumberMatch.group(1)!.trim();
+      }
 
       debugPrint(
-          "Front Data Extracted: Name=$name, DOB=$dateOfBirth, Place=$placeOfBirth, DocNumber=$documentNumber");
+          "Front Data Extracted: Name=${nameController.text}, DOB=${dateOfBirthController.text}, Place=${placeOfBirthController.text}, DocNumber=${documentNumberController.text}");
     } else if (documentType == DocumentsType.rasdBackIdCard) {
-      // Back ID Card Extraction
-
       final sexoPattern = RegExp(r'SEXO\s+([MF])');
       final fatherNamePattern = RegExp(r'NOMBRE DEL PADRE\s+(.+?)\n');
       final motherNamePattern = RegExp(r'NOMBRE DE LA MADRE\s+(.+?)\n');
       final domicilioPattern = RegExp(r'DOMICILIO\s+(.+?)\n');
       final datePattern = RegExp(r'(\d{2}/\d{2}/\d{4})'); // Match any date in DD/MM/YYYY format
 
+      // Extract Sexo
       final sexoMatch = sexoPattern.firstMatch(text);
-      if (sexoMatch != null) sexo = sexoMatch.group(1)!.trim();
+      if (sexoMatch != null) {
+        final extractedSexo = sexoMatch.group(1)!.trim();
+        if (extractedSexo == 'M' || extractedSexo == 'F') {
+          setState(() {
+            selectedSexo = extractedSexo;
+          });
+        } else {
+          selectedSexo = null; // Default value if extraction is invalid
+        }
+      } else {
+        selectedSexo = null; // Default value if extraction fails
+      }
 
       final fatherNameMatch = fatherNamePattern.firstMatch(text);
-      if (fatherNameMatch != null) fatherName = fatherNameMatch.group(1)!.trim();
+      if (fatherNameMatch != null) fatherNameController.text = fatherNameMatch.group(1)!.trim();
 
       final motherNameMatch = motherNamePattern.firstMatch(text);
-      if (motherNameMatch != null) motherName = motherNameMatch.group(1)!.trim();
+      if (motherNameMatch != null) motherNameController.text = motherNameMatch.group(1)!.trim();
 
       final domicilioMatch = domicilioPattern.firstMatch(text);
-      if (domicilioMatch != null) domicilio = domicilioMatch.group(1)!.trim();
+      if (domicilioMatch != null) {
+        domicilioController.text = domicilioMatch.group(1)!.trim();
+      }
 
-      // Simplified logic: Use the first date found on the back of the ID
       final expiryDateMatch = datePattern.firstMatch(text);
-      if (expiryDateMatch != null) fechaDeExpedicion = expiryDateMatch.group(1)!.trim();
+      if (expiryDateMatch != null) {
+        fechaDeExpedicionController.text = expiryDateMatch.group(1)!.trim();
+      }
 
       debugPrint(
-          "Back Data Extracted: Sexo=$sexo, Father=$fatherName, Mother=$motherName, Domicilio=$domicilio, ExpiryDate=$fechaDeExpedicion");
+          "Back Data Extracted: Sexo=${sexoController.text}, Father=${fatherNameController.text}, Mother=${motherNameController.text}, Domicilio=${domicilioController.text}, ExpiryDate=${fechaDeExpedicionController.text}");
     }
   }
 
   bool _isDocumentRecognized(String text, DocumentsType docType) {
-    // Normalize text for consistent matching
     final normalizedText = text.toLowerCase().replaceAll('\n', ' ').replaceAll(RegExp(r'\s+'), ' ');
 
     if (docType == DocumentsType.rasdFrontIdCard) {
-      // Front ID Card: Check for multiple relaxed indicators
       final patterns = [
-        RegExp(r'republica', caseSensitive: false), // Look for "REPUBLICA"
-        RegExp(r'árabe saharaui democrática',
-            caseSensitive: false), // Look for "ÁRABE SAHARAUI DEMOCRÁTICA"
-        RegExp(r'\b\d{8,9}\b'), // Look for an 8 or 9-digit document number
+        RegExp(r'republica', caseSensitive: false),
+        RegExp(r'árabe saharaui democrática', caseSensitive: false),
+        RegExp(r'\b\d{8,9}\b'),
       ];
 
-      // Count the number of matches
       int matchCount = patterns.where((pattern) => pattern.hasMatch(normalizedText)).length;
 
-      // Return true if at least 2 key patterns match
       return matchCount >= 2;
     } else if (docType == DocumentsType.rasdBackIdCard) {
-      // Back ID Card: Check for multiple relaxed indicators
       final patterns = [
-        RegExp(r'ministerio del interior',
-            caseSensitive: false), // Look for "MINISTERIO DEL INTERIOR"
-        RegExp(r'sexo', caseSensitive: false), // Look for "SEXO"
-        RegExp(r'(\d{2}/\d{2}/\d{4})'), // Look for a date in DD/MM/YYYY format
+        RegExp(r'ministerio del interior', caseSensitive: false),
+        RegExp(r'sexo', caseSensitive: false),
+        RegExp(r'(\d{2}/\d{2}/\d{4})'),
       ];
 
-      // Count the number of matches
       int matchCount = patterns.where((pattern) => pattern.hasMatch(normalizedText)).length;
 
-      // Return true if at least 2 key patterns match
       return matchCount >= 2;
     }
 
