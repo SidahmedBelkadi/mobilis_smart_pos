@@ -280,7 +280,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
                   setState(() {
                     smsLoading = false;
                   });
-                  generateContractParamsEntity.msisdn = "FAILED";
+                  generateContractParamsEntity.msisdn = "";
                   cubit.attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
                 }
               },
