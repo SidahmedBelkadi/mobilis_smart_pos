@@ -120,11 +120,9 @@ class _SignatureScreenState extends State<SignatureScreen> {
   }
 
   _startSmsTimer() {
-    _smsTimer = Timer(const Duration(seconds: 45), () {
-      generateContractParamsEntity.msisdn = "";
-      context
-          .read<ContractCubit>()
-          .attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
+    _smsTimer = Timer(const Duration(seconds: 30), () {
+      AppToasts.showWarningToast(message: "activation_failed".tr(context), context: context);
+      Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
     });
   }
 
@@ -279,8 +277,9 @@ class _SignatureScreenState extends State<SignatureScreen> {
                   setState(() {
                     smsLoading = false;
                   });
-                  generateContractParamsEntity.msisdn = "";
-                  cubit.attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
+                  AppToasts.showWarningToast(
+                      message: "activation_failed".tr(context), context: context);
+                  Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
                 }
               },
               builder: (context, state) {
