@@ -5,20 +5,22 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:mobilis_smart_pos/src/config/routing/app_routes.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/toast_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/ressources/app_colors.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/generate_contract_params_entity.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/entities/retry_trigger_sms_params_entity.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/entities/retry_trigger_sms_response_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/contract_cubit.dart';
-import 'package:mobilis_smart_pos/src/features/invoices/presentation/cubit/invoices_cubit.dart';
-import 'package:mobilis_smart_pos/src/features/invoices/presentation/cubit/retry_activation/retry_activation_cubit.dart';
+import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/sms_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/sign_in/data/data_sources/smart_pos_local_storage.dart';
-import '../../../../core/utils/enums/invoice_status.dart';
-import 'invoice_status.dart';
 
+import '../../../../core/utils/enums/invoice_status.dart';
 import '../../../../core/utils/helpers/app_localization_helper.dart';
 import '../../../../core/utils/helpers/media_query_values.dart';
-import '../../domain/entities/invoice_entity.dart';
 import '../../../../dependency_injection/injection_container.dart' as di;
+import '../../domain/entities/invoice_entity.dart';
+import 'invoice_status.dart';
 
 class Invoice extends StatelessWidget {
   const Invoice({
@@ -161,13 +163,13 @@ class Invoice extends StatelessWidget {
                         ],
                       ),
                     ),
-                    // SizedBox(width: 12.sp),
-                    // _filterInvoiceStatus(invoiceEntity.status, invoiceEntity.msisdn) ==
-                    //         InvoiceStatusEnum.pending
-                    //     ? RetryActivationWidget(
-                    //         invoiceEntity: invoiceEntity,
-                    //       )
-                    //     : const SizedBox.shrink()
+                    SizedBox(width: 12.sp),
+                    _filterInvoiceStatus(invoiceEntity.status, invoiceEntity.msisdn) ==
+                            InvoiceStatusEnum.pending
+                        ? RetryActivationWidget(
+                            invoiceEntity: invoiceEntity,
+                          )
+                        : const SizedBox.shrink()
                   ],
                 ),
               ],
@@ -192,15 +194,15 @@ class RetryActivationWidget extends StatefulWidget {
 }
 
 class _RetryActivationWidgetState extends State<RetryActivationWidget> {
-  Map<int, bool> _loadingInvoices = {};
+  bool _isLoading = false;
   String _smsMessage = "No message received yet.";
-  // bool smsLoading = false;
+  String dsaMessage = '';
+  RetryTriggerSmsResponseEntity? retryTriggerSmsResponseEntity;
+
   late GenerateContractParamsEntity generateContractParamsEntity;
   String senderPhoneNumber =
-      "+${di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials()!.msisdn!}";
+      di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials()!.msisdn!;
   Timer? _smsTimer;
-  int _preferedSlot = 0;
-  bool _smsSent = false;
 
   static const platform = MethodChannel('sms/sms_receiver');
 
@@ -210,93 +212,16 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
     super.dispose();
   }
 
-  Future<void> sendSms(String message, String recipient, int slot) async {
-    if (_smsSent) return;
-
-    try {
-      setState(() {
-        _smsSent = true;
-        _loadingInvoices[widget.invoiceEntity.id] = true;
-      });
-      await platform.invokeMethod('sendSms', {
-        'slot': slot,
-        'message': message,
-        'recipient': recipient,
-        'dealerNumber': senderPhoneNumber,
-      });
-      debugPrint("=========== SMS SENT ===============");
-
-      // Start the timer after SMS is sent
-      if (mounted) {
-        debugPrint("==================== TIMER FOR SMS STARTED");
-        context.read<ContractCubit>().attributeMsisdnAndGenerateContract(
-              params: GenerateContractParamsEntity(
-                msisdn: "FAILED",
-                contractCode: widget.invoiceEntity.contractCode,
-                clientId: 0,
-                invoiceId: widget.invoiceEntity.id,
-                subsId: 0,
-                dsaMessage: '',
-              ),
-            );
-      }
-    } on PlatformException catch (e) {
-      handleSmsError(e.code, context);
-      debugPrint("${e.message} ");
-    } finally {
-      setState(() {
-        _loadingInvoices[widget.invoiceEntity.id] = false;
-      });
-    }
-  }
-
-  void checkSmsSuccess(String message, BuildContext context) {
-    debugPrint("==================== MESSAGE : $message");
-    setState(() {
-      generateContractParamsEntity.dsaMessage = message;
-    });
-
-    final RegExp regExp = RegExp(r'La carte SIM (\d+) est activee, avec le numero (2136\d{8})');
-    final RegExp regExp2 = RegExp(r'Activation en cours');
-    final match = regExp.firstMatch(message);
-    final cubit = context.read<ContractCubit>();
-
-    if (match != null) {
-      final phoneNumber = match.group(2);
-      debugPrint("==================== Success Message: $message");
-      debugPrint("==================== Extracted Phone Number : $phoneNumber");
-      if (phoneNumber != null) {
-        generateContractParamsEntity.msisdn = phoneNumber;
-        cubit.attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
-      }
-    } else {
-      debugPrint("===================== Message: $message");
-      if (!regExp2.hasMatch(message)) {
-        generateContractParamsEntity.msisdn = "FAILED";
-        cubit.attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
-      } else if (regExp2.hasMatch(message)) {
-      } else {
-        AppToasts.showErrorToast(message: message, context: context);
-      }
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-
-    _getPreferedSlot();
 
     platform.setMethodCallHandler((call) async {
       if (call.method == "receivedSms") {
         // Cancel the timer when SMS is received
         _smsTimer?.cancel();
         debugPrint("=================== TIMER FOR SMS STOPPED");
-
         setState(() {
-          setState(() {
-            _loadingInvoices[widget.invoiceEntity.id] = false;
-          });
           _smsMessage = call.arguments;
           checkSmsSuccess(_smsMessage, context);
         });
@@ -304,123 +229,187 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
     });
   }
 
-  void handleSmsError(String code, BuildContext context) {
-    String errorMessage;
-    switch (code) {
-      case 'PERMISSION_DENIED':
-        errorMessage = "PERMISSION_DENIED";
-        break;
-      case 'SIM_NOT_READY':
-        errorMessage = "SIM_NOT_READY";
-        break;
-      case 'AIRPLANE_MODE':
-        errorMessage = "AIRPLANE_MODE";
-        break;
-      case 'NO_SMS_NETWORK':
-        errorMessage = "NO_SMS_NETWORK";
-        break;
-      case 'NO_SIM':
-        errorMessage = "NO_SIM";
-        break;
-      case 'INVALID_OPERATOR':
-        errorMessage = "INVALID_OPERATOR";
-        break;
-      case 'SMS_FAILED':
-        errorMessage = "SMS_FAILED";
-        break;
-      default:
-        errorMessage = "UNKNOWN_ERROR";
-    }
-    AppToasts.showErrorToast(message: errorMessage.tr(context), context: context);
+  @override
+  Widget build(BuildContext context) {
+    final smsCubit = context.read<SmsCubit>();
+
+    return BlocConsumer<SmsCubit, SmsState>(
+      listener: (context, state) {
+        if (state is RetryTriggerSmsFailure) {
+          setState(() {
+            _isLoading = false;
+          });
+          AppToasts.showWarningToast(message: "activation_failed".tr(context), context: context);
+          Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
+        }
+        if (state is RetryTriggerSmsSuccess) {
+          setState(() {
+            retryTriggerSmsResponseEntity = state.retryTriggerSmsResponseEntity;
+          });
+        }
+      },
+      builder: (context, state) {
+        return BlocConsumer<ContractCubit, ContractState>(
+          listener: (context, state) {
+            if (state is GenerateContractFailed) {
+              setState(() {
+                _isLoading = false;
+              });
+              AppToasts.showWarningToast(
+                  message: "problem_generating_contract".tr(context), context: context);
+              Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
+            }
+            if (state is GenerateContractSuccess) {
+              setState(() {
+                _isLoading = false;
+              });
+              AppToasts.showSuccessToast(
+                  message: "generated_success".tr(context), context: context);
+              Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
+            }
+          },
+          builder: (context, state) {
+            if (state is GenerateContractLoading) {
+              return const RetryActivationLoadingWidget();
+            }
+            return _isLoading
+                ? const RetryActivationLoadingWidget()
+                : RepeatActivationWidget(
+                    onTap: () async {
+                      final bool isBlocked =
+                          di.serviceLocator<SmartPosLocalStorage>().isRetryBlocked();
+
+                      if (isBlocked) {
+                        AppToasts.showWarningToast(
+                            message: "wait_for_seconds".tr(context), context: context);
+                        return;
+                      }
+
+                      final smsParams = RetryTriggerSmsParamsEntity(
+                        id: widget.invoiceEntity.id,
+                        msisdnAPN: senderPhoneNumber,
+                      );
+                      setState(() {
+                        _isLoading = true;
+                      });
+                      await smsCubit.retryTriggerSms(smsParams: smsParams);
+                      // Block retries for 90 seconds
+                      di
+                          .serviceLocator<SmartPosLocalStorage>()
+                          .blockRetryActivationTemporarly(seconds: 120);
+                      _startSmsTimer();
+                    },
+                  );
+          },
+        );
+      },
+    );
   }
 
-  _getPreferedSlot() {
-    final slot = di.serviceLocator<SmartPosLocalStorage>().getPreferedSlot();
-    if (slot != null) {
-      setState(() {
-        _preferedSlot = slot;
-      });
+  _startSmsTimer() {
+    _smsTimer = Timer(const Duration(seconds: 30), () {
+      AppToasts.showWarningToast(message: "activation_failed".tr(context), context: context);
+      Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
+    });
+  }
+
+  _generateContract({required RetryTriggerSmsResponseEntity params, required String msisdn}) {
+    if (retryTriggerSmsResponseEntity != null) {
+      generateContractParamsEntity = GenerateContractParamsEntity(
+          clientId: retryTriggerSmsResponseEntity!.clientId,
+          invoiceId: retryTriggerSmsResponseEntity!.invoiceId,
+          subsId: retryTriggerSmsResponseEntity!.subsId,
+          contractCode: retryTriggerSmsResponseEntity!.contractCode,
+          dsaMessage: dsaMessage,
+          msisdn: msisdn);
+
+      context
+          .read<ContractCubit>()
+          .attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
+    }
+    return;
+  }
+
+  void checkSmsSuccess(String message, BuildContext context) {
+    setState(() {
+      generateContractParamsEntity.dsaMessage = message;
+    });
+
+    // RegExp for the original cases
+    final RegExp regExp = RegExp(r'La carte SIM (\d+) est activee, avec le numero (2136\d{8})');
+    final RegExp regExp2 = RegExp(r'Activation en cours');
+
+    // New RegExp for the "SIM deja active" case
+    final RegExp regExp3 = RegExp(r'SIM deja active avec MSISDN (\d{12})');
+
+    final match = regExp.firstMatch(message);
+
+    if (match != null) {
+      final phoneNumber = match.group(2);
+      if (phoneNumber != null) {
+        _generateContract(params: retryTriggerSmsResponseEntity!, msisdn: phoneNumber);
+      }
+    } else if (regExp3.hasMatch(message)) {
+      final match3 = regExp3.firstMatch(message);
+      final phoneNumber = match3?.group(1);
+      if (phoneNumber != null) {
+        _generateContract(params: retryTriggerSmsResponseEntity!, msisdn: phoneNumber);
+      }
     } else {
-      _preferedSlot = 0;
+      if (!regExp2.hasMatch(message)) {
+        _generateContract(params: retryTriggerSmsResponseEntity!, msisdn: "FAILED");
+      }
     }
   }
+}
+
+class RepeatActivationWidget extends StatelessWidget {
+  const RepeatActivationWidget({
+    super.key,
+    this.onTap,
+  });
+
+  final void Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<ContractCubit, ContractState>(
-      listener: (context, state) {
-        if (state is GenerateContractSuccess || state is GenerateContractFailed) {
-          context.read<InvoicesCubit>().getInvoices(isFirstTime: true);
-        }
-      },
-      child: BlocConsumer<RetryActivationCubit, RetryActivationState>(
-        builder: (context, state) {
-          final isLoadingState =
-              state is RetryActivationLoading && state.id == widget.invoiceEntity.id;
-          final isLoading = _loadingInvoices[widget.invoiceEntity.id] ?? false;
-          if (isLoading || isLoadingState) {
-            return Container(
-              padding: EdgeInsets.all(5.sp),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.all(Radius.circular(12.sp)),
-              ),
-              child: SizedBox(
-                height: 16.sp,
-                width: 16.sp,
-                child: const CircularProgressIndicator(
-                  color: Colors.white,
-                ),
-              ),
-            );
-          }
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(5.sp),
+        decoration: BoxDecoration(
+          color: AppColors.primary,
+          borderRadius: BorderRadius.all(Radius.circular(12.sp)),
+        ),
+        child: Icon(
+          FontAwesomeIcons.repeat,
+          size: 16.sp,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+}
 
-          return GestureDetector(
-            key: Key(widget.invoiceEntity.id.toString()),
-            onTap: () {
-              context
-                  .read<RetryActivationCubit>()
-                  .retryActivation(id: widget.invoiceEntity.id.toString());
-            },
-            child: Container(
-              padding: EdgeInsets.all(5.sp),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.all(Radius.circular(12.sp)),
-              ),
-              child: Icon(
-                FontAwesomeIcons.repeat,
-                size: 16.sp,
-                color: Colors.white,
-              ),
-            ),
-          );
-        },
-        listener: (BuildContext context, RetryActivationState state) {
-          if (state is RetryActivationSuccess) {
-            final url = state.responseEntity.generateContractUrl;
-            final sms = state.responseEntity.formattedStringSms;
+class RetryActivationLoadingWidget extends StatelessWidget {
+  const RetryActivationLoadingWidget({
+    super.key,
+  });
 
-            final List<String> parts = url.split('/');
-
-            // Assign each part to a variable
-            final int clientId = int.parse(parts[0]);
-            final int invoiceId = int.parse(parts[1]);
-            final int subscriptionId = int.parse(parts[2]);
-
-            sendSms(sms, "444", _preferedSlot);
-
-            setState(() {
-              generateContractParamsEntity = GenerateContractParamsEntity(
-                clientId: clientId,
-                invoiceId: invoiceId,
-                subsId: subscriptionId,
-                contractCode: widget.invoiceEntity.contractCode,
-                dsaMessage: '',
-              );
-            });
-          }
-        },
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(5.sp),
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.all(Radius.circular(12.sp)),
+      ),
+      child: SizedBox(
+        height: 16.sp,
+        width: 16.sp,
+        child: const CircularProgressIndicator(
+          color: Colors.white,
+        ),
       ),
     );
   }

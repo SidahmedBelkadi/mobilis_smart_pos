@@ -141,8 +141,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
 
     if (match != null) {
       final phoneNumber = match.group(2);
-      debugPrint("==================== Success Message: $message");
-      debugPrint("==================== Extracted Phone Number : $phoneNumber");
+
       if (phoneNumber != null) {
         generateContractParamsEntity.msisdn = phoneNumber;
         cubit.attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);

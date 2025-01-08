@@ -317,5 +317,8 @@
   "SMSC_NOT_DELIVERED": "An error occurred, please try again.",
   "please_wait": "Please wait",
   "NO_CONTRACT_PROVIDED": "Attempt failed",
-  "DSA_ERROR": "Attempt failed"
+  "DSA_ERROR": "Attempt failed",
+  "activation_failed": "Activation Failed",
+  "problem_generating_contract": "Error generating the contract",
+  "wait_for_seconds": "Please wait 2 minutes before trying again"
 }

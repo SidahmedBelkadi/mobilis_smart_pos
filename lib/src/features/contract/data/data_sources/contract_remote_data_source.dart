@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:mobilis_smart_pos/src/features/contract/data/models/retry_trigger_sms_response_model.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/entities/retry_trigger_sms_params_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/trigger_sms_params_entity.dart';
 
 import '../../../../core/api/dio_consumer.dart';
@@ -16,7 +18,8 @@ import '../models/generate_contract_response_model.dart';
 abstract class ContractRemoteDataSource {
   Future<void> triggerSms({required TriggerSmsParamsEntity triggerSmsParams});
 
-  Future<void> retryTriggerSms({required TriggerSmsParamsEntity triggerSmsParams});
+  Future<RetryTriggerSmsResponseModel> retryTriggerSms(
+      {required RetryTriggerSmsParamsEntity triggerSmsParams});
 
   Future<CheckBeforeEditContractResponseModel> checkBeforeEditContract({
     required ContractRequestParamsEntitiy contract,
@@ -153,7 +156,11 @@ class ContractRemoteDataSourceImpl implements ContractRemoteDataSource {
   }
 
   @override
-  Future<void> retryTriggerSms({required TriggerSmsParamsEntity triggerSmsParams}) async {
-    await dioConsumer.post(EndPoints.retryTriggerSms, body: triggerSmsParams.toJson());
+  Future<RetryTriggerSmsResponseModel> retryTriggerSms({
+    required RetryTriggerSmsParamsEntity triggerSmsParams,
+  }) async {
+    final response =
+        await dioConsumer.post(EndPoints.retryTriggerSms, body: triggerSmsParams.toJson());
+    return RetryTriggerSmsResponseModel.fromJson(json: jsonDecode(response));
   }
 }

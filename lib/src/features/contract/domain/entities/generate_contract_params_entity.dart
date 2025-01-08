@@ -2,11 +2,11 @@ import 'package:equatable/equatable.dart';
 
 // ignore: must_be_immutable
 class GenerateContractParamsEntity extends Equatable {
-  final int clientId;
-  final int invoiceId;
-  final int subsId;
+  int clientId;
+  int invoiceId;
+  int subsId;
   String? msisdn;
-  final String contractCode;
+  String contractCode;
   String? dsaMessage;
 
   GenerateContractParamsEntity({
@@ -19,6 +19,5 @@ class GenerateContractParamsEntity extends Equatable {
   });
 
   @override
-  List<Object?> get props =>
-      [clientId, invoiceId, subsId, msisdn, contractCode];
+  List<Object?> get props => [clientId, invoiceId, subsId, msisdn, contractCode];
 }

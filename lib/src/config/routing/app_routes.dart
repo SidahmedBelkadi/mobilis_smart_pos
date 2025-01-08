@@ -334,6 +334,9 @@ class AppRoutes {
               BlocProvider(
                 create: (context) => serviceLocator<ContractCubit>(),
               ),
+              BlocProvider(
+                create: (context) => serviceLocator<SmsCubit>(),
+              ),
             ],
             child: const InvoicesScreen(),
           ),

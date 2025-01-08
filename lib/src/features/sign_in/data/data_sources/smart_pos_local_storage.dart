@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import '../../../../core/utils/enums/themes_enum.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,6 +48,13 @@ abstract class SmartPosLocalStorage {
   Future<void> setPreferedSlot({required int slot});
 
   int? getPreferedSlot();
+
+  // =========== Invoices retry Activation ========== //
+  Future<void> blockRetryActivationTemporarly({required int seconds});
+
+  void unBlockRetryActivationTemporarly();
+
+  bool isRetryBlocked();
 }
 
 class SmartPosLocalStorageImpl implements SmartPosLocalStorage {
@@ -212,5 +220,27 @@ class SmartPosLocalStorageImpl implements SmartPosLocalStorage {
   @override
   Future<void> setPreferedSlot({required int slot}) async {
     await sharedPreferences.setInt(AppKeys.slot, slot);
+  }
+
+  @override
+  Future<void> blockRetryActivationTemporarly({required int seconds}) async {
+    final DateTime now = DateTime.now();
+    final DateTime blockUntil = now.add(Duration(seconds: seconds));
+    await sharedPreferences.setString(AppKeys.blockRetryActivation, blockUntil.toIso8601String());
+  }
+
+  @override
+  void unBlockRetryActivationTemporarly() async {
+    await sharedPreferences.remove(AppKeys.blockRetryActivation);
+  }
+
+  @override
+  bool isRetryBlocked() {
+    final String? blockUntilString = sharedPreferences.getString(AppKeys.blockRetryActivation);
+    debugPrint("==== result from local storage : $blockUntilString");
+    if (blockUntilString == null) return false;
+
+    final DateTime blockUntil = DateTime.parse(blockUntilString);
+    return DateTime.now().isBefore(blockUntil);
   }
 }

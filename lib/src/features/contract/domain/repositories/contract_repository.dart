@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/entities/retry_trigger_sms_params_entity.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/entities/retry_trigger_sms_response_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/trigger_sms_params_entity.dart';
 
 import '../../../../core/error/failure.dart';
@@ -34,5 +36,6 @@ abstract class ContractRepository {
     required GenerateContractParamsEntity generateContractParams,
   });
 
-  Future<Either<Failure, Unit>> retryTriggerSms({required TriggerSmsParamsEntity params});
+  Future<Either<Failure, RetryTriggerSmsResponseEntity>> retryTriggerSms(
+      {required RetryTriggerSmsParamsEntity params});
 }

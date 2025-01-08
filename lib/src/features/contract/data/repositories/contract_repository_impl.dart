@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/entities/retry_trigger_sms_params_entity.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/entities/retry_trigger_sms_response_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/trigger_sms_params_entity.dart';
 
 import '../../../../core/error/exception.dart';
@@ -114,11 +116,13 @@ class ContractRepositoryImpl implements ContractRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> retryTriggerSms({required TriggerSmsParamsEntity params}) async {
+  Future<Either<Failure, RetryTriggerSmsResponseEntity>> retryTriggerSms(
+      {required RetryTriggerSmsParamsEntity params}) async {
     if (await networkInfo.isConnected) {
       try {
-        remoteDataSource.retryTriggerSms(triggerSmsParams: params);
-        return const Right(unit);
+        final RetryTriggerSmsResponseEntity retryTriggerSmsResponseEntity =
+            await remoteDataSource.retryTriggerSms(triggerSmsParams: params);
+        return Right(retryTriggerSmsResponseEntity);
       } on ServerException catch (e) {
         return Left(ServerFailure(message: ErrorHandler.getErrorMessage(e)));
       }
