@@ -25,8 +25,7 @@ class DioConsumer extends ApiConsumer {
     final httpClientAdapter = IOHttpClientAdapter();
     httpClientAdapter.createHttpClient = () {
       final client = HttpClient();
-      client.badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+      client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
       return client;
     };
 
@@ -34,9 +33,9 @@ class DioConsumer extends ApiConsumer {
     client.options
       ..baseUrl = EndPoints.baseUrl
       ..responseType = ResponseType.plain
-      ..sendTimeout = const Duration(seconds: 60)
-      ..receiveTimeout = const Duration(seconds: 60)
-      ..connectTimeout = const Duration(seconds: 60)
+      ..sendTimeout = const Duration(seconds: 30)
+      ..receiveTimeout = const Duration(seconds: 30)
+      ..connectTimeout = const Duration(seconds: 30)
       ..followRedirects = false;
 
     client.interceptors.add(di.serviceLocator<DioInterceptor>());
@@ -44,8 +43,7 @@ class DioConsumer extends ApiConsumer {
 
   @override
   Future<dynamic> get(String path,
-      {Map<String, dynamic>? queryParameters,
-      Map<String, String>? headers}) async {
+      {Map<String, dynamic>? queryParameters, Map<String, String>? headers}) async {
     try {
       final response = await client.get(
         path,
@@ -230,8 +228,7 @@ class DioConsumer extends ApiConsumer {
       try {
         // Try to parse the response data as JSON
         final responseData = jsonDecode(error.response!.data);
-        if (responseData is Map<String, dynamic> &&
-            responseData.containsKey('message')) {
+        if (responseData is Map<String, dynamic> && responseData.containsKey('message')) {
           errorMessage = responseData['message'];
         } else {
           errorMessage = error.response!.data.toString();
@@ -257,14 +254,11 @@ class DioConsumer extends ApiConsumer {
           case StatusCode.internalServerError:
             throw const InternalServerErrorException('internalServerError');
           case StatusCode.unauthorized:
-            throw UnauthorizedException(
-                errorMessage); // Show Real server message
+            throw UnauthorizedException(errorMessage); // Show Real server message
           case StatusCode.unprocessable:
-            throw UnprocessableEntityException(
-                errorMessage); // Show Real server message
+            throw UnprocessableEntityException(errorMessage); // Show Real server message
           case StatusCode.badRequest:
-            throw UnprocessableEntityException(
-                errorMessage); // Show Real server messages
+            throw UnprocessableEntityException(errorMessage); // Show Real server messages
           default:
             throw const ServerException("errorDuringCommunication");
         }

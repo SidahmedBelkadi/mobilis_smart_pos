@@ -296,7 +296,7 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
                       // Block retries for 90 seconds
                       di
                           .serviceLocator<SmartPosLocalStorage>()
-                          .blockRetryActivationTemporarly(seconds: 120);
+                          .blockRetryActivationTemporarly(seconds: 10);
                       _startSmsTimer();
                     },
                   );
@@ -331,10 +331,6 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
   }
 
   void checkSmsSuccess(String message, BuildContext context) {
-    setState(() {
-      generateContractParamsEntity.dsaMessage = message;
-    });
-
     // RegExp for the original cases
     final RegExp regExp = RegExp(r'La carte SIM (\d+) est activee, avec le numero (2136\d{8})');
     final RegExp regExp2 = RegExp(r'Activation en cours');
@@ -355,10 +351,9 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
       if (phoneNumber != null) {
         _generateContract(params: retryTriggerSmsResponseEntity!, msisdn: phoneNumber);
       }
+    } else if (regExp2.hasMatch(message)) {
     } else {
-      if (!regExp2.hasMatch(message)) {
-        _generateContract(params: retryTriggerSmsResponseEntity!, msisdn: "FAILED");
-      }
+      Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
     }
   }
 }
