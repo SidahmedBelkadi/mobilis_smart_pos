@@ -24,11 +24,6 @@ class SmartPos extends StatelessWidget {
   Widget build(BuildContext context) {
     final initialRouteHelper = di.serviceLocator<InitialRouteHelper>();
 
-    _getTheme() {
-      final storedTheme = di.serviceLocator<SmartPosLocalStorage>().getCurrentTheme();
-      return storedTheme;
-    }
-
     return ScreenUtilInit(
       // Resolution of pixel 6 pro (Android Studio)
       designSize: const Size(384, 832),
