@@ -299,7 +299,8 @@ class _SignatureScreenState extends State<SignatureScreen> {
                           (route) => false);
                     }
                     if (state is GenerateContractSuccess) {
-                      Navigator.of(context).pushReplacementNamed(Routes.contractGenerated);
+                      Navigator.of(context)
+                          .pushNamedAndRemoveUntil(Routes.contractGenerated, (route) => false);
                     }
 
                     if (state is EditContractSuccess) {
