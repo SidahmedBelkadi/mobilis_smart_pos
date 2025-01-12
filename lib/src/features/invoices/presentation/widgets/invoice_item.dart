@@ -13,6 +13,7 @@ import 'package:mobilis_smart_pos/src/features/contract/domain/entities/retry_tr
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/retry_trigger_sms_response_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/contract_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/sms_cubit.dart';
+import 'package:mobilis_smart_pos/src/features/invoices/presentation/cubit/invoices_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/sign_in/data/data_sources/smart_pos_local_storage.dart';
 
 import '../../../../core/utils/enums/invoice_status.dart';
@@ -236,17 +237,14 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
     return BlocConsumer<SmsCubit, SmsState>(
       listener: (context, state) {
         if (state is RetryTriggerSmsFailure) {
-          setState(() {
-            _isLoading = false;
-          });
           AppToasts.showWarningToast(message: "activation_failed".tr(context), context: context);
           Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
         }
-        if (state is RetryTriggerSmsSuccess) {
-          setState(() {
-            retryTriggerSmsResponseEntity = state.retryTriggerSmsResponseEntity;
-          });
-        }
+        // if (state is RetryTriggerSmsSuccess) {
+        //   setState(() {
+        //     retryTriggerSmsResponseEntity = state.retryTriggerSmsResponseEntity;
+        //   });
+        // }
       },
       builder: (context, state) {
         return BlocConsumer<ContractCubit, ContractState>(
@@ -260,12 +258,7 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
               Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
             }
             if (state is GenerateContractSuccess) {
-              setState(() {
-                _isLoading = false;
-              });
-              AppToasts.showSuccessToast(
-                  message: "generated_success".tr(context), context: context);
-              Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
+              context.read<InvoicesCubit>().getInvoices(isFirstTime: true);
             }
           },
           builder: (context, state) {
@@ -292,11 +285,11 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
                       setState(() {
                         _isLoading = true;
                       });
-                      await smsCubit.retryTriggerSms(smsParams: smsParams);
+                      smsCubit.retryTriggerSms(smsParams: smsParams);
                       // Block retries for 90 seconds
                       di
                           .serviceLocator<SmartPosLocalStorage>()
-                          .blockRetryActivationTemporarly(seconds: 10);
+                          .blockRetryActivationTemporarly(seconds: 120);
                       _startSmsTimer();
                     },
                   );
@@ -307,30 +300,33 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
   }
 
   _startSmsTimer() {
-    _smsTimer = Timer(const Duration(seconds: 30), () {
+    _smsTimer = Timer(const Duration(seconds: 45), () {
       AppToasts.showWarningToast(message: "activation_failed".tr(context), context: context);
       Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
     });
   }
 
   _generateContract({required RetryTriggerSmsResponseEntity params, required String msisdn}) {
-    if (retryTriggerSmsResponseEntity != null) {
-      generateContractParamsEntity = GenerateContractParamsEntity(
-          clientId: retryTriggerSmsResponseEntity!.clientId,
-          invoiceId: retryTriggerSmsResponseEntity!.invoiceId,
-          subsId: retryTriggerSmsResponseEntity!.subsId,
-          contractCode: retryTriggerSmsResponseEntity!.contractCode,
-          dsaMessage: dsaMessage,
-          msisdn: msisdn);
+    debugPrint("=========== called");
+    generateContractParamsEntity = GenerateContractParamsEntity(
+        clientId: widget.invoiceEntity.clientId,
+        invoiceId: widget.invoiceEntity.id,
+        subsId: widget.invoiceEntity.subId,
+        contractCode: retryTriggerSmsResponseEntity!.contractCode,
+        dsaMessage: dsaMessage,
+        msisdn: msisdn);
 
-      context
-          .read<ContractCubit>()
-          .attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
-    }
+    debugPrint("========= params :  ${generateContractParamsEntity.toString()}");
+
+    context
+        .read<ContractCubit>()
+        .attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
+
     return;
   }
 
-  void checkSmsSuccess(String message, BuildContext context) {
+  void checkSmsSuccess(String message, BuildContext context) async {
+    debugPrint("================= Message : $message");
     // RegExp for the original cases
     final RegExp regExp = RegExp(r'La carte SIM (\d+) est activee, avec le numero (2136\d{8})');
     final RegExp regExp2 = RegExp(r'Activation en cours');
@@ -341,19 +337,53 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
     final match = regExp.firstMatch(message);
 
     if (match != null) {
+      debugPrint("========= CONDITION 01");
       final phoneNumber = match.group(2);
-      if (phoneNumber != null) {
-        _generateContract(params: retryTriggerSmsResponseEntity!, msisdn: phoneNumber);
-      }
+      final params = GenerateContractParamsEntity(
+          clientId: widget.invoiceEntity.clientId,
+          invoiceId: widget.invoiceEntity.id,
+          subsId: widget.invoiceEntity.subId,
+          contractCode: widget.invoiceEntity.contractCode,
+          dsaMessage: dsaMessage,
+          msisdn: phoneNumber);
+
+      debugPrint("========= params :  ${params.toString()}");
+
+      await context.read<ContractCubit>().attributeMsisdnAndGenerateContract(params: params);
     } else if (regExp3.hasMatch(message)) {
+      debugPrint("========= CONDITION 02");
       final match3 = regExp3.firstMatch(message);
       final phoneNumber = match3?.group(1);
-      if (phoneNumber != null) {
-        _generateContract(params: retryTriggerSmsResponseEntity!, msisdn: phoneNumber);
-      }
+      debugPrint("====== phoneNumber : $phoneNumber");
+      debugPrint("====== Tirgger attribute msdisdn");
+
+      final params = GenerateContractParamsEntity(
+          clientId: widget.invoiceEntity.clientId,
+          invoiceId: widget.invoiceEntity.id,
+          subsId: widget.invoiceEntity.subId,
+          contractCode: widget.invoiceEntity.contractCode,
+          dsaMessage: dsaMessage,
+          msisdn: phoneNumber);
+
+      debugPrint("========= params :  ${params.toString()}");
+
+      await context.read<ContractCubit>().attributeMsisdnAndGenerateContract(params: params);
     } else if (regExp2.hasMatch(message)) {
+      debugPrint("========= CONDITION 03");
     } else {
-      Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
+      debugPrint("========= CONDITION 04");
+
+      final params = GenerateContractParamsEntity(
+          clientId: widget.invoiceEntity.clientId,
+          invoiceId: widget.invoiceEntity.id,
+          subsId: widget.invoiceEntity.subId,
+          contractCode: widget.invoiceEntity.contractCode,
+          dsaMessage: dsaMessage,
+          msisdn: "FAILED");
+
+      debugPrint("========= params :  ${params.toString()}");
+
+      await context.read<ContractCubit>().attributeMsisdnAndGenerateContract(params: params);
     }
   }
 }

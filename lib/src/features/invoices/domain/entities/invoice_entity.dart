@@ -5,6 +5,8 @@ class InvoiceEntity extends Equatable {
   final int id;
   final String contractCode;
   final String invoiceDate;
+  final int clientId;
+  final int subId;
   final int? amount;
   final String status;
   final String? msisdn;
@@ -14,6 +16,8 @@ class InvoiceEntity extends Equatable {
     required this.id,
     required this.contractCode,
     required this.invoiceDate,
+    required this.clientId,
+    required this.subId,
     required this.amount,
     required this.status,
     required this.msisdn,
