@@ -77,6 +77,8 @@ class AppImages {
   static const banner6 = "$imagesDir/banner_4.jpg";
   static const banner7 = "$imagesDir/banner_7.jpg";
   static const banner8 = "$imagesDir/banner_8.jpg";
+  static const bannerBonus = "$imagesDir/bonus_latest.png";
+  static const bannerOmra = "$imagesDir/omra_latest.png";
   static const mobilisAr = "$imagesDir/mobilis_ar.png";
   static const mobilisEn = "$imagesDir/mobilis_en.png";
 

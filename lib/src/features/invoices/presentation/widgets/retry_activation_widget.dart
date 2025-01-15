@@ -85,13 +85,14 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
                   message: "problem_generating_contract".tr(context), context: context);
             }
             if (state is GenerateContractSuccess) {
+              _smsTimer?.cancel();
               context.read<InvoicesCubit>().getInvoices(isFirstTime: true);
             }
           },
           builder: (context, state) {
-            if (state is GenerateContractLoading) {
-              return const RetryActivationLoadingWidget();
-            }
+            // if (state is GenerateContractLoading ) {
+            //   return const RetryActivationLoadingWidget();
+            // }
             return _isLoading
                 ? const RetryActivationLoadingWidget()
                 : RepeatActivationWidget(

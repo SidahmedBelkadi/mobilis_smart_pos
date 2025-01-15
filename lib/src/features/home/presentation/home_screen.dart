@@ -105,10 +105,13 @@ class _MyHomePageState extends State<HomeScreen> {
                     width: context.width,
                     child: HomeBanner(
                       banners: const [
-                        AppImages.ban1,
-                        AppImages.ban2,
+                        AppImages.bannerBonus,
+
+                        // AppImages.ban1,
+                        // AppImages.ban2,
                         AppImages.ban3,
-                        AppImages.ban4,
+                        // AppImages.ban4,
+                        AppImages.bannerOmra,
                       ],
                       currentIndex: currentIndex,
                       onPageChanged: (index) {

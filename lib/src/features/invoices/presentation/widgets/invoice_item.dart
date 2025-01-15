@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mobilis_smart_pos/src/features/invoices/presentation/widgets/retry_activation_widget.dart';
 import '../../../../core/utils/enums/invoice_status.dart';
 import '../../../../core/utils/helpers/app_localization_helper.dart';
 import '../../../../core/utils/helpers/media_query_values.dart';
@@ -149,10 +148,10 @@ class Invoice extends StatelessWidget {
                       ),
                     ),
                     SizedBox(width: 12.sp),
-                    _filterInvoiceStatus(invoiceEntity.status, invoiceEntity.msisdn) ==
-                            InvoiceStatusEnum.pending
-                        ? RetryActivationWidget(invoiceEntity: invoiceEntity)
-                        : const SizedBox.shrink()
+                    // _filterInvoiceStatus(invoiceEntity.status, invoiceEntity.msisdn) ==
+                    //         InvoiceStatusEnum.pending
+                    //     ? RetryActivationWidget(invoiceEntity: invoiceEntity)
+                    //     : const SizedBox.shrink()
                   ],
                 ),
               ],

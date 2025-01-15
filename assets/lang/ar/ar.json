@@ -320,5 +320,6 @@
   "DSA_ERROR": "المحاولة فشلت",
   "activation_failed": "فشل تفعيل الشريحة",
   "problem_generating_contract": "خطأ أثناء إنشاء العقد",
-  "wait_for_seconds": "يرجى الانتظار دقيقتين قبل المحاولة مرة أخرى"
+  "wait_for_seconds": "يرجى الانتظار دقيقتين قبل المحاولة مرة أخرى",
+  "SMPP_NOT_ANSWER": "يرجى إعادة المحاولة"
 }

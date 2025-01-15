@@ -176,6 +176,7 @@ class SmartPosLocalStorageImpl implements SmartPosLocalStorage {
 
   @override
   Future<void> saveCheckedUpdateDate(DateTime dateTime) async {
+    debugPrint("========= DATE TO SAVE : ${dateTime.toIso8601String()}");
     await sharedPreferences.setString(AppKeys.checkVerionUpdate, dateTime.toIso8601String());
   }
 

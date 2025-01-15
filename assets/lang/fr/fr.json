@@ -320,5 +320,6 @@
   "DSA_ERROR": "Tentative échouée",
   "activation_failed": "Echec d'activation",
   "problem_generating_contract": "Erreur lors de la génération du contrat",
-  "wait_for_seconds": "Veuillez patienter 2 minutes avant de réessayer"
+  "wait_for_seconds": "Veuillez patienter 2 minutes avant de réessayer",
+  "SMPP_NOT_ANSWER": "Veuillez réessayer"
 }

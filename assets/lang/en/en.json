@@ -320,5 +320,6 @@
   "DSA_ERROR": "Attempt failed",
   "activation_failed": "Activation Failed",
   "problem_generating_contract": "Error generating the contract",
-  "wait_for_seconds": "Please wait 2 minutes before trying again"
+  "wait_for_seconds": "Please wait 2 minutes before trying again",
+  "SMPP_NOT_ANSWER": "Please try again"
 }
