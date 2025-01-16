@@ -4,5 +4,7 @@ enum DocumentsType {
   passport,
   commercialRegister,
   nif,
-  justificatif
+  justificatif,
+  rasdFrontIdCard,
+  rasdBackIdCard
 }
