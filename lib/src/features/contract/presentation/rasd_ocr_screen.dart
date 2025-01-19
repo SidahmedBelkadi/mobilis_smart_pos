@@ -1,18 +1,30 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cunning_document_scanner/cunning_document_scanner.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:insta_image_viewer/insta_image_viewer.dart';
+import 'package:json_pretty/json_pretty.dart';
+import 'package:mobilis_smart_pos/src/config/routing/app_routes.dart';
 import 'package:mobilis_smart_pos/src/core/commom/widgets/app_text_form_field.dart';
+import 'package:mobilis_smart_pos/src/core/commom/widgets/commune_drop_down.dart';
 import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_app_bar.dart';
+import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_floating_action_button.dart';
+import 'package:mobilis_smart_pos/src/core/commom/widgets/wilaya_drop_down.dart';
 import 'package:mobilis_smart_pos/src/core/utils/enums/documents_type.dart';
+import 'package:mobilis_smart_pos/src/core/utils/enums/input_type.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
+import 'package:mobilis_smart_pos/src/core/utils/helpers/json_loader_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/toast_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/ressources/app_colors.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/entities/commune_entity.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/entities/rasd_request_params_entity.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/entities/wilaya_entity.dart';
 import 'package:mobilis_smart_pos/src/features/profile/presentation/widget/upload_image_field.dart';
 
 class RasdOcrScreen extends StatefulWidget {
@@ -31,7 +43,8 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
   bool isConfirmed = false;
 
   // TextEditingControllers for editable fields
-  final TextEditingController nameController = TextEditingController();
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
   final TextEditingController dateOfBirthController = TextEditingController();
   final TextEditingController placeOfBirthController = TextEditingController();
   final TextEditingController documentNumberController = TextEditingController();
@@ -40,16 +53,25 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
   final TextEditingController motherNameController = TextEditingController();
   final TextEditingController domicilioController = TextEditingController();
   final TextEditingController fechaDeExpedicionController = TextEditingController();
+  final TextEditingController addressEditingController = TextEditingController();
+  final TextEditingController emailEditingController = TextEditingController();
+
+  // Form Key
+  final GlobalKey<FormState> _rasdFormKey = GlobalKey();
 
   // Dropdown for Sexo
   String? selectedSexo;
-  String? selectedPlaceOfBirth;
 
-  // Predefined list of valid Place of Birth values
-  final List<String> validPlacesOfBirth = ['LAIUN', 'AOUSERD', 'SMARA', 'DAJLA', 'BOJDUR'];
+// Wilaya & Commune
+  List<Wilaya> _wilayas = [];
+  List<Commune> _communes = [];
+  List<Commune> _filteredCommunes = [];
+  String? _selectedWilaya;
+  String? _selectedCommune;
 
   @override
   void initState() {
+    _loadData();
     _textRecognizer = TextRecognizer();
     super.initState();
   }
@@ -57,7 +79,8 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
   @override
   void dispose() {
     _textRecognizer.close();
-    nameController.dispose();
+    firstNameController.dispose();
+    lastNameController.dispose();
     dateOfBirthController.dispose();
     placeOfBirthController.dispose();
     documentNumberController.dispose();
@@ -66,6 +89,8 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
     motherNameController.dispose();
     domicilioController.dispose();
     fechaDeExpedicionController.dispose();
+    addressEditingController.dispose();
+    emailEditingController.dispose();
     super.dispose();
   }
 
@@ -95,7 +120,68 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: "RASD"),
+      floatingActionButton: isCaptureDone
+          ? CustomFAB(
+              label: "continuer".tr(context),
+              icon: CupertinoIcons.right_chevron,
+              onPressed: () {
+                final isValidated = _rasdFormKey.currentState!.validate();
+                if (!isValidated) {
+                  AppToasts.showWarningToast(
+                    message: "all_fields".tr(context),
+                    context: context,
+                  );
+                  return;
+                }
+
+                if (_selectedWilaya == null) {
+                  AppToasts.showWarningToast(
+                    message: "required_wilaya".tr(context),
+                    context: context,
+                  );
+                  return;
+                }
+
+                if (_selectedCommune == null) {
+                  AppToasts.showWarningToast(
+                    message: "required_commune".tr(context),
+                    context: context,
+                  );
+                  return;
+                }
+                if (!isConfirmed) {
+                  AppToasts.showWarningToast(
+                    message: "rasd_checkbox_error".tr(context),
+                    context: context,
+                  );
+                  return;
+                }
+
+                RasdRequestParamsEntity params = RasdRequestParamsEntity(
+                  firstName: firstNameController.text,
+                  birthLastName: lastNameController.text,
+                  gender: selectedSexo!,
+                  birthDate: dateOfBirthController.text,
+                  birthPlace: placeOfBirthController.text,
+                  wilayaId: _selectedWilaya!,
+                  street: addressEditingController.text,
+                  commune: _selectedCommune!,
+                  email: emailEditingController.text,
+                  documentType: "ID Card",
+                  documentNumber: documentNumberController.text,
+                  issueDate: fechaDeExpedicionController.text,
+                  address: addressEditingController.text,
+                );
+
+                debugPrint(prettyPrintJson(jsonEncode(params.toJson())));
+
+                Navigator.of(context)
+                    .pushNamed(Routes.rasdBarCodeScanner, arguments: {'rasdParams': params});
+                return;
+              },
+            )
+          : null,
+      appBar: CustomAppBar(title: "contractTitle".tr(context)),
       body: Container(
         padding: EdgeInsets.all(24.sp),
         height: context.height,
@@ -103,154 +189,176 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
         child: isCaptureDone
             ? SingleChildScrollView(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "Extracted Information",
-                      style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 16.sp),
-                    AppTextFormField(
-                      enabled: true,
-                      label: 'Name',
-                      textEditingController: nameController,
-                    ),
-                    SizedBox(height: 16.sp),
-                    GestureDetector(
-                      onTap: () => _selectDate(context, dateOfBirthController),
-                      child: AbsorbPointer(
-                        child: AppTextFormField(
-                          enabled: true,
-                          label: 'Date of Birth',
-                          textEditingController: dateOfBirthController,
-                        ),
+                    OCRInstruction(
+                      child: Text(
+                        "rasd_ocr_instruction".tr(context),
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              color: Colors.green,
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                     ),
-                    SizedBox(height: 16.sp),
-                    DropdownButtonFormField<String>(
-                      value: selectedPlaceOfBirth,
-                      items: validPlacesOfBirth
-                          .map((place) => DropdownMenuItem(
-                                value: place,
-                                child: Text(place),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedPlaceOfBirth = value;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Place of Birth',
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.0.r),
-                          borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 16.sp),
-                    AppTextFormField(
-                      enabled: true,
-                      label: 'Document Number',
-                      textEditingController: documentNumberController,
-                    ),
-                    SizedBox(height: 16.sp),
-                    DropdownButtonFormField<String>(
-                      value: selectedSexo, // Preselect based on extraction result
-                      items: ['M', 'F']
-                          .map((sexo) => DropdownMenuItem(
-                                value: sexo,
-                                child: Text(sexo),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedSexo = value;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Sexo',
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.0.r),
-                          borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 16.sp),
-                    AppTextFormField(
-                      enabled: true,
-                      label: 'Father\'s Name',
-                      textEditingController: fatherNameController,
-                    ),
-                    SizedBox(height: 16.sp),
-                    AppTextFormField(
-                      enabled: true,
-                      label: 'Mother\'s Name',
-                      textEditingController: motherNameController,
-                    ),
-                    SizedBox(height: 16.sp),
-                    AppTextFormField(
-                      enabled: true,
-                      label: 'Domicilio',
-                      textEditingController: domicilioController,
-                    ),
-                    SizedBox(height: 16.sp),
-                    GestureDetector(
-                      onTap: () => _selectDate(context, fechaDeExpedicionController),
-                      child: AbsorbPointer(
-                        child: AppTextFormField(
-                          enabled: true,
-                          label: 'Expiry Date',
-                          textEditingController: fechaDeExpedicionController,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 16.sp),
-                    Row(
-                      children: [
-                        Checkbox.adaptive(
-                          value: isConfirmed,
-                          onChanged: (value) {
-                            setState(() {
-                              isConfirmed = value ?? false;
-                            });
-                          },
-                        ),
-                        const Flexible(
-                          child: Text(
-                            "I confirm that the information is correct and verified.",
-                            style: TextStyle(fontSize: 14),
+                    const SizedBox(height: 24),
+                    Form(
+                      key: _rasdFormKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AppTextFormField(
+                            enabled: true,
+                            label: 'firstNameLabel'.tr(context),
+                            textEditingController: firstNameController,
+                            validationType: InputType.FIRST_NAME,
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16.sp),
-                    Text(
-                      "Captured Images",
-                      style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 16.sp),
-                    rectoImage != null
-                        ? InstaImageViewer(
-                            child: Image.file(
-                              rectoImage!,
-                              height: 200,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
+                          SizedBox(height: 16.sp),
+                          AppTextFormField(
+                            enabled: true,
+                            label: 'lastNameLabel'.tr(context),
+                            textEditingController: lastNameController,
+                            validationType: InputType.LAST_NAME,
+                          ),
+                          SizedBox(height: 16.sp),
+                          GestureDetector(
+                            onTap: () => _selectDate(context, dateOfBirthController),
+                            child: AbsorbPointer(
+                              child: AppTextFormField(
+                                enabled: true,
+                                label: "birthDateLabel".tr(context),
+                                textEditingController: dateOfBirthController,
+                              ),
                             ),
-                          )
-                        : const Text("Front Image not captured"),
-                    SizedBox(height: 16.sp),
-                    versoImage != null
-                        ? InstaImageViewer(
-                            child: Image.file(
-                              versoImage!,
-                              height: 200,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
+                          ),
+                          SizedBox(height: 16.sp),
+                          AppTextFormField(
+                            enabled: true,
+                            label: "birthPlaceLabel".tr(context),
+                            textEditingController: placeOfBirthController,
+                            validationType: InputType.ADDRESS,
+                          ),
+                          SizedBox(height: 16.sp),
+                          AppTextFormField(
+                            enabled: true,
+                            label: "documentNumberLabel".tr(context),
+                            textEditingController: documentNumberController,
+                            validationType: InputType.RASD_DOCUMENT_NUMBER,
+                          ),
+                          SizedBox(height: 16.sp),
+                          DropdownButtonFormField<String>(
+                            value: selectedSexo,
+                            items: ['M', 'F']
+                                .map(
+                                  (sexo) => DropdownMenuItem(
+                                    value: sexo,
+                                    child: Text(sexo.tr(context)),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedSexo = value;
+                              });
+                            },
+                            decoration: InputDecoration(
+                              labelText: "genderLabel".tr(context),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12.0.r),
+                                borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                              ),
                             ),
-                          )
-                        : const Text("Back Image not captured"),
+                          ),
+                          SizedBox(height: 16.sp),
+                          AppTextFormField(
+                            enabled: true,
+                            label: 'domicilio'.tr(context),
+                            textEditingController: domicilioController,
+                            validationType: InputType.ADDRESS,
+                          ),
+                          SizedBox(height: 16.sp),
+                          GestureDetector(
+                            onTap: () => _selectDate(context, fechaDeExpedicionController),
+                            child: AbsorbPointer(
+                              child: AppTextFormField(
+                                enabled: true,
+                                label: 'expirationDateLabel'.tr(context),
+                                textEditingController: fechaDeExpedicionController,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 16.sp),
+                          AppTextFormField(
+                            isRequired: false,
+                            label: "email".tr(context),
+                            validationType: InputType.EMAIL,
+                            textEditingController: emailEditingController,
+                          ),
+                          SizedBox(height: 16.sp),
+                          // === Wilaya & daira & commune drop downs
+                          WilayaDropDown(
+                            items: _wilayas,
+                            onChanged: (value) {
+                              _filterCommunes(value);
+                            },
+                          ),
+                          SizedBox(height: 16.sp),
+                          CommuneDropDown(
+                            items: _filteredCommunes,
+                            selectedValue: _selectedCommune,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedCommune = value;
+                              });
+                            },
+                          ),
+                          SizedBox(height: 16.sp),
+                          AppTextFormField(
+                            isLatinOnly: true,
+                            label: "streetLabel".tr(context),
+                            validationType: InputType.ADDRESS,
+                            textEditingController: addressEditingController,
+                          ),
+                          SizedBox(height: 32.sp),
+
+                          SizedBox(height: 16.sp),
+                          rectoImage != null
+                              ? InstaImageViewer(
+                                  child: Image.file(
+                                    rectoImage!,
+                                    height: 200,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : const SizedBox(),
+                          SizedBox(height: 16.sp),
+                          versoImage != null
+                              ? InstaImageViewer(
+                                  child: Image.file(
+                                    versoImage!,
+                                    height: 200,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : const SizedBox(),
+                          SizedBox(height: 32.sp),
+                          OCRInstruction(
+                            child: CheckboxListTile(
+                              title: Text("rasd_checkbox".tr(context),
+                                  style: Theme.of(context).textTheme.bodySmall),
+                              value: isConfirmed,
+                              onChanged: (value) {
+                                setState(() {
+                                  isConfirmed = value ?? false;
+                                });
+                              },
+                            ),
+                          ),
+                          SizedBox(height: 64.sp),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               )
@@ -308,6 +416,23 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
     );
   }
 
+  Future<void> _loadData() async {
+    final wilayas = await JsonLoaderHelper.loadWilayas();
+    final communes = await JsonLoaderHelper.loadCommunes();
+    setState(() {
+      _wilayas = wilayas;
+      _communes = communes;
+    });
+  }
+
+  void _filterCommunes(String? wilayaCode) {
+    setState(() {
+      _selectedWilaya = wilayaCode;
+      _selectedCommune = null;
+      _filteredCommunes = _communes.where((commune) => commune.stateCode == wilayaCode).toList();
+    });
+  }
+
   Future<File?> captureDocument({
     required TextRecognizer recognizer,
     required DocumentsType docType,
@@ -330,23 +455,24 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
         // Extract data if valid
         extractAndStoreData(recognizedText.text, docType);
 
-        AppToasts.showSuccessToast(
-            message: "Document validated and data extracted successfully!", context: context);
         return file;
       } else {
         // Show error message if not valid
         String message;
         switch (docType) {
           case DocumentsType.rasdFrontIdCard:
+            // ignore: use_build_context_synchronously
             message = "incorrect_front_id_card_image".tr(context);
             break;
           case DocumentsType.rasdBackIdCard:
+            // ignore: use_build_context_synchronously
             message = "incorrect_back_id_card_image".tr(context);
             break;
           default:
             message = "incorrect_image".tr(context);
             break;
         }
+        // ignore: use_build_context_synchronously
         AppToasts.showWarningToast(message: message, context: context);
       }
     }
@@ -358,38 +484,56 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
       final namePattern = RegExp(r'NOMBRE\s+(.+?)\n');
       final birthDatePattern = RegExp(r'FECHA DE NACIMIENTO\s+(\d{2}/\d{2}/\d{4})');
       final placeOfBirthPattern = RegExp(r'\bW\.\s+([^\n]+)'); // Matches 'W.' followed by text
+      final lugarNacimientoPattern = RegExp(r'LUGAR DE NACIMIENTO\s+([^\n]+)');
+
       final documentNumberPattern = RegExp(r'(\d{8,})'); // Look for 8+ digit numbers
 
       final nameMatch = namePattern.firstMatch(text);
-      if (nameMatch != null) nameController.text = nameMatch.group(1)!.trim();
+      if (nameMatch != null) {
+        final fullName = nameMatch.group(1)!.trim();
+        final nameParts = fullName.split(' ');
+
+        if (nameParts.isNotEmpty) {
+          if (nameParts[0].contains('-')) {
+            // If the first word is composed, treat it as the first name
+            firstNameController.text = nameParts[0];
+            lastNameController.text = nameParts.skip(1).join(' '); // Join the rest as last name
+          } else {
+            // Otherwise, take the first word as the first name
+            firstNameController.text = nameParts[0];
+            lastNameController.text = nameParts.skip(1).join(' '); // Join the rest as last name
+          }
+        } else {
+          firstNameController.text = '';
+          lastNameController.text = '';
+        }
+      }
 
       final birthDateMatch = birthDatePattern.firstMatch(text);
       if (birthDateMatch != null) dateOfBirthController.text = birthDateMatch.group(1)!.trim();
 
-      final placeOfBirthMatch = placeOfBirthPattern.firstMatch(text);
-      if (placeOfBirthMatch != null) {
-        final extractedPlaceOfBirth = placeOfBirthMatch.group(0)!.trim().toUpperCase();
+      String? placeOfBirth;
 
-        // Match with predefined list
-        final match = validPlacesOfBirth.firstWhere(
-          (place) => extractedPlaceOfBirth.contains(place),
-          orElse: () => '',
-        );
-
-        setState(() {
-          selectedPlaceOfBirth = match.isNotEmpty ? match : null;
-        });
+      // Try to match 'W.' first
+      final wMatch = placeOfBirthPattern.firstMatch(text);
+      if (wMatch != null) {
+        placeOfBirth = wMatch.group(0); // Get the matched value
       } else {
-        selectedPlaceOfBirth = null; // No match found
+        // Step 2: Fallback to 'Lugar de Nacimiento'
+        final lugarMatch = lugarNacimientoPattern.firstMatch(text);
+        if (lugarMatch != null) {
+          placeOfBirth = lugarMatch.group(1)?.trim(); // Extract value after the keyword
+        }
+      }
+
+      if (placeOfBirth != null) {
+        placeOfBirthController.text = placeOfBirth;
       }
 
       final documentNumberMatch = documentNumberPattern.firstMatch(text);
       if (documentNumberMatch != null) {
         documentNumberController.text = documentNumberMatch.group(1)!.trim();
       }
-
-      debugPrint(
-          "Front Data Extracted: Name=${nameController.text}, DOB=${dateOfBirthController.text}, Place=${placeOfBirthController.text}, DocNumber=${documentNumberController.text}");
     } else if (documentType == DocumentsType.rasdBackIdCard) {
       final sexoPattern = RegExp(r'SEXO\s+([MF])');
       final fatherNamePattern = RegExp(r'NOMBRE DEL PADRE\s+(.+?)\n');
@@ -427,9 +571,6 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
       if (expiryDateMatch != null) {
         fechaDeExpedicionController.text = expiryDateMatch.group(1)!.trim();
       }
-
-      debugPrint(
-          "Back Data Extracted: Sexo=${sexoController.text}, Father=${fatherNameController.text}, Mother=${motherNameController.text}, Domicilio=${domicilioController.text}, ExpiryDate=${fechaDeExpedicionController.text}");
     }
   }
 
@@ -439,7 +580,9 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
     if (docType == DocumentsType.rasdFrontIdCard) {
       final patterns = [
         RegExp(r'republica', caseSensitive: false),
-        RegExp(r'árabe saharaui democrática', caseSensitive: false),
+        RegExp(r'árabe', caseSensitive: false),
+        RegExp(r'saharaui', caseSensitive: false),
+        RegExp(r'democrática', caseSensitive: false),
         RegExp(r'\b\d{8,9}\b'),
       ];
 
@@ -459,5 +602,30 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
     }
 
     return false;
+  }
+}
+
+class OCRInstruction extends StatelessWidget {
+  const OCRInstruction({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: context.width,
+          padding: EdgeInsets.symmetric(horizontal: 12.sp, vertical: 16.sp),
+          decoration: BoxDecoration(
+            color: Colors.green.withOpacity(.1),
+            borderRadius: BorderRadius.all(
+              Radius.circular(12.sp),
+            ),
+          ),
+          child: child,
+        ),
+      ],
+    );
   }
 }

@@ -193,6 +193,7 @@
   "yearsOfExperienceError": "Les années d'expérience doivent être un nombre valide.",
   "ninError": "Le NIN doit être un nombre composé de 18 caractères.",
   "documentNumberError": "Le numéro de document doit être composé de 9 caractères.",
+  "rasdDocumentNumberError": "Le numéro de document doit être composé de 8 caractères.",
   "issuingCountryError": "Le pays de délivrance doit contenir entre 6 et 30 caractères.",
   "issuingPlaceError": "Le lieu de délivrance doit contenir entre 6 et 30 caractères.",
   "issuingDateError": "La date de délivrance est requise.",
@@ -321,5 +322,13 @@
   "activation_failed": "Echec d'activation",
   "problem_generating_contract": "Erreur lors de la génération du contrat",
   "wait_for_seconds": "Veuillez patienter 2 minutes avant de réessayer",
-  "SMPP_NOT_ANSWER": "Veuillez réessayer"
+  "SMPP_NOT_ANSWER": "Veuillez réessayer",
+  "domicilio": "Résidence",
+  "rasd_ocr_instruction": "Veuillez vérifier attentivement les informations ci-dessous. Il est important de s'assurer que tous les détails sont exacts, car ils seront utilisés à des fins officielles.",
+  "rasd_checkbox": "Je confirme que les informations sont correctes et vérifiées",
+  "rasd_checkbox_error": "Vous devez confirmer les informations en cochant la case avant de continuer",
+  "M": "Male",
+  "F": "Femelle",
+  "dz_client": "Client Algérien 🇩🇿",
+  "rasd_client": "Client du Sahara Occidental 🇪🇭"
 }

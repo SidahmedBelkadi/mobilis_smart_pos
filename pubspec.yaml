@@ -2,7 +2,7 @@ name: mobilis_smart_pos
 description: "Enabling Mobile Sales Channels through Digitalization and Automation"
 publish_to: "none"
 
-version: 1.9.1+1
+version: 2.0.0+1
 
 environment:
   sdk: ">=3.2.6 <4.0.0"
@@ -78,6 +78,7 @@ dependencies:
   mobile_scanner: ^6.0.2
   flutter_zxing: ^1.7.0
   dropdown_search: ^6.0.1
+  json_pretty: ^1.0.4
 
 dev_dependencies:
   flutter_test:

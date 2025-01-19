@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobilis_smart_pos/src/features/bar_code/presentation/cubit/offers_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/bar_code/presentation/offers_page.dart';
 import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/sms_cubit.dart';
+import 'package:mobilis_smart_pos/src/features/contract/presentation/rasd_bar_code_scanner.dart';
+import 'package:mobilis_smart_pos/src/features/contract/presentation/rasd_signature_screen.dart';
 import 'package:mobilis_smart_pos/src/features/invoices/presentation/cubit/retry_activation/retry_activation_cubit.dart';
 import '../../features/contract/presentation/parent_contract_screen.dart';
 import '../../features/contract/presentation/parent_preparation_screen.dart';
@@ -90,6 +92,8 @@ class Routes {
   static const String test = "/test";
   static const String contractGenerated = "/contract_generated";
   static const String changePassword = "/profile_change_password";
+  static const String rasdBarCodeScanner = "/rasd_bar_code_scanner";
+  static const String rasdBarSignatureSCreen = "/rasd_signature";
 }
 
 class AppRoutes {
@@ -432,6 +436,20 @@ class AppRoutes {
               parentIsPassport: params['parentIsPassport'],
             ),
           ),
+        );
+      case Routes.rasdBarCodeScanner:
+        final params = args as Map<String, dynamic>;
+        return RoutesAnimationManager.slideFromBottomTransition(
+          args: args,
+          RasdBarCodeScanner(
+            rasdParams: params['rasdParams'],
+          ),
+        );
+      case Routes.rasdBarSignatureSCreen:
+        // final params = args as Map<String, dynamic>;
+        return RoutesAnimationManager.slideFromBottomTransition(
+          args: args,
+          const RasdSignatureScreen(),
         );
     }
     return null;

@@ -182,27 +182,24 @@ class _ContractScreenState extends State<ContractScreen> {
     bool isValidated = _formKey.currentState!.validate();
 
     if (!isValidated) {
-      AppToasts.showErrorToast(
+      AppToasts.showWarningToast(
         message: "all_fields".tr(context),
-        onAutoCompleteCompleted: (p0) {},
         context: context,
       );
       return;
     }
 
     if (_selectedWilaya == null) {
-      AppToasts.showErrorToast(
+      AppToasts.showWarningToast(
         message: "required_wilaya".tr(context),
-        onAutoCompleteCompleted: (p0) {},
         context: context,
       );
       return;
     }
 
     if (_selectedCommune == null) {
-      AppToasts.showErrorToast(
+      AppToasts.showWarningToast(
         message: "required_commune".tr(context),
-        onAutoCompleteCompleted: (p0) {},
         context: context,
       );
       return;

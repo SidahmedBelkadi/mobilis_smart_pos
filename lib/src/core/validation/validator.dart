@@ -69,6 +69,11 @@ class Validator {
             return "documentNumberError".tr(context);
           }
           break;
+        case InputType.RASD_DOCUMENT_NUMBER:
+          if (!RegExp(ValidationPatterns.rasdDocumentNumberPattern).hasMatch(value)) {
+            return "rasdDocumentNumberError".tr(context);
+          }
+          break;
         case InputType.ISSUING_COUNTRY:
           if (!RegExp(ValidationPatterns.issuingCountryPattern).hasMatch(value)) {
             return "issuingCountryError".tr(context);

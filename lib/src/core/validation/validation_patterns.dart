@@ -9,6 +9,7 @@ class ValidationPatterns {
   static const String yearsOfExperiencePattern = r'^\d+$';
   static const String ninPattern = r'^\d{18}$';
   static const String documentNumberPattern = r'^\d{9}$';
+  static const String rasdDocumentNumberPattern = r'^\d{8}$';
   static const String issuingCountryPattern = r'^.{5,30}$';
   static const String issuingPlacePattern = r'^.{5,30}$';
   static const String datePattern = r'^\d{4}-\d{2}-\d{2}$';

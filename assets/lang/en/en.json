@@ -193,6 +193,7 @@
   "yearsOfExperienceError": "Years of experience must be a valid number.",
   "ninError": "The NIN must be a number composed of 18 characters.",
   "documentNumberError": "The document number must be composed of 9 characters.",
+  "rasdDocumentNumberError": "The document number must be composed of 8 characters.",
   "issuingCountryError": "The issuing country must be between 6 and 30 characters.",
   "issuingPlaceError": "The issuing place must be between 6 and 30 characters.",
   "issuingDateError": "The issuing date is required.",
@@ -321,5 +322,13 @@
   "activation_failed": "Activation Failed",
   "problem_generating_contract": "Error generating the contract",
   "wait_for_seconds": "Please wait 2 minutes before trying again",
-  "SMPP_NOT_ANSWER": "Please try again"
+  "SMPP_NOT_ANSWER": "Please try again",
+  "domicilio": "Residence",
+  "rasd_ocr_instruction": "Please carefully review the information below. It's important to ensure that all details are accurate as they will be used for official purposes.",
+  "rasd_checkbox": "I confirm that the information is correct and verified.",
+  "rasd_checkbox_error": "You need to confirm the information by checking the box before proceeding",
+  "M": "Male",
+  "F": "Female",
+  "dz_client": "Algerian Client 🇩🇿",
+  "rasd_client": "Western Sahara Client 🇪🇭"
 }

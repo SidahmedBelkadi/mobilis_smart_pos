@@ -66,7 +66,7 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.darkGrey,
+        backgroundColor: context.isDarkMode ? AppColors.darkGrey : Colors.white,
         actions: [
           DropdownButton<String>(
             value: nationalitiesValues.contains(nationality)
@@ -76,8 +76,10 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
               return DropdownMenuItem<String>(
                 value: value, // Assign unique value for each item
                 child: Text(
-                  value == 'DZ' ? 'Algérien' : 'Sahraoui', // Properly map value to display text
-                  style: Theme.of(context).textTheme.bodySmall,
+                  value == 'DZ'
+                      ? 'dz_client'.tr(context)
+                      : 'rasd_client'.tr(context), // Properly map value to display text
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
               );
             }).toList(),
