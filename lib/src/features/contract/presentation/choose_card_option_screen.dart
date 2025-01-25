@@ -68,28 +68,43 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
       appBar: AppBar(
         backgroundColor: context.isDarkMode ? AppColors.darkGrey : Colors.white,
         actions: [
-          DropdownButton<String>(
-            value: nationalitiesValues.contains(nationality)
-                ? nationality
-                : null, // Validate selected value
-            items: nationalitiesValues.map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value, // Assign unique value for each item
-                child: Text(
-                  value == 'DZ'
-                      ? 'dz_client'.tr(context)
-                      : 'rasd_client'.tr(context), // Properly map value to display text
+          Container(
+            padding: EdgeInsets.all(12.sp),
+            width: context.width,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Text(
+                  "nationality_with_point".tr(context),
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
-              );
-            }).toList(),
-            onChanged: (String? newValue) {
-              if (newValue != null) {
-                setState(() {
-                  nationality = newValue; // Update the selected value
-                });
-              }
-            },
+                SizedBox(width: 30.sp),
+                DropdownButton<String>(
+                  value: nationalitiesValues.contains(nationality)
+                      ? nationality
+                      : null, // Validate selected value
+                  items: nationalitiesValues.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value, // Assign unique value for each item
+                      child: Text(
+                        value == 'DZ'
+                            ? 'dz_client'.tr(context)
+                            : 'rasd_client'.tr(context), // Properly map value to display text
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        nationality = newValue; // Update the selected value
+                      });
+                    }
+                  },
+                ),
+              ],
+            ),
           )
         ],
       ),

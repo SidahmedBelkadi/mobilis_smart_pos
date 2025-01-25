@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,9 +16,16 @@ import 'package:mobilis_smart_pos/src/core/utils/ressources/app_images.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/rasd_request_params_entity.dart';
 
 class RasdBarCodeScanner extends StatefulWidget {
-  const RasdBarCodeScanner({super.key, required this.rasdParams});
+  const RasdBarCodeScanner({
+    super.key,
+    required this.rasdParams,
+    this.rectoImage,
+    this.versoImage,
+  });
 
-  final RasdRequestParamsEntity rasdParams;
+  final RasdEditRequestParamsEntity rasdParams;
+  final File? rectoImage;
+  final File? versoImage;
 
   @override
   State<RasdBarCodeScanner> createState() => _RasdBarCodeScannerState();
@@ -26,32 +34,48 @@ class RasdBarCodeScanner extends StatefulWidget {
 class _RasdBarCodeScannerState extends State<RasdBarCodeScanner> {
   static const platform = MethodChannel("channel");
 
+  // @override
+  // void initState() {
+  //   super.initState();
+
+  //   debugPrint(
+  //       "============= RASD CONTRACT : \n ${prettyPrintJson(jsonEncode(widget.rasdParams.toJson()))}");
+
+  //   debugPrint("ID CARD RECTO IMAGE : ${widget.rectoImage?.path}");
+  //   debugPrint("ID CARD VERSO IMAGE : ${widget.versoImage?.path}");
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Scanner'),
-      body: Container(
-        height: context.height,
-        width: context.width,
-        padding: EdgeInsets.all(32.sp),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Lottie.asset(AppImages.barCodeAnimation5, height: 200.h, width: 200.w),
-            SizedBox(height: 32.h),
-            Text(
-              "bar_code_instruction".tr(context),
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: AppColors.primary,
-                  ),
-            ),
-            SizedBox(height: 64.h),
-            AppElevatedButtonWithText(
-              text: "start_button".tr(context),
-              onPressed: () => _startBarcodeScanner(context),
-            )
-          ],
+      appBar: CustomAppBar(
+        title: "scan_sim".tr(context),
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          alignment: Alignment.center,
+          height: context.height - 56.h,
+          width: context.width,
+          padding: EdgeInsets.all(32.sp),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Lottie.asset(AppImages.barCodeAnimation5, height: 200.h, width: 200.w),
+              SizedBox(height: 32.h),
+              Text(
+                "bar_code_instruction".tr(context),
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                      color: AppColors.primary,
+                    ),
+              ),
+              SizedBox(height: 64.h),
+              AppElevatedButtonWithText(
+                text: "start_button".tr(context),
+                onPressed: () => _startBarcodeScanner(context),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -109,7 +133,7 @@ class _RasdBarCodeScannerState extends State<RasdBarCodeScanner> {
                     subscriptionTypeId: selectedOffer['offerId'],
                   );
                   debugPrint(prettyPrintJson(jsonEncode(params.toJson())));
-                  _navigateToSignatureScreen();
+                  _navigateToSignatureScreen(params);
                 }
               },
             ),
@@ -119,7 +143,11 @@ class _RasdBarCodeScannerState extends State<RasdBarCodeScanner> {
     );
   }
 
-  _navigateToSignatureScreen() {
-    Navigator.of(context).pushNamed(Routes.rasdBarSignatureSCreen);
+  _navigateToSignatureScreen(RasdEditRequestParamsEntity rasdParams) {
+    Navigator.of(context).pushNamed(Routes.rasdBarSignatureSCreen, arguments: {
+      'rasdParams': rasdParams,
+      'recto': widget.rectoImage,
+      'verso': widget.versoImage,
+    });
   }
 }

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:cunning_document_scanner/cunning_document_scanner.dart';
@@ -8,7 +7,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:insta_image_viewer/insta_image_viewer.dart';
-import 'package:json_pretty/json_pretty.dart';
 import 'package:mobilis_smart_pos/src/config/routing/app_routes.dart';
 import 'package:mobilis_smart_pos/src/core/commom/widgets/app_text_form_field.dart';
 import 'package:mobilis_smart_pos/src/core/commom/widgets/commune_drop_down.dart';
@@ -18,6 +16,7 @@ import 'package:mobilis_smart_pos/src/core/commom/widgets/wilaya_drop_down.dart'
 import 'package:mobilis_smart_pos/src/core/utils/enums/documents_type.dart';
 import 'package:mobilis_smart_pos/src/core/utils/enums/input_type.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
+import 'package:mobilis_smart_pos/src/core/utils/helpers/civils_informations_converter_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/json_loader_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/toast_helper.dart';
@@ -110,9 +109,11 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
       lastDate: DateTime(2100),
     );
     if (picked != null && picked != initialDate) {
+      final dateStr =
+          "${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}";
+      debugPrint("=============== date Str : $dateStr");
       setState(() {
-        controller.text =
-            "${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}";
+        controller.text = dateStr;
       });
     }
   }
@@ -157,11 +158,13 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
                   return;
                 }
 
-                RasdRequestParamsEntity params = RasdRequestParamsEntity(
+                RasdEditRequestParamsEntity params = RasdEditRequestParamsEntity(
                   firstName: firstNameController.text,
                   birthLastName: lastNameController.text,
-                  gender: selectedSexo!,
-                  birthDate: dateOfBirthController.text,
+                  gender: CivilsInformationsConverterHelper.getToSubmitGenderRasdValue(
+                      gender: selectedSexo!),
+                  birthDate: CivilsInformationsConverterHelper.convertToIso8601Rasd(
+                      dateOfBirthController.text),
                   birthPlace: placeOfBirthController.text,
                   wilayaId: _selectedWilaya!,
                   street: addressEditingController.text,
@@ -169,14 +172,18 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
                   email: emailEditingController.text,
                   documentType: "ID Card",
                   documentNumber: documentNumberController.text,
-                  issueDate: fechaDeExpedicionController.text,
+                  issueDate: CivilsInformationsConverterHelper.convertToIso8601Rasd(
+                      fechaDeExpedicionController.text),
                   address: addressEditingController.text,
                 );
 
-                debugPrint(prettyPrintJson(jsonEncode(params.toJson())));
+                // debugPrint(prettyPrintJson(jsonEncode(params.toJson())));
 
-                Navigator.of(context)
-                    .pushNamed(Routes.rasdBarCodeScanner, arguments: {'rasdParams': params});
+                Navigator.of(context).pushNamed(Routes.rasdBarCodeScanner, arguments: {
+                  'rasdParams': params,
+                  'recto': rectoImage,
+                  'verso': versoImage,
+                });
                 return;
               },
             )

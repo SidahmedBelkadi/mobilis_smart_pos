@@ -21,7 +21,7 @@ class SessionTimeout extends StatefulWidget {
 class _SessionTimeoutState extends State<SessionTimeout> {
   Timer? _timer;
   Timer? _countdownTimer;
-  int _remainingTime = 800; // 10 minutes
+  int _remainingTime = 1600; // 10 minutes
 
   void _startTimer() {
     // Cancel any existing timers

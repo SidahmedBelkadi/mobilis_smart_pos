@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobilis_smart_pos/src/features/bar_code/presentation/cubit/offers_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/bar_code/presentation/offers_page.dart';
+import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/rasd/rasd_contract_cubit.dart';
+import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/rasd/rasd_sms_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/sms_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/contract/presentation/rasd_bar_code_scanner.dart';
 import 'package:mobilis_smart_pos/src/features/contract/presentation/rasd_signature_screen.dart';
@@ -441,15 +443,34 @@ class AppRoutes {
         final params = args as Map<String, dynamic>;
         return RoutesAnimationManager.slideFromBottomTransition(
           args: args,
-          RasdBarCodeScanner(
-            rasdParams: params['rasdParams'],
+          BlocProvider(
+            create: (context) => serviceLocator<RasdContractCubit>(),
+            child: RasdBarCodeScanner(
+              rasdParams: params['rasdParams'],
+              rectoImage: params['recto'],
+              versoImage: params['verso'],
+            ),
           ),
         );
       case Routes.rasdBarSignatureSCreen:
-        // final params = args as Map<String, dynamic>;
+        final params = args as Map<String, dynamic>;
         return RoutesAnimationManager.slideFromBottomTransition(
           args: args,
-          const RasdSignatureScreen(),
+          MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => serviceLocator<RasdSmsCubit>(),
+              ),
+              BlocProvider(
+                create: (context) => serviceLocator<RasdContractCubit>(),
+              ),
+            ],
+            child: RasdSignatureScreen(
+              rasdParams: params['rasdParams'],
+              recto: params['recto'],
+              verso: params['verso'],
+            ),
+          ),
         );
     }
     return null;

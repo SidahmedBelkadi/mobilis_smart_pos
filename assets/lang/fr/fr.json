@@ -23,7 +23,7 @@
   "seConnecter": "Se Connecter",
   "createAccount": "Créer un compte",
   "dontHaveAccount": "Vous n'avez pas un compte?",
-  "chooseCard": "Veuillez choisir une option et préparer votre carte d'identité ou votre passeport pour le scan.",
+  "chooseCard": "Veuillez préparer votre pièce d'identité pour la numérisation.",
   "ocr": "OCR",
   "ocrSentence": "OCR (Reconnaissance optique de caractères)",
   "identityCard": "Carte d'identité",
@@ -327,8 +327,10 @@
   "rasd_ocr_instruction": "Veuillez vérifier attentivement les informations ci-dessous. Il est important de s'assurer que tous les détails sont exacts, car ils seront utilisés à des fins officielles.",
   "rasd_checkbox": "Je confirme que les informations sont correctes et vérifiées",
   "rasd_checkbox_error": "Vous devez confirmer les informations en cochant la case avant de continuer",
-  "M": "Male",
-  "F": "Femelle",
-  "dz_client": "Client Algérien 🇩🇿",
-  "rasd_client": "Client du Sahara Occidental 🇪🇭"
+  "M": "Masculin",
+  "F": "Féminin",
+  "dz_client": "Algérienne 🇩🇿",
+  "rasd_client": "Sahara Occidental 🇪🇭",
+  "nationality_with_point": "Nationalité : ",
+  "coming_soon": "À venir .."
 }

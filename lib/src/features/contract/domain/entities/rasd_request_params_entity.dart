@@ -2,7 +2,7 @@ import 'package:mobilis_smart_pos/src/features/sign_in/data/data_sources/smart_p
 
 import '../../../../dependency_injection/injection_container.dart' as di;
 
-class RasdRequestParamsEntity {
+class RasdEditRequestParamsEntity {
   final String firstName;
   final String birthLastName;
   final String gender;
@@ -22,7 +22,7 @@ class RasdRequestParamsEntity {
   final int? serialNumber;
   final String address;
 
-  RasdRequestParamsEntity({
+  RasdEditRequestParamsEntity({
     required this.firstName,
     required this.birthLastName,
     required this.gender,
@@ -45,30 +45,32 @@ class RasdRequestParamsEntity {
 
   Map<String, dynamic> toJson() {
     return {
-      'First_name': firstName,
-      'Birth_last_name': birthLastName,
-      'Gender': gender,
-      'Birth_date': birthDate,
-      'Birth_place': birthPlace,
-      'Nationality': nationality,
-      'Wilaya_id': wilayaId,
-      'Street': street,
-      'Commune': commune,
-      'Authority': authority,
-      'email': email,
-      'Document_type': documentType,
-      'Document_number': documentNumber,
-      'Issue_date': issueDate,
-      'Subscription_type_ID': subscriptionTypeId,
-      'Folder_files': folderFiles,
-      'PDV_ID': di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials()!.userId,
-      'Employee_ID':
-          di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials()!.employeeId,
-      'serial_number': serialNumber,
+      'client': {
+        'First_name': firstName,
+        'Birth_last_name': birthLastName,
+        'Gender': gender,
+        'Birth_date': birthDate,
+        'Birth_place': birthPlace,
+        'Nationality': 'RSD',
+        'Wilaya_id': wilayaId,
+        'Street': street,
+        'Commune': commune,
+        'Authority': 'Ministerio del interior',
+        'email': email,
+        'Document_type': documentType,
+        'Document_number': documentNumber,
+        'Issue_date': issueDate,
+        'Subscription_type_ID': subscriptionTypeId,
+        'Folder_files': folderFiles,
+        'PDV_ID': di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials()!.userId,
+        'Employee_ID':
+            di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials()!.employeeId,
+        'serial_number': serialNumber,
+      }
     };
   }
 
-  RasdRequestParamsEntity copyWith({
+  RasdEditRequestParamsEntity copyWith({
     String? firstName,
     String? birthLastName,
     String? gender,
@@ -88,7 +90,7 @@ class RasdRequestParamsEntity {
     int? serialNumber,
     String? address,
   }) {
-    return RasdRequestParamsEntity(
+    return RasdEditRequestParamsEntity(
       firstName: firstName ?? this.firstName,
       birthLastName: birthLastName ?? this.birthLastName,
       gender: gender ?? this.gender,

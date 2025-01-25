@@ -16,15 +16,19 @@ class CivilsInformationsConverterHelper {
     required BuildContext context,
   }) {
     if (gender == "MALE") {
-      return context.isArabicLocale ? "ذكر" : "Male";
+      return context.isArabicLocale ? "ذكر" : "Masculin";
     } else {
-      return context.isArabicLocale ? "أنثى" : "Female";
+      return context.isArabicLocale ? "أنثى" : "Féminin";
     }
   }
 
   // Convert gender to submit-friendly value
   static String getToSubmitGenderValue({required String gender}) {
     return gender == "MALE" ? "Male" : "Female";
+  }
+
+  static String getToSubmitGenderRasdValue({required String gender}) {
+    return gender == "M" ? "Male" : "Female";
   }
 
   // Convert document type to submit-friendly value
@@ -95,6 +99,17 @@ class CivilsInformationsConverterHelper {
   static String convertToIso8601WithTiret(String dateStr) {
     try {
       DateTime parsedDate = DateFormat('yyyy-MM-dd').parse(dateStr);
+      return parsedDate.toIso8601String();
+    } catch (e) {
+      debugPrint("============ ERROR : $e");
+      return 'Invalid Date';
+    }
+  }
+
+  // Convert date from 'yyyy-MM-dd' to ISO 8601 format
+  static String convertToIso8601Rasd(String dateStr) {
+    try {
+      DateTime parsedDate = DateFormat('dd/MM/yyyy').parse(dateStr);
       return parsedDate.toIso8601String();
     } catch (e) {
       debugPrint("============ ERROR : $e");

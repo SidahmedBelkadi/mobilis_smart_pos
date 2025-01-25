@@ -18,6 +18,12 @@ class EditContractResponseEntity extends Equatable {
   });
 
   @override
-  List<Object?> get props =>
-      [subscriptionId, invoiceId, clientId, contractCode, message, contractMessage];
+  List<Object?> get props => [
+        subscriptionId,
+        invoiceId,
+        clientId,
+        contractCode,
+        message,
+        contractMessage,
+      ];
 }

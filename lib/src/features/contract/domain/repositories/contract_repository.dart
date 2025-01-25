@@ -1,6 +1,10 @@
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/entities/rasd_edit_contract_response_entity.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/entities/rasd_generate_contract_params_entity.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/entities/rasd_request_params_entity.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/entities/rasd_trigger_sms_params_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/retry_trigger_sms_params_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/retry_trigger_sms_response_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/trigger_sms_params_entity.dart';
@@ -36,6 +40,23 @@ abstract class ContractRepository {
     required GenerateContractParamsEntity generateContractParams,
   });
 
-  Future<Either<Failure, RetryTriggerSmsResponseEntity>> retryTriggerSms(
-      {required RetryTriggerSmsParamsEntity params});
+  Future<Either<Failure, RetryTriggerSmsResponseEntity>> retryTriggerSms({
+    required RetryTriggerSmsParamsEntity params,
+  });
+
+  Future<Either<Failure, RasdEditContractResponseEntity>> rasdEditContract({
+    required RasdEditRequestParamsEntity rasdEditRequestParamsEntity,
+    required File? recto,
+    required File? verso,
+    required File? signature,
+  });
+
+  Future<Either<Failure, String>> rasdTriggerSms({
+    required RasdTriggerSmsParamsEntity rasdTriggerSmsParamsEntity,
+  });
+
+  Future<Either<Failure, GenerateContractResponseEntity>> rasdGenerateContract({
+    required RasdGenerateContractParamsEntity rasdGenerateContractParams,
+    required int subscriptionId,
+  });
 }

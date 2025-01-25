@@ -23,7 +23,7 @@
   "seConnecter": "Sign In",
   "createAccount": "Create Account",
   "dontHaveAccount": "Don't have an account?",
-  "chooseCard": "Please choose an option and prepare your identity card or passport for scanning.",
+  "chooseCard": "Please prepare your ID card for scanning",
   "ocr": "OCR",
   "ocrSentence": "OCR (Optical Character Recognition)",
   "identityCard": "Identity Card",
@@ -329,6 +329,8 @@
   "rasd_checkbox_error": "You need to confirm the information by checking the box before proceeding",
   "M": "Male",
   "F": "Female",
-  "dz_client": "Algerian Client 🇩🇿",
-  "rasd_client": "Western Sahara Client 🇪🇭"
+  "dz_client": "Algerian 🇩🇿",
+  "rasd_client": "Western Sahara 🇪🇭",
+  "nationality_with_point": "Nationality : ",
+  "coming_soon": "Coming soon .."
 }

@@ -27,8 +27,9 @@ class ContractCubit extends Cubit<ContractState> {
     required this.authenticationLocalDataSource,
   }) : super(ContractInitial());
 
-  Future<void> checkBeforeEditContract(
-      {required ContractRequestParamsEntitiy contract}) async {
+  Future<void> checkBeforeEditContract({
+    required ContractRequestParamsEntitiy contract,
+  }) async {
     emit(CheckBeforeEditContractLoading());
 
     final failureOrCheckBeforeEditResponseEntity =
@@ -56,8 +57,7 @@ class ContractCubit extends Cubit<ContractState> {
   }) async {
     emit(EditContractLoading());
 
-    final savedLoginCredentials =
-        authenticationLocalDataSource.getSavedLoginCredentials();
+    final savedLoginCredentials = authenticationLocalDataSource.getSavedLoginCredentials();
     if (savedLoginCredentials != null) {
       if (savedLoginCredentials.pdvCode != null) {
         final failureOrEditContractResponseEntity = await editContractUseCase(
@@ -75,8 +75,7 @@ class ContractCubit extends Cubit<ContractState> {
         failureOrEditContractResponseEntity.fold((error) {
           emit(EditContractFailed(message: error.message));
         }, (editContractResponseEntity) async {
-          emit(EditContractSuccess(
-              editContractResponseEntity: editContractResponseEntity));
+          emit(EditContractSuccess(editContractResponseEntity: editContractResponseEntity));
         });
       } else {
         emit(const EditContractFailed(
@@ -101,8 +100,7 @@ class ContractCubit extends Cubit<ContractState> {
     failureOrGenerateContractResponseEntity.fold((error) {
       emit(GenerateContractFailed(message: error.message));
     }, (generateContractResponseEntity) async {
-      emit(GenerateContractSuccess(
-          generateContractResponseEntity: generateContractResponseEntity));
+      emit(GenerateContractSuccess(generateContractResponseEntity: generateContractResponseEntity));
     });
   }
 }

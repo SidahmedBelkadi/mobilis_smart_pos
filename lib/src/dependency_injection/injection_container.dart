@@ -7,8 +7,13 @@ import 'package:mobilis_smart_pos/src/features/bar_code/data/repositories/offers
 import 'package:mobilis_smart_pos/src/features/bar_code/domain/repositories/offers_repository.dart';
 import 'package:mobilis_smart_pos/src/features/bar_code/domain/use_cases/get_all_offers_use_case.dart';
 import 'package:mobilis_smart_pos/src/features/bar_code/presentation/cubit/offers_cubit.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/use_cases/rasd_edit_contract_use_case.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/use_cases/rasd_generate_contract_use_case.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/use_cases/rasd_trigger_sms_use_case.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/use_cases/retry_sms_use_case.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/use_cases/trigger_sms_use_case.dart';
+import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/rasd/rasd_contract_cubit.dart';
+import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/rasd/rasd_sms_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/sms_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/invoices/domain/use_cases/retry_activation_use_case.dart';
 import 'package:mobilis_smart_pos/src/features/invoices/presentation/cubit/retry_activation/retry_activation_cubit.dart';
@@ -212,6 +217,10 @@ Future<void> initializeAppDependencies() async {
   serviceLocator.registerLazySingleton(() => GetAllOffersUseCase(repository: serviceLocator()));
   serviceLocator.registerLazySingleton(() => TrigggerSmsUseCase(repository: serviceLocator()));
   serviceLocator.registerLazySingleton(() => RetryTrigggerSmsUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(() => RasdEditContractUseCase(repository: serviceLocator()));
+  serviceLocator
+      .registerLazySingleton(() => RasdGenerateContractUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(() => RasdTrigggerSmsUseCase(repository: serviceLocator()));
   // ================ BLOCS ================ //
 
   serviceLocator.registerFactory(() => SignInCubit(
@@ -262,4 +271,15 @@ Future<void> initializeAppDependencies() async {
   serviceLocator.registerFactory(() => OffersCubit(offersUseCase: serviceLocator()));
   serviceLocator
       .registerFactory(() => SmsCubit(useCase: serviceLocator(), retryUseCase: serviceLocator()));
+
+  serviceLocator.registerFactory(() => RasdContractCubit(
+        rasdEditContractUseCase: serviceLocator(),
+        rasdGenerateContractUseCase: serviceLocator(),
+        smartPosLocalStorage: serviceLocator(),
+      ));
+
+  serviceLocator.registerFactory(() => RasdSmsCubit(
+        rasdTrigggerSmsUseCase: serviceLocator(),
+        smartPosLocalStorage: serviceLocator(),
+      ));
 }
