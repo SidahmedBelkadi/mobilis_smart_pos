@@ -109,7 +109,6 @@ class _MyHomePageState extends State<HomeScreen> {
                         AppImages.ban3,
                         AppImages.bannerOmra,
                         AppImages.bannerTestMail1,
-                        AppImages.bannerTestMail2,
                       ],
                       currentIndex: currentIndex,
                       onPageChanged: (index) {

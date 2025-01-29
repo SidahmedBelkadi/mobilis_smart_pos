@@ -324,7 +324,7 @@
   "wait_for_seconds": "Veuillez patienter 2 minutes avant de réessayer",
   "SMPP_NOT_ANSWER": "Veuillez réessayer",
   "domicilio": "Résidence",
-  "rasd_ocr_instruction": "Veuillez vérifier attentivement les informations ci-dessous. Il est important de s'assurer que tous les détails sont exacts, car ils seront utilisés à des fins officielles.",
+  "rasd_ocr_instruction": "Veuillez vérifier attentivement les informations ci-dessous",
   "rasd_checkbox": "Je confirme que les informations sont correctes et vérifiées",
   "rasd_checkbox_error": "Vous devez confirmer les informations en cochant la case avant de continuer",
   "M": "Masculin",
