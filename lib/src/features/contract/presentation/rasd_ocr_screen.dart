@@ -503,13 +503,13 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
 
     if (imagesPath != null && imagesPath.isNotEmpty) {
       File file = File(imagesPath[0]);
-
+      File preProcessFile = file;
       // Preprocess the image (convert to grayscale)
-      file = convertToGrayscale(file);
-      file = reduceNoise(file);
+      preProcessFile = convertToGrayscale(file);
+      preProcessFile = reduceNoise(file);
 
       // Use the preprocessed image for OCR
-      final inputImage = InputImage.fromFile(file);
+      final inputImage = InputImage.fromFile(preProcessFile);
       final recognizedText = await recognizer.processImage(inputImage);
 
       debugPrint("===== Recognized Text : \n ${recognizedText.text}");
