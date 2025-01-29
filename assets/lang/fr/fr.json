@@ -333,5 +333,6 @@
   "rasd_client": "Sahara Occidental 🇪🇭",
   "nationality_with_point": "Nationalité : ",
   "coming_soon": "Prochainement !!",
-  "select_sexe": "Veuillez sélectionner votre sexe pour continuer"
+  "select_sexe": "Veuillez sélectionner votre sexe pour continuer",
+  "rasd_minor_message": "Le client est mineur"
 }

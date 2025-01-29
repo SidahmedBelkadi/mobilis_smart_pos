@@ -333,5 +333,6 @@
   "rasd_client": "الصحراء الغربية 🇪🇭",
   "nationality_with_point": " الجنسية : ",
   "coming_soon": "قريبا !!",
-  "select_sexe": "يرجى تحديد الجنس للمتابعة."
+  "select_sexe": "يرجى تحديد الجنس للمتابعة.",
+  "rasd_minor_message": "الزبون قاصر"
 }

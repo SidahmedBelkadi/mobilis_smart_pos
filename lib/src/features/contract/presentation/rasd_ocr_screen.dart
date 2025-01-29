@@ -8,6 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image/image.dart' as img;
 import 'package:insta_image_viewer/insta_image_viewer.dart';
+import 'package:intl/intl.dart';
 import 'package:mobilis_smart_pos/src/config/routing/app_routes.dart';
 import 'package:mobilis_smart_pos/src/core/commom/widgets/app_text_form_field.dart';
 import 'package:mobilis_smart_pos/src/core/commom/widgets/commune_drop_down.dart';
@@ -18,6 +19,7 @@ import 'package:mobilis_smart_pos/src/core/utils/enums/documents_type.dart';
 import 'package:mobilis_smart_pos/src/core/utils/enums/input_type.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/civils_informations_converter_helper.dart';
+import 'package:mobilis_smart_pos/src/core/utils/helpers/dialog_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/json_loader_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/toast_helper.dart';
@@ -165,6 +167,28 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
                     context: context,
                   );
                   return;
+                }
+
+                if (dateOfBirthController.text.isNotEmpty) {
+                  try {
+                    DateTime birthDate = DateFormat("dd/MM/yyyy").parse(dateOfBirthController.text);
+                    DateTime now = DateTime.now();
+                    int age = now.year - birthDate.year;
+                    if (now.month < birthDate.month ||
+                        (now.month == birthDate.month && now.day < birthDate.day)) {
+                      age--;
+                    }
+
+                    if (age < 19) {
+                      AppToasts.showWarningToast(
+                        message: "rasd_minor_message".tr(context),
+                        context: context,
+                      );
+                      return;
+                    }
+                  } catch (e) {
+                    return;
+                  }
                 }
 
                 RasdEditRequestParamsEntity params = RasdEditRequestParamsEntity(
