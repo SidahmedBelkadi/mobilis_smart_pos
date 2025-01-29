@@ -81,24 +81,34 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
                 ),
                 SizedBox(width: 30.sp),
                 DropdownButton<String>(
-                  value: nationalitiesValues.contains(nationality)
-                      ? nationality
-                      : null, // Validate selected value
-                  items: nationalitiesValues.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value, // Assign unique value for each item
+                  value: nationalitiesValues.contains(nationality) ? nationality : null,
+                  items: [
+                    // Existing nationalities
+                    ...nationalitiesValues.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(
+                          value == 'DZ' ? 'dz_client'.tr(context) : 'rasd_client'.tr(context),
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      );
+                    }).toList(),
+                    // Add the "Coming Soon" option
+                    DropdownMenuItem<String>(
+                      value: null, // Set value to null to make it unselectable
+                      enabled: false, // Disable the option
                       child: Text(
-                        value == 'DZ'
-                            ? 'dz_client'.tr(context)
-                            : 'rasd_client'.tr(context), // Properly map value to display text
-                        style: Theme.of(context).textTheme.bodyLarge,
+                        'coming_soon'.tr(context),
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                              color: Colors.grey, // Grey out the text to indicate it's disabled
+                            ),
                       ),
-                    );
-                  }).toList(),
+                    ),
+                  ],
                   onChanged: (String? newValue) {
                     if (newValue != null) {
                       setState(() {
-                        nationality = newValue; // Update the selected value
+                        nationality = newValue;
                       });
                     }
                   },

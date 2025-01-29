@@ -79,6 +79,7 @@ dependencies:
   flutter_zxing: ^1.7.0
   dropdown_search: ^6.0.1
   json_pretty: ^1.0.4
+  image: ^4.3.0
 
 dev_dependencies:
   flutter_test:

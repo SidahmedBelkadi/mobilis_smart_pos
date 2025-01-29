@@ -106,12 +106,10 @@ class _MyHomePageState extends State<HomeScreen> {
                     child: HomeBanner(
                       banners: const [
                         AppImages.bannerBonus,
-
-                        // AppImages.ban1,
-                        // AppImages.ban2,
                         AppImages.ban3,
-                        // AppImages.ban4,
                         AppImages.bannerOmra,
+                        AppImages.bannerTestMail1,
+                        AppImages.bannerTestMail2,
                       ],
                       currentIndex: currentIndex,
                       onPageChanged: (index) {
@@ -197,7 +195,7 @@ class HomeBanner extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16.0.sp),
                   child: Image(
                     image: AssetImage(imageUrl),
-                    fit: BoxFit.cover,
+                    fit: BoxFit.fill,
                   ),
                 ),
               )

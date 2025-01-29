@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:image/image.dart' as img;
 import 'package:insta_image_viewer/insta_image_viewer.dart';
 import 'package:mobilis_smart_pos/src/config/routing/app_routes.dart';
 import 'package:mobilis_smart_pos/src/core/commom/widgets/app_text_form_field.dart';
@@ -146,6 +147,14 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
                 if (_selectedCommune == null) {
                   AppToasts.showWarningToast(
                     message: "required_commune".tr(context),
+                    context: context,
+                  );
+                  return;
+                }
+
+                if (selectedSexo == null) {
+                  AppToasts.showWarningToast(
+                    message: "select_sexe".tr(context),
                     context: context,
                   );
                   return;
@@ -423,6 +432,50 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
     );
   }
 
+  File convertToGrayscale(File imageFile) {
+    final image = img.decodeImage(imageFile.readAsBytesSync())!;
+    final grayscaleImage = img.grayscale(image);
+    final grayscaleFile = File('${imageFile.path}_grayscale.png');
+    grayscaleFile.writeAsBytesSync(img.encodePng(grayscaleImage));
+    return grayscaleFile;
+  }
+
+  File reduceNoise(File imageFile, {int radius = 1}) {
+    // Decode the image file
+    final image = img.decodeImage(imageFile.readAsBytesSync())!;
+
+    // Apply Gaussian blur to reduce noise
+    final noiseReducedImage = img.gaussianBlur(image, radius: radius);
+
+    // Save the noise-reduced image to a new file
+    final noiseReducedFile = File('${imageFile.path}_noise_reduced.png');
+    noiseReducedFile.writeAsBytesSync(img.encodePng(noiseReducedImage));
+
+    return noiseReducedFile;
+  }
+
+  File binarizeImage(File imageFile, {int threshold = 128}) {
+    final image = img.decodeImage(imageFile.readAsBytesSync())!;
+    final binaryImage = img.copyResize(image, width: image.width, height: image.height);
+
+    for (var y = 0; y < binaryImage.height; y++) {
+      for (var x = 0; x < binaryImage.width; x++) {
+        final pixel = binaryImage.getPixel(x, y);
+        final luminance = img.getLuminance(pixel);
+
+        // Set pixel to black or white based on the threshold
+        final newColor = luminance > threshold ? 255 : 0;
+
+        // Use setPixelRgba with 6 arguments (x, y, r, g, b, a)
+        binaryImage.setPixelRgba(x, y, newColor, newColor, newColor, 255); // 255 = fully opaque
+      }
+    }
+
+    final binaryFile = File('${imageFile.path}_binary.png');
+    binaryFile.writeAsBytesSync(img.encodePng(binaryImage));
+    return binaryFile;
+  }
+
   Future<void> _loadData() async {
     final wilayas = await JsonLoaderHelper.loadWilayas();
     final communes = await JsonLoaderHelper.loadCommunes();
@@ -451,6 +504,11 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
     if (imagesPath != null && imagesPath.isNotEmpty) {
       File file = File(imagesPath[0]);
 
+      // Preprocess the image (convert to grayscale)
+      file = convertToGrayscale(file);
+      file = reduceNoise(file);
+
+      // Use the preprocessed image for OCR
       final inputImage = InputImage.fromFile(file);
       final recognizedText = await recognizer.processImage(inputImage);
 
@@ -486,34 +544,91 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
     return null;
   }
 
+  // Helper function to check if extracted text is a common label
+  bool _isCommonLabel(String text) {
+    final labels = [
+      "FECHA",
+      "NACIMIENTO",
+      "LUGAR",
+      "DOCUMENTO",
+      "SEXO",
+      "PADRE",
+      "MADRE",
+      "DOMICILIO"
+    ];
+    return labels.any((label) => text.contains(label));
+  }
+
   void extractAndStoreData(String text, DocumentsType documentType) {
     if (documentType == DocumentsType.rasdFrontIdCard) {
-      final namePattern = RegExp(r'NOMBRE\s+(.+?)\n');
-      final birthDatePattern = RegExp(r'FECHA DE NACIMIENTO\s+(\d{2}/\d{2}/\d{4})');
+      final birthDatePattern = RegExp(r'\b(\d{2}/\d{2}/\d{4})\b');
+
       final placeOfBirthPattern = RegExp(r'\bW\.\s+([^\n]+)'); // Matches 'W.' followed by text
-      final lugarNacimientoPattern = RegExp(r'LUGAR DE NACIMIENTO\s+([^\n]+)');
+      final lugarNacimientoPattern =
+          RegExp(r'LUGAR DE NACIMIENTO\s+([^\n]+)', caseSensitive: false);
 
       final documentNumberPattern = RegExp(r'(\d{8,})'); // Look for 8+ digit numbers
+      final nombreVariations = ["NOMBRE", "NONMEE", "NONBRE", "NOME", "NOMEE", "NOBRE"];
+      final namePattern =
+          RegExp(r'\b([A-Z][a-z]+(?:-[A-Z][a-z]+)?(?:\s+[A-Z][a-z]+(?:-[A-Z][a-z]+)?)*)\b');
 
-      final nameMatch = namePattern.firstMatch(text);
-      if (nameMatch != null) {
-        final fullName = nameMatch.group(1)!.trim();
-        final nameParts = fullName.split(' ');
+      String? extractedName;
 
-        if (nameParts.isNotEmpty) {
-          if (nameParts[0].contains('-')) {
-            // If the first word is composed, treat it as the first name
-            firstNameController.text = nameParts[0];
-            lastNameController.text = nameParts.skip(1).join(' '); // Join the rest as last name
-          } else {
-            // Otherwise, take the first word as the first name
-            firstNameController.text = nameParts[0];
-            lastNameController.text = nameParts.skip(1).join(' '); // Join the rest as last name
+      debugPrint("=========  Starting name extraction process...");
+
+      // Step 1: Look for "NOMBRE" (or OCR variations) and extract name after it
+      for (final variation in nombreVariations) {
+        final index = text.indexOf(variation);
+        if (index != -1) {
+          debugPrint("=========  Found potential name label: $variation at index $index");
+          final afterNombre = text.substring(index + variation.length).trim();
+          final nameMatch = namePattern.firstMatch(afterNombre);
+          if (nameMatch != null) {
+            extractedName = nameMatch.group(1);
+            debugPrint("=========  Extracted name after 'NOMBRE': $extractedName");
+            break;
           }
-        } else {
-          firstNameController.text = '';
-          lastNameController.text = '';
         }
+      }
+
+      // Step 2: If no match, try finding the name before "FECHA DE NACIMIENTO"
+      if (extractedName == null) {
+        final birthDateIndex = text.indexOf("FECHA DE NACIMIENTO");
+        if (birthDateIndex != -1) {
+          debugPrint("=========  'FECHA DE NACIMIENTO' found at index $birthDateIndex");
+          final beforeBirthDate = text.substring(0, birthDateIndex);
+          final nameMatch = namePattern.firstMatch(beforeBirthDate);
+          if (nameMatch != null) {
+            extractedName = nameMatch.group(1);
+            debugPrint("=========  Extracted name before 'FECHA DE NACIMIENTO': $extractedName");
+          }
+        }
+      }
+
+      // Step 3: If still no match, take the first valid uppercase name
+      if (extractedName == null) {
+        debugPrint("========= Trying fallback method to find any valid name...");
+        final nameMatches = namePattern.allMatches(text);
+        for (final match in nameMatches) {
+          final candidate = match.group(1)!;
+          debugPrint("========= Found potential name: $candidate");
+          if (!_isCommonLabel(candidate)) {
+            extractedName = candidate;
+            debugPrint("=========  Selected valid name: $extractedName");
+            break;
+          }
+        }
+      }
+
+      // Store extracted name in text controllers
+      if (extractedName != null) {
+        final nameParts = extractedName.split(' ');
+        firstNameController.text = nameParts.first;
+        lastNameController.text = nameParts.skip(1).join(' ');
+        debugPrint("=========  Final extracted first name: ${firstNameController.text}");
+        debugPrint("=========  Final extracted last name: ${lastNameController.text}");
+      } else {
+        debugPrint("=========  No valid name extracted.");
       }
 
       final birthDateMatch = birthDatePattern.firstMatch(text);
