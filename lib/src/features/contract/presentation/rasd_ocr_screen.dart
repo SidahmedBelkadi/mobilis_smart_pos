@@ -21,12 +21,14 @@ import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper
 import 'package:mobilis_smart_pos/src/core/utils/helpers/civils_informations_converter_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/json_loader_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
+import 'package:mobilis_smart_pos/src/core/utils/helpers/session_timeout.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/toast_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/ressources/app_colors.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/commune_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/rasd_request_params_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/wilaya_entity.dart';
 import 'package:mobilis_smart_pos/src/features/profile/presentation/widget/upload_image_field.dart';
+import 'package:mobilis_smart_pos/src/services/screenshot_service.dart';
 
 class RasdOcrScreen extends StatefulWidget {
   const RasdOcrScreen({super.key});
@@ -72,6 +74,8 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
 
   @override
   void initState() {
+    ScreenshotService.preventScreenshotOn();
+
     _loadData();
     _textRecognizer = TextRecognizer();
     super.initState();
@@ -79,6 +83,7 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
 
   @override
   void dispose() {
+    ScreenshotService.preventScreenshotOff();
     _textRecognizer.close();
     firstNameController.dispose();
     lastNameController.dispose();
@@ -122,335 +127,338 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: isCaptureDone
-          ? CustomFAB(
-              label: "continuer".tr(context),
-              icon: CupertinoIcons.right_chevron,
-              onPressed: () {
-                final isValidated = _rasdFormKey.currentState!.validate();
-                if (!isValidated) {
-                  AppToasts.showWarningToast(
-                    message: "all_fields".tr(context),
-                    context: context,
-                  );
-                  return;
-                }
-
-                if (_selectedWilaya == null) {
-                  AppToasts.showWarningToast(
-                    message: "required_wilaya".tr(context),
-                    context: context,
-                  );
-                  return;
-                }
-
-                if (_selectedCommune == null) {
-                  AppToasts.showWarningToast(
-                    message: "required_commune".tr(context),
-                    context: context,
-                  );
-                  return;
-                }
-
-                if (selectedSexo == null) {
-                  AppToasts.showWarningToast(
-                    message: "select_sexe".tr(context),
-                    context: context,
-                  );
-                  return;
-                }
-                if (!isConfirmed) {
-                  AppToasts.showWarningToast(
-                    message: "rasd_checkbox_error".tr(context),
-                    context: context,
-                  );
-                  return;
-                }
-
-                if (dateOfBirthController.text.isNotEmpty) {
-                  try {
-                    DateTime birthDate = DateFormat("dd/MM/yyyy").parse(dateOfBirthController.text);
-                    DateTime now = DateTime.now();
-                    int age = now.year - birthDate.year;
-                    if (now.month < birthDate.month ||
-                        (now.month == birthDate.month && now.day < birthDate.day)) {
-                      age--;
-                    }
-
-                    if (age < 19) {
-                      AppToasts.showWarningToast(
-                        message: "rasd_minor_message".tr(context),
-                        context: context,
-                      );
-                      // return;
-                    }
-                  } catch (e) {
+    return SessionTimeout(
+      child: Scaffold(
+        floatingActionButton: isCaptureDone
+            ? CustomFAB(
+                label: "continuer".tr(context),
+                icon: CupertinoIcons.right_chevron,
+                onPressed: () {
+                  final isValidated = _rasdFormKey.currentState!.validate();
+                  if (!isValidated) {
+                    AppToasts.showWarningToast(
+                      message: "all_fields".tr(context),
+                      context: context,
+                    );
                     return;
                   }
-                }
 
-                RasdEditRequestParamsEntity params = RasdEditRequestParamsEntity(
-                  firstName: firstNameController.text,
-                  birthLastName: lastNameController.text,
-                  gender: CivilsInformationsConverterHelper.getToSubmitGenderRasdValue(
-                      gender: selectedSexo!),
-                  birthDate: CivilsInformationsConverterHelper.convertToIso8601Rasd(
-                      dateOfBirthController.text),
-                  birthPlace: placeOfBirthController.text,
-                  wilayaId: _selectedWilaya!,
-                  street: addressEditingController.text,
-                  commune: _selectedCommune!,
-                  email: emailEditingController.text,
-                  documentType: "ID Card",
-                  documentNumber: documentNumberController.text,
-                  issueDate: CivilsInformationsConverterHelper.convertToIso8601Rasd(
-                      fechaDeExpedicionController.text),
-                  address: addressEditingController.text,
-                );
+                  if (_selectedWilaya == null) {
+                    AppToasts.showWarningToast(
+                      message: "required_wilaya".tr(context),
+                      context: context,
+                    );
+                    return;
+                  }
 
-                // debugPrint(prettyPrintJson(jsonEncode(params.toJson())));
+                  if (_selectedCommune == null) {
+                    AppToasts.showWarningToast(
+                      message: "required_commune".tr(context),
+                      context: context,
+                    );
+                    return;
+                  }
 
-                Navigator.of(context).pushNamed(Routes.rasdBarCodeScanner, arguments: {
-                  'rasdParams': params,
-                  'recto': rectoImage,
-                  'verso': versoImage,
-                });
-                return;
-              },
-            )
-          : null,
-      appBar: CustomAppBar(title: "contractTitle".tr(context)),
-      body: Container(
-        padding: EdgeInsets.all(24.sp),
-        height: context.height,
-        width: context.width,
-        child: isCaptureDone
-            ? SingleChildScrollView(
-                child: Column(
-                  children: [
-                    OCRInstruction(
-                      child: Text(
-                        "rasd_ocr_instruction".tr(context),
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                              color: Colors.green,
-                              fontWeight: FontWeight.bold,
-                            ),
+                  if (selectedSexo == null) {
+                    AppToasts.showWarningToast(
+                      message: "select_sexe".tr(context),
+                      context: context,
+                    );
+                    return;
+                  }
+                  if (!isConfirmed) {
+                    AppToasts.showWarningToast(
+                      message: "rasd_checkbox_error".tr(context),
+                      context: context,
+                    );
+                    return;
+                  }
+
+                  if (dateOfBirthController.text.isNotEmpty) {
+                    try {
+                      DateTime birthDate =
+                          DateFormat("dd/MM/yyyy").parse(dateOfBirthController.text);
+                      DateTime now = DateTime.now();
+                      int age = now.year - birthDate.year;
+                      if (now.month < birthDate.month ||
+                          (now.month == birthDate.month && now.day < birthDate.day)) {
+                        age--;
+                      }
+
+                      if (age < 19) {
+                        AppToasts.showWarningToast(
+                          message: "rasd_minor_message".tr(context),
+                          context: context,
+                        );
+                        // return;
+                      }
+                    } catch (e) {
+                      return;
+                    }
+                  }
+
+                  RasdEditRequestParamsEntity params = RasdEditRequestParamsEntity(
+                    firstName: firstNameController.text,
+                    birthLastName: lastNameController.text,
+                    gender: CivilsInformationsConverterHelper.getToSubmitGenderRasdValue(
+                        gender: selectedSexo!),
+                    birthDate: CivilsInformationsConverterHelper.convertToIso8601Rasd(
+                        dateOfBirthController.text),
+                    birthPlace: placeOfBirthController.text,
+                    wilayaId: _selectedWilaya!,
+                    street: addressEditingController.text,
+                    commune: _selectedCommune!,
+                    email: emailEditingController.text,
+                    documentType: "ID Card",
+                    documentNumber: documentNumberController.text,
+                    issueDate: CivilsInformationsConverterHelper.convertToIso8601Rasd(
+                        fechaDeExpedicionController.text),
+                    address: addressEditingController.text,
+                  );
+
+                  // debugPrint(prettyPrintJson(jsonEncode(params.toJson())));
+
+                  Navigator.of(context).pushNamed(Routes.rasdBarCodeScanner, arguments: {
+                    'rasdParams': params,
+                    'recto': rectoImage,
+                    'verso': versoImage,
+                  });
+                  return;
+                },
+              )
+            : null,
+        appBar: CustomAppBar(title: "contractTitle".tr(context)),
+        body: Container(
+          padding: EdgeInsets.all(24.sp),
+          height: context.height,
+          width: context.width,
+          child: isCaptureDone
+              ? SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      OCRInstruction(
+                        child: Text(
+                          "rasd_ocr_instruction".tr(context),
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    Form(
-                      key: _rasdFormKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          AppTextFormField(
-                            enabled: true,
-                            label: 'firstNameLabel'.tr(context),
-                            textEditingController: firstNameController,
-                            validationType: InputType.FIRST_NAME,
-                          ),
-                          SizedBox(height: 16.sp),
-                          AppTextFormField(
-                            enabled: true,
-                            label: 'lastNameLabel'.tr(context),
-                            textEditingController: lastNameController,
-                            validationType: InputType.LAST_NAME,
-                          ),
-                          SizedBox(height: 16.sp),
-                          GestureDetector(
-                            onTap: () => _selectDate(context, dateOfBirthController),
-                            child: AbsorbPointer(
-                              child: AppTextFormField(
-                                enabled: true,
-                                label: "birthDateLabel".tr(context),
-                                textEditingController: dateOfBirthController,
+                      const SizedBox(height: 24),
+                      Form(
+                        key: _rasdFormKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AppTextFormField(
+                              enabled: true,
+                              label: 'firstNameLabel'.tr(context),
+                              textEditingController: firstNameController,
+                              validationType: InputType.FIRST_NAME,
+                            ),
+                            SizedBox(height: 16.sp),
+                            AppTextFormField(
+                              enabled: true,
+                              label: 'lastNameLabel'.tr(context),
+                              textEditingController: lastNameController,
+                              validationType: InputType.LAST_NAME,
+                            ),
+                            SizedBox(height: 16.sp),
+                            GestureDetector(
+                              onTap: () => _selectDate(context, dateOfBirthController),
+                              child: AbsorbPointer(
+                                child: AppTextFormField(
+                                  enabled: true,
+                                  label: "birthDateLabel".tr(context),
+                                  textEditingController: dateOfBirthController,
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(height: 16.sp),
-                          AppTextFormField(
-                            enabled: true,
-                            label: "birthPlaceLabel".tr(context),
-                            textEditingController: placeOfBirthController,
-                            validationType: InputType.ADDRESS,
-                          ),
-                          SizedBox(height: 16.sp),
-                          AppTextFormField(
-                            enabled: true,
-                            label: "documentNumberLabel".tr(context),
-                            textEditingController: documentNumberController,
-                            validationType: InputType.RASD_DOCUMENT_NUMBER,
-                          ),
-                          SizedBox(height: 16.sp),
-                          DropdownButtonFormField<String>(
-                            value: selectedSexo,
-                            items: ['M', 'F']
-                                .map(
-                                  (sexo) => DropdownMenuItem(
-                                    value: sexo,
-                                    child: Text(sexo.tr(context)),
-                                  ),
-                                )
-                                .toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                selectedSexo = value;
-                              });
-                            },
-                            decoration: InputDecoration(
-                              labelText: "genderLabel".tr(context),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.0.r),
-                                borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                              ),
+                            SizedBox(height: 16.sp),
+                            AppTextFormField(
+                              enabled: true,
+                              label: "birthPlaceLabel".tr(context),
+                              textEditingController: placeOfBirthController,
+                              validationType: InputType.ADDRESS,
                             ),
-                          ),
-                          SizedBox(height: 16.sp),
-                          AppTextFormField(
-                            enabled: true,
-                            label: 'domicilio'.tr(context),
-                            textEditingController: domicilioController,
-                            validationType: InputType.ADDRESS,
-                          ),
-                          SizedBox(height: 16.sp),
-                          GestureDetector(
-                            onTap: () => _selectDate(context, fechaDeExpedicionController),
-                            child: AbsorbPointer(
-                              child: AppTextFormField(
-                                enabled: true,
-                                label: 'expirationDateLabel'.tr(context),
-                                textEditingController: fechaDeExpedicionController,
-                              ),
+                            SizedBox(height: 16.sp),
+                            AppTextFormField(
+                              enabled: true,
+                              label: "documentNumberLabel".tr(context),
+                              textEditingController: documentNumberController,
+                              validationType: InputType.RASD_DOCUMENT_NUMBER,
                             ),
-                          ),
-                          SizedBox(height: 16.sp),
-                          AppTextFormField(
-                            isRequired: false,
-                            label: "email".tr(context),
-                            validationType: InputType.EMAIL,
-                            textEditingController: emailEditingController,
-                          ),
-                          SizedBox(height: 16.sp),
-                          // === Wilaya & daira & commune drop downs
-                          WilayaDropDown(
-                            items: _wilayas,
-                            onChanged: (value) {
-                              _filterCommunes(value);
-                            },
-                          ),
-                          SizedBox(height: 16.sp),
-                          CommuneDropDown(
-                            items: _filteredCommunes,
-                            selectedValue: _selectedCommune,
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedCommune = value;
-                              });
-                            },
-                          ),
-                          SizedBox(height: 16.sp),
-                          AppTextFormField(
-                            isLatinOnly: true,
-                            label: "streetLabel".tr(context),
-                            validationType: InputType.ADDRESS,
-                            textEditingController: addressEditingController,
-                          ),
-                          SizedBox(height: 32.sp),
-
-                          SizedBox(height: 16.sp),
-                          rectoImage != null
-                              ? InstaImageViewer(
-                                  child: Image.file(
-                                    rectoImage!,
-                                    height: 200,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                  ),
-                                )
-                              : const SizedBox(),
-                          SizedBox(height: 16.sp),
-                          versoImage != null
-                              ? InstaImageViewer(
-                                  child: Image.file(
-                                    versoImage!,
-                                    height: 200,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                  ),
-                                )
-                              : const SizedBox(),
-                          SizedBox(height: 32.sp),
-                          OCRInstruction(
-                            child: CheckboxListTile(
-                              title: Text("rasd_checkbox".tr(context),
-                                  style: Theme.of(context).textTheme.bodySmall),
-                              value: isConfirmed,
+                            SizedBox(height: 16.sp),
+                            DropdownButtonFormField<String>(
+                              value: selectedSexo,
+                              items: ['M', 'F']
+                                  .map(
+                                    (sexo) => DropdownMenuItem(
+                                      value: sexo,
+                                      child: Text(sexo.tr(context)),
+                                    ),
+                                  )
+                                  .toList(),
                               onChanged: (value) {
                                 setState(() {
-                                  isConfirmed = value ?? false;
+                                  selectedSexo = value;
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText: "genderLabel".tr(context),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12.0.r),
+                                  borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 16.sp),
+                            AppTextFormField(
+                              enabled: true,
+                              label: 'domicilio'.tr(context),
+                              textEditingController: domicilioController,
+                              validationType: InputType.ADDRESS,
+                            ),
+                            SizedBox(height: 16.sp),
+                            GestureDetector(
+                              onTap: () => _selectDate(context, fechaDeExpedicionController),
+                              child: AbsorbPointer(
+                                child: AppTextFormField(
+                                  enabled: true,
+                                  label: 'expirationDateLabel'.tr(context),
+                                  textEditingController: fechaDeExpedicionController,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 16.sp),
+                            AppTextFormField(
+                              isRequired: false,
+                              label: "email".tr(context),
+                              validationType: InputType.EMAIL,
+                              textEditingController: emailEditingController,
+                            ),
+                            SizedBox(height: 16.sp),
+                            // === Wilaya & daira & commune drop downs
+                            WilayaDropDown(
+                              items: _wilayas,
+                              onChanged: (value) {
+                                _filterCommunes(value);
+                              },
+                            ),
+                            SizedBox(height: 16.sp),
+                            CommuneDropDown(
+                              items: _filteredCommunes,
+                              selectedValue: _selectedCommune,
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedCommune = value;
                                 });
                               },
                             ),
-                          ),
-                          SizedBox(height: 64.sp),
-                        ],
+                            SizedBox(height: 16.sp),
+                            AppTextFormField(
+                              isLatinOnly: true,
+                              label: "streetLabel".tr(context),
+                              validationType: InputType.ADDRESS,
+                              textEditingController: addressEditingController,
+                            ),
+                            SizedBox(height: 32.sp),
+
+                            SizedBox(height: 16.sp),
+                            rectoImage != null
+                                ? InstaImageViewer(
+                                    child: Image.file(
+                                      rectoImage!,
+                                      height: 200,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : const SizedBox(),
+                            SizedBox(height: 16.sp),
+                            versoImage != null
+                                ? InstaImageViewer(
+                                    child: Image.file(
+                                      versoImage!,
+                                      height: 200,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : const SizedBox(),
+                            SizedBox(height: 32.sp),
+                            OCRInstruction(
+                              child: CheckboxListTile(
+                                title: Text("rasd_checkbox".tr(context),
+                                    style: Theme.of(context).textTheme.bodySmall),
+                                value: isConfirmed,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isConfirmed = value ?? false;
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(height: 64.sp),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                )
+              : Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      rectoImage != null
+                          ? InstaImageViewer(child: Image.file(rectoImage!))
+                          : UploadImageField(
+                              icon: FontAwesomeIcons.camera,
+                              label: "recto".tr(context),
+                              onTap: () async {
+                                final result = await captureDocument(
+                                  recognizer: _textRecognizer,
+                                  docType: DocumentsType.rasdFrontIdCard,
+                                  context: context,
+                                );
+                                if (result != null) {
+                                  setState(() {
+                                    rectoImage = result;
+                                    if (rectoImage != null && versoImage != null) {
+                                      isCaptureDone = true;
+                                    }
+                                  });
+                                }
+                              },
+                            ),
+                      SizedBox(height: 36.sp),
+                      versoImage != null
+                          ? InstaImageViewer(child: Image.file(versoImage!))
+                          : UploadImageField(
+                              icon: FontAwesomeIcons.camera,
+                              label: "verso".tr(context),
+                              onTap: () async {
+                                final result = await captureDocument(
+                                  recognizer: _textRecognizer,
+                                  docType: DocumentsType.rasdBackIdCard,
+                                  context: context,
+                                );
+                                if (result != null) {
+                                  setState(() {
+                                    versoImage = result;
+                                    if (rectoImage != null && versoImage != null) {
+                                      isCaptureDone = true;
+                                    }
+                                  });
+                                }
+                              },
+                            )
+                    ],
+                  ),
                 ),
-              )
-            : Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    rectoImage != null
-                        ? InstaImageViewer(child: Image.file(rectoImage!))
-                        : UploadImageField(
-                            icon: FontAwesomeIcons.camera,
-                            label: "recto".tr(context),
-                            onTap: () async {
-                              final result = await captureDocument(
-                                recognizer: _textRecognizer,
-                                docType: DocumentsType.rasdFrontIdCard,
-                                context: context,
-                              );
-                              if (result != null) {
-                                setState(() {
-                                  rectoImage = result;
-                                  if (rectoImage != null && versoImage != null) {
-                                    isCaptureDone = true;
-                                  }
-                                });
-                              }
-                            },
-                          ),
-                    SizedBox(height: 36.sp),
-                    versoImage != null
-                        ? InstaImageViewer(child: Image.file(versoImage!))
-                        : UploadImageField(
-                            icon: FontAwesomeIcons.camera,
-                            label: "verso".tr(context),
-                            onTap: () async {
-                              final result = await captureDocument(
-                                recognizer: _textRecognizer,
-                                docType: DocumentsType.rasdBackIdCard,
-                                context: context,
-                              );
-                              if (result != null) {
-                                setState(() {
-                                  versoImage = result;
-                                  if (rectoImage != null && versoImage != null) {
-                                    isCaptureDone = true;
-                                  }
-                                });
-                              }
-                            },
-                          )
-                  ],
-                ),
-              ),
+        ),
       ),
     );
   }

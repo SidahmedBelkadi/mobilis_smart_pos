@@ -15,6 +15,7 @@ import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_app_bar.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/permissions_helper.dart';
+import 'package:mobilis_smart_pos/src/core/utils/helpers/session_timeout.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/toast_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/ressources/app_colors.dart';
 import 'package:mobilis_smart_pos/src/core/utils/ressources/app_images.dart';
@@ -26,6 +27,7 @@ import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/rasd/
 import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/rasd/rasd_sms_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/contract/presentation/signature_screen.dart';
 import 'package:mobilis_smart_pos/src/features/sign_in/data/data_sources/smart_pos_local_storage.dart';
+import 'package:mobilis_smart_pos/src/services/screenshot_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
@@ -73,6 +75,7 @@ class _RasdSignatureScreenState extends State<RasdSignatureScreen> {
 
   @override
   void initState() {
+    ScreenshotService.preventScreenshotOn();
     smsLoading = false;
     platform.setMethodCallHandler((call) async {
       if (call.method == "receivedSms") {
@@ -96,233 +99,242 @@ class _RasdSignatureScreenState extends State<RasdSignatureScreen> {
   }
 
   @override
+  void dispose() {
+    ScreenshotService.preventScreenshotOff();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final cubit = context.read<RasdContractCubit>();
 
-    return Scaffold(
-      appBar: CustomAppBar(title: "signature".tr(context)),
-      body: SingleChildScrollView(
-        child: BlocConsumer<RasdSmsCubit, RasdSmsState>(
-          listener: (context, state) {
-            if (state is RasdTriggerSmsFailed) {
-              setState(() {
-                smsLoading = false;
-              });
-              AppToasts.showWarningToast(
-                  message: "activation_failed".tr(context), context: context);
-              Navigator.of(context)
-                  .pushNamedAndRemoveUntil(Routes.main, (route) => false, arguments: {
-                "index": 1,
-              });
-            }
-          },
-          builder: (context, state) {
-            return BlocConsumer<RasdContractCubit, RasdContractState>(
-              listener: (context, state) {
-                if (state is RasdEditContractFailed) {
-                  AppToasts.showErrorToast(message: state.message.tr(context), context: context);
-                  Navigator.of(context).pop();
-                }
-                if (state is RasdGenerateContractFailed) {
-                  AppToasts.showErrorToast(message: state.message.tr(context), context: context);
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                      Routes.main, arguments: {'index': 1}, (route) => false);
-                }
-                if (state is RasdGenerateContractSuccess) {
-                  Navigator.of(context)
-                      .pushNamedAndRemoveUntil(Routes.contractGenerated, (route) => false);
-                }
+    return SessionTimeout(
+      child: Scaffold(
+        appBar: CustomAppBar(title: "signature".tr(context)),
+        body: SingleChildScrollView(
+          child: BlocConsumer<RasdSmsCubit, RasdSmsState>(
+            listener: (context, state) {
+              if (state is RasdTriggerSmsFailed) {
+                setState(() {
+                  smsLoading = false;
+                });
+                AppToasts.showWarningToast(
+                    message: "activation_failed".tr(context), context: context);
+                Navigator.of(context)
+                    .pushNamedAndRemoveUntil(Routes.main, (route) => false, arguments: {
+                  "index": 1,
+                });
+              }
+            },
+            builder: (context, state) {
+              return BlocConsumer<RasdContractCubit, RasdContractState>(
+                listener: (context, state) {
+                  if (state is RasdEditContractFailed) {
+                    AppToasts.showErrorToast(message: state.message.tr(context), context: context);
+                    Navigator.of(context).pop();
+                  }
+                  if (state is RasdGenerateContractFailed) {
+                    AppToasts.showErrorToast(message: state.message.tr(context), context: context);
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                        Routes.main, arguments: {'index': 1}, (route) => false);
+                  }
+                  if (state is RasdGenerateContractSuccess) {
+                    Navigator.of(context)
+                        .pushNamedAndRemoveUntil(Routes.contractGenerated, (route) => false);
+                  }
 
-                if (state is RasdGenerateContractSuccess) {
-                  Navigator.of(context)
-                      .pushNamedAndRemoveUntil(Routes.contractGenerated, (route) => false);
-                }
+                  if (state is RasdGenerateContractSuccess) {
+                    Navigator.of(context)
+                        .pushNamedAndRemoveUntil(Routes.contractGenerated, (route) => false);
+                  }
 
-                if (state is RasdEditContractSuccess) {
-                  final response = state.rasdEditContractResponseEntity;
-                  setState(() {
-                    subscriptiondId = response.subscriptionID;
-                    generateContractParamsEntity = RasdGenerateContractParamsEntity(
-                      contractCode: response.contractCode,
-                      dsaMessage: dsaMessage,
+                  if (state is RasdEditContractSuccess) {
+                    final response = state.rasdEditContractResponseEntity;
+                    setState(() {
+                      subscriptiondId = response.subscriptionID;
+                      generateContractParamsEntity = RasdGenerateContractParamsEntity(
+                        contractCode: response.contractCode,
+                        dsaMessage: dsaMessage,
+                      );
+                    });
+                    debugPrint(
+                        "================ STATE IS SUCCESS ==============================  ");
+                    final rasdTriggerSmsParamsEntity = RasdTriggerSmsParamsEntity(
+                      subscritpionId: response.subscriptionID,
+                      msisdnAPN: msisdnApn,
                     );
-                  });
-                  debugPrint("================ STATE IS SUCCESS ==============================  ");
-                  final rasdTriggerSmsParamsEntity = RasdTriggerSmsParamsEntity(
-                    subscritpionId: response.subscriptionID,
-                    msisdnAPN: msisdnApn,
-                  );
-                  context
-                      .read<RasdSmsCubit>()
-                      .rasdTriggerSms(rasdTriggerSmsParamsEntity: rasdTriggerSmsParamsEntity);
-                  setState(() {
-                    smsLoading = true;
-                  });
-                  _startSmsTimer();
-                }
-              },
-              builder: (context, state) {
-                if (state is RasdEditContractLoading) {
-                  return SizedBox(
-                    height: context.height - 100.h,
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(
-                            height: 32.sp,
-                            width: 32.sp,
-                            child: const CircularProgressIndicator(),
-                          ),
-                          SizedBox(height: 16.sp),
-                          Text(
-                            "generating".tr(context),
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
-
-                if (state is RasdGenerateContractLoading) {
-                  return SizedBox(
-                    height: context.height,
-                    child: Center(
-                      child: SizedBox(
-                        height: 32.sp,
-                        width: 32.sp,
-                        child: const CircularProgressIndicator(),
-                      ),
-                    ),
-                  );
-                }
-                return smsLoading
-                    ? SizedBox(
-                        height: context.height - 200.h,
-                        width: context.width,
-                        child: Center(
-                          child: Column(
-                            children: [
-                              Text(
-                                "please_wait".tr(context),
-                                style: Theme.of(context).textTheme.bodyLarge,
-                              ),
-                              SizedBox(height: 12.sp),
-                              LottieBuilder.asset(
-                                AppImages.smsAnim1,
-                                height: 350.sp,
-                                width: 350.sp,
-                              )
-                            ],
-                          ),
-                        ),
-                      )
-                    : Container(
-                        width: context.width,
-                        padding: EdgeInsets.all(32.sp),
+                    context
+                        .read<RasdSmsCubit>()
+                        .rasdTriggerSms(rasdTriggerSmsParamsEntity: rasdTriggerSmsParamsEntity);
+                    setState(() {
+                      smsLoading = true;
+                    });
+                    _startSmsTimer();
+                  }
+                },
+                builder: (context, state) {
+                  if (state is RasdEditContractLoading) {
+                    return SizedBox(
+                      height: context.height - 100.h,
+                      child: Center(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Column(
-                              children: [
-                                const ConditionsOfUse(
-                                  desc: AppStrings.arabicAgrement,
-                                ),
-                                SizedBox(height: 12.sp),
-                                Text(
-                                  "الجزائر، في $currentDateAr\nأنا، الممضي أسفله، أؤكد أنني قرأت و وافقت على كامل شروط البيع العامة",
-                                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                      color: AppColors.primary, fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(height: 32.h),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(width: 1, color: AppColors.secondary),
-                                  ),
-                                  height: 200.h,
-                                  width: 300.w,
-                                  child: SfSignaturePad(
-                                    key: _signaturePadKey,
-                                    minimumStrokeWidth: 5,
-                                    maximumStrokeWidth: 6,
-                                    strokeColor: Colors.black,
-                                    backgroundColor: Colors.white,
-                                    onDrawStart: () {
-                                      setState(() {
-                                        isSignatureValidated = true;
-                                      });
-                                      return false;
-                                    },
-                                  ),
-                                ),
-                                EraseSignatureButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      isSignatureValidated = false;
-                                    });
-                                    _signaturePadKey.currentState!.clear();
-                                  },
-                                ),
-                                SizedBox(height: 24.sp),
-                                CheckboxListTile(
-                                  title: Text(
-                                    "أوافق على إدراج توقيعي في العقد الخاص بي و كذلك في وثيقة الشروط العامة للبيع",
-                                    style: Theme.of(context).textTheme.bodySmall,
-                                  ),
-                                  value: _isConditionOfSignatureChecked,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _isConditionOfSignatureChecked = true;
-                                    });
-                                  },
-                                ),
-                                // SizedBox(height: 24.sp),
-                              ],
+                            SizedBox(
+                              height: 32.sp,
+                              width: 32.sp,
+                              child: const CircularProgressIndicator(),
                             ),
-                            SizedBox(height: 64.h),
-                            ElevatedButton(
-                              child: Text("confrim_sell".tr(context)),
-                              onPressed: () async {
-                                bool hasPermission = await _requestSmsPermission();
-                                if (!hasPermission) {
-                                  // ignore: use_build_context_synchronously
-                                  _showPermissionDeniedDialog(context);
-                                  return;
-                                }
-
-                                if (!isSignatureValidated) {
-                                  AppToasts.showErrorToast(
-                                    // ignore: use_build_context_synchronously
-                                    message: "required_signature".tr(context),
-                                    // ignore: use_build_context_synchronously
-                                    context: context,
-                                  );
-                                  return;
-                                }
-
-                                if (!_isConditionOfSignatureChecked) {
-                                  AppToasts.showErrorToast(
-                                    // ignore: use_build_context_synchronously
-                                    message: "signature_approve".tr(context),
-                                    // ignore: use_build_context_synchronously
-                                    context: context,
-                                  );
-                                  return;
-                                }
-                                _checkPermissionsAndShowDialog(context, cubit);
-                              },
+                            SizedBox(height: 16.sp),
+                            Text(
+                              "generating".tr(context),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
-                      );
-              },
-            );
-          },
+                      ),
+                    );
+                  }
+
+                  if (state is RasdGenerateContractLoading) {
+                    return SizedBox(
+                      height: context.height,
+                      child: Center(
+                        child: SizedBox(
+                          height: 32.sp,
+                          width: 32.sp,
+                          child: const CircularProgressIndicator(),
+                        ),
+                      ),
+                    );
+                  }
+                  return smsLoading
+                      ? SizedBox(
+                          height: context.height - 200.h,
+                          width: context.width,
+                          child: Center(
+                            child: Column(
+                              children: [
+                                Text(
+                                  "please_wait".tr(context),
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                                SizedBox(height: 12.sp),
+                                LottieBuilder.asset(
+                                  AppImages.smsAnim1,
+                                  height: 350.sp,
+                                  width: 350.sp,
+                                )
+                              ],
+                            ),
+                          ),
+                        )
+                      : Container(
+                          width: context.width,
+                          padding: EdgeInsets.all(32.sp),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Column(
+                                children: [
+                                  const ConditionsOfUse(
+                                    desc: AppStrings.arabicAgrement,
+                                  ),
+                                  SizedBox(height: 12.sp),
+                                  Text(
+                                    "الجزائر، في $currentDateAr\nأنا، الممضي أسفله، أؤكد أنني قرأت و وافقت على كامل شروط البيع العامة",
+                                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                        color: AppColors.primary, fontWeight: FontWeight.bold),
+                                  ),
+                                  SizedBox(height: 32.h),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(width: 1, color: AppColors.secondary),
+                                    ),
+                                    height: 200.h,
+                                    width: 300.w,
+                                    child: SfSignaturePad(
+                                      key: _signaturePadKey,
+                                      minimumStrokeWidth: 5,
+                                      maximumStrokeWidth: 6,
+                                      strokeColor: Colors.black,
+                                      backgroundColor: Colors.white,
+                                      onDrawStart: () {
+                                        setState(() {
+                                          isSignatureValidated = true;
+                                        });
+                                        return false;
+                                      },
+                                    ),
+                                  ),
+                                  EraseSignatureButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        isSignatureValidated = false;
+                                      });
+                                      _signaturePadKey.currentState!.clear();
+                                    },
+                                  ),
+                                  SizedBox(height: 24.sp),
+                                  CheckboxListTile(
+                                    title: Text(
+                                      "أوافق على إدراج توقيعي في العقد الخاص بي و كذلك في وثيقة الشروط العامة للبيع",
+                                      style: Theme.of(context).textTheme.bodySmall,
+                                    ),
+                                    value: _isConditionOfSignatureChecked,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _isConditionOfSignatureChecked = true;
+                                      });
+                                    },
+                                  ),
+                                  // SizedBox(height: 24.sp),
+                                ],
+                              ),
+                              SizedBox(height: 64.h),
+                              ElevatedButton(
+                                child: Text("confrim_sell".tr(context)),
+                                onPressed: () async {
+                                  bool hasPermission = await _requestSmsPermission();
+                                  if (!hasPermission) {
+                                    // ignore: use_build_context_synchronously
+                                    _showPermissionDeniedDialog(context);
+                                    return;
+                                  }
+
+                                  if (!isSignatureValidated) {
+                                    AppToasts.showErrorToast(
+                                      // ignore: use_build_context_synchronously
+                                      message: "required_signature".tr(context),
+                                      // ignore: use_build_context_synchronously
+                                      context: context,
+                                    );
+                                    return;
+                                  }
+
+                                  if (!_isConditionOfSignatureChecked) {
+                                    AppToasts.showErrorToast(
+                                      // ignore: use_build_context_synchronously
+                                      message: "signature_approve".tr(context),
+                                      // ignore: use_build_context_synchronously
+                                      context: context,
+                                    );
+                                    return;
+                                  }
+                                  _checkPermissionsAndShowDialog(context, cubit);
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                },
+              );
+            },
+          ),
         ),
       ),
     );
