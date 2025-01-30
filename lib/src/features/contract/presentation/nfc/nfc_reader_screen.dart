@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:mobilis_smart_pos/src/core/utils/helpers/session_timeout.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/toast_helper.dart';
 import '../../../../core/commom/widgets/custom_app_bar.dart';
 import '../../../../core/utils/helpers/app_localization_helper.dart';
@@ -101,7 +102,7 @@ class _NfcReaderScreenState extends State<NfcReaderScreen> {
         debugPrint("NFC DATA : $_nfcData");
         widget.minorContract != null
             ? _navigateToParentContract()
-            : Navigator.of(context).pushNamed(Routes.contract, arguments: {
+            : Navigator.of(context).pushReplacementNamed(Routes.contract, arguments: {
                 'data': _nfcData,
                 'isMinor': widget.isMinor,
                 'isPresumed': !RegExp(r'^\d{6}$').hasMatch(widget.dateOfBirth)
@@ -123,42 +124,44 @@ class _NfcReaderScreenState extends State<NfcReaderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: CustomAppBar(
-          title: "scan_nfc".tr(context),
-          showProgressIndicator: true,
-          currentStep: widget.minorRecto != null ? 5 : 2,
-          allSteps: widget.minorRecto != null ? 8 : 5,
-        ),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.all(24.sp),
-          child: _isLoading
-              ? Container(
-                  height: context.height - 200.sp,
-                  alignment: Alignment.center,
-                  child: Column(
+    return SessionTimeout(
+      child: SafeArea(
+        child: Scaffold(
+          appBar: CustomAppBar(
+            title: "scan_nfc".tr(context),
+            showProgressIndicator: true,
+            currentStep: widget.minorRecto != null ? 5 : 2,
+            allSteps: widget.minorRecto != null ? 8 : 5,
+          ),
+          body: SingleChildScrollView(
+            padding: EdgeInsets.all(24.sp),
+            child: _isLoading
+                ? Container(
+                    height: context.height - 200.sp,
+                    alignment: Alignment.center,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const LinearProgressIndicator(),
+                        SizedBox(height: 12.sp),
+                        Text(
+                          'reading'.tr(context),
+                          style: Theme.of(context).textTheme.bodyMedium,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  )
+                : Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const LinearProgressIndicator(),
-                      SizedBox(height: 12.sp),
-                      Text(
-                        'reading'.tr(context),
-                        style: Theme.of(context).textTheme.bodyMedium,
-                        textAlign: TextAlign.center,
-                      ),
+                      SizedBox(height: 16.sp),
+                      const ScanInstruction(),
+                      SizedBox(height: 16.sp),
+                      LottieBuilder.asset(AppImages.nfc),
                     ],
                   ),
-                )
-              : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(height: 16.sp),
-                    const ScanInstruction(),
-                    SizedBox(height: 16.sp),
-                    LottieBuilder.asset(AppImages.nfc),
-                  ],
-                ),
+          ),
         ),
       ),
     );

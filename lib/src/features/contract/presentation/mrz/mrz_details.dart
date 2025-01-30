@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mobilis_smart_pos/src/core/utils/helpers/session_timeout.dart';
 import 'package:mobilis_smart_pos/src/services/nfc_service.dart';
 import '../../../../core/commom/widgets/custom_floating_action_button.dart';
 import '../../../../core/utils/helpers/dialog_helper.dart';
@@ -143,102 +144,104 @@ class MrzDetailsScreenState extends State<MrzDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: CustomAppBar(
-          title: "mrzScanResultTitle".tr(context),
-          showProgressIndicator: true,
-          currentStep: 1,
-          allSteps: isMinor ? 8 : 5,
-        ),
-        floatingActionButton: isExpired || isMinor
-            ? null
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: context.isArabicLocale
-                        ? EdgeInsets.only(right: 32.sp)
-                        : EdgeInsets.only(left: 32.sp),
-                    child: CustomFAB(
-                      label: '',
-                      icon: Icons.repeat,
-                      heroTag: 're-scan',
-                      onPressed: () {
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                          Routes.main,
-                          arguments: {'index': 1},
-                          (route) => false,
-                        );
-                      },
-                    ),
-                  ),
-                  CustomFAB(
-                    label: "continuer".tr(context),
-                    icon: context.isArabicLocale
-                        ? CupertinoIcons.chevron_left
-                        : CupertinoIcons.chevron_right,
-                    heroTag: 'continue-to-nfc',
-                    onPressed: () async {
-                      final isNFcEnabled = await NFCService.isNfcEnabled();
-                      if (!isNFcEnabled) {
-                        AppToasts.showWarningToast(
-                          message: "enable_nfc".tr(context),
-                          context: context,
-                        );
-                        return;
-                      }
-                      Navigator.of(context).pushReplacementNamed(Routes.nfcReader, arguments: {
-                        'documentNumber': widget.documentNumber,
-                        'dateOfBirth': widget.dateOfBirth,
-                        'dateOfExpiry': widget.dateOfExpiry,
-                        'docType': widget.docType,
-                        'isMinor': false
-                      });
-                    },
-                  ),
-                ],
-              ),
-        body: SingleChildScrollView(
-          child: Container(
-            width: context.width,
-            height: context.height - 200.h,
-            padding: EdgeInsets.all(32.sp),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                const ScanInstruction(),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
+    return SessionTimeout(
+      child: SafeArea(
+        child: Scaffold(
+          appBar: CustomAppBar(
+            title: "mrzScanResultTitle".tr(context),
+            showProgressIndicator: true,
+            currentStep: 1,
+            allSteps: isMinor ? 8 : 5,
+          ),
+          floatingActionButton: isExpired || isMinor
+              ? null
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      children: [
-                        AppTextFormField(
-                          label: "documentNumberLabel".tr(context),
-                          textEditingController: documentNumberController,
-                          enabled: false,
-                          disabledValue: widget.documentNumber,
-                        ),
-                        SizedBox(height: 16.h),
-                        AppTextFormField(
-                          label: "birthDateLabel".tr(context),
-                          textEditingController: birthDateController,
-                          enabled: false,
-                          disabledValue: widget.dateOfBirth,
-                        ),
-                        SizedBox(height: 16.h),
-                        AppTextFormField(
-                          label: "expirationDateLabel".tr(context),
-                          textEditingController: expirationDateController,
-                          enabled: false,
-                          disabledValue: widget.dateOfExpiry,
-                        ),
-                      ],
+                    Padding(
+                      padding: context.isArabicLocale
+                          ? EdgeInsets.only(right: 32.sp)
+                          : EdgeInsets.only(left: 32.sp),
+                      child: CustomFAB(
+                        label: '',
+                        icon: Icons.repeat,
+                        heroTag: 're-scan',
+                        onPressed: () {
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                            Routes.main,
+                            arguments: {'index': 1},
+                            (route) => false,
+                          );
+                        },
+                      ),
+                    ),
+                    CustomFAB(
+                      label: "continuer".tr(context),
+                      icon: context.isArabicLocale
+                          ? CupertinoIcons.chevron_left
+                          : CupertinoIcons.chevron_right,
+                      heroTag: 'continue-to-nfc',
+                      onPressed: () async {
+                        final isNFcEnabled = await NFCService.isNfcEnabled();
+                        if (!isNFcEnabled) {
+                          AppToasts.showWarningToast(
+                            message: "enable_nfc".tr(context),
+                            context: context,
+                          );
+                          return;
+                        }
+                        Navigator.of(context).pushReplacementNamed(Routes.nfcReader, arguments: {
+                          'documentNumber': widget.documentNumber,
+                          'dateOfBirth': widget.dateOfBirth,
+                          'dateOfExpiry': widget.dateOfExpiry,
+                          'docType': widget.docType,
+                          'isMinor': false
+                        });
+                      },
                     ),
                   ],
                 ),
-              ],
+          body: SingleChildScrollView(
+            child: Container(
+              width: context.width,
+              height: context.height - 200.h,
+              padding: EdgeInsets.all(32.sp),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  const ScanInstruction(),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Column(
+                        children: [
+                          AppTextFormField(
+                            label: "documentNumberLabel".tr(context),
+                            textEditingController: documentNumberController,
+                            enabled: false,
+                            disabledValue: widget.documentNumber,
+                          ),
+                          SizedBox(height: 16.h),
+                          AppTextFormField(
+                            label: "birthDateLabel".tr(context),
+                            textEditingController: birthDateController,
+                            enabled: false,
+                            disabledValue: widget.dateOfBirth,
+                          ),
+                          SizedBox(height: 16.h),
+                          AppTextFormField(
+                            label: "expirationDateLabel".tr(context),
+                            textEditingController: expirationDateController,
+                            enabled: false,
+                            disabledValue: widget.dateOfExpiry,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

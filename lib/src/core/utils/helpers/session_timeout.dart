@@ -21,7 +21,7 @@ class SessionTimeout extends StatefulWidget {
 class _SessionTimeoutState extends State<SessionTimeout> {
   Timer? _timer;
   Timer? _countdownTimer;
-  int _remainingTime = 1600; // 10 minutes
+  int _remainingTime = 720; // 12 minutes
 
   void _startTimer() {
     // Cancel any existing timers
@@ -29,7 +29,7 @@ class _SessionTimeoutState extends State<SessionTimeout> {
     _countdownTimer?.cancel();
 
     // Reset remaining time to 10 minutes
-    _remainingTime = 800;
+    _remainingTime = 720;
 
     // Start the periodic countdown timer to print remaining time every second
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -42,7 +42,7 @@ class _SessionTimeoutState extends State<SessionTimeout> {
 
     // Start the main timer to sign out after 10 minutes
     _timer = Timer(
-      const Duration(seconds: 800),
+      const Duration(seconds: 720),
       () {
         context.read<SignOutCubit>().signOut(context);
       },
@@ -67,6 +67,7 @@ class _SessionTimeoutState extends State<SessionTimeout> {
     return Listener(
       behavior: HitTestBehavior.translucent,
       onPointerDown: (event) {
+        debugPrint("***************** ======= | TIMER RESTRATED ======= | *********************");
         _startTimer();
       },
       child: BlocConsumer<SignOutCubit, SignOutState>(

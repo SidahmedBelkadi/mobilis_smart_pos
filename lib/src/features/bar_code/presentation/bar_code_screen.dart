@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mobilis_smart_pos/src/core/utils/helpers/session_timeout.dart';
 import 'package:mobilis_smart_pos/src/features/bar_code/presentation/loading_barier.dart';
 import 'package:mobilis_smart_pos/src/features/bar_code/presentation/ui.dart';
 import '../../../config/routing/app_routes.dart';
@@ -54,47 +55,49 @@ class SimScannerScreenState extends State<SimScannerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: _buildBarCodeScreenAppBar(context),
-        body: SingleChildScrollView(
-          child: SizedBox(
-            height: context.height - 56.sp,
-            width: context.width,
-            child: BlocConsumer<ContractCubit, ContractState>(
-              listener: (context, state) {
-                if (state is CheckBeforeEditContractSuccess) {
-                  Navigator.of(context).pushNamed(
-                    Routes.signatureScreen,
-                    arguments: {
-                      'contract': newContract,
-                      'formattedSmsCode': state.formattedStringWithoutSpaces,
-                      'recto': widget.recto,
-                      'verso': widget.verso,
-                      'isPassport': widget.isPassport,
-                      'parentRecto': widget.parentRecto,
-                      'parentVerso': widget.parentVerso,
-                      'justificatif': widget.justificatif,
-                      'parentIsPassport': widget.parentIsPassport
-                    },
-                  );
-                }
-                if (state is CheckBeforeEditContractFailed) {
-                  AppToasts.showErrorToast(
-                    message: state.message.tr(context),
-                    context: context,
-                  );
-                }
-              },
-              builder: (context, state) {
-                if (state is CheckBeforeEditContractLoading) {
-                  return const LoadingBarrier();
-                }
+    return SessionTimeout(
+      child: SafeArea(
+        child: Scaffold(
+          appBar: _buildBarCodeScreenAppBar(context),
+          body: SingleChildScrollView(
+            child: SizedBox(
+              height: context.height - 56.sp,
+              width: context.width,
+              child: BlocConsumer<ContractCubit, ContractState>(
+                listener: (context, state) {
+                  if (state is CheckBeforeEditContractSuccess) {
+                    Navigator.of(context).pushNamed(
+                      Routes.signatureScreen,
+                      arguments: {
+                        'contract': newContract,
+                        'formattedSmsCode': state.formattedStringWithoutSpaces,
+                        'recto': widget.recto,
+                        'verso': widget.verso,
+                        'isPassport': widget.isPassport,
+                        'parentRecto': widget.parentRecto,
+                        'parentVerso': widget.parentVerso,
+                        'justificatif': widget.justificatif,
+                        'parentIsPassport': widget.parentIsPassport
+                      },
+                    );
+                  }
+                  if (state is CheckBeforeEditContractFailed) {
+                    AppToasts.showErrorToast(
+                      message: state.message.tr(context),
+                      context: context,
+                    );
+                  }
+                },
+                builder: (context, state) {
+                  if (state is CheckBeforeEditContractLoading) {
+                    return const LoadingBarrier();
+                  }
 
-                return SimScannerUI(
-                  onPressed: () => _startBarcodeScanner(context),
-                );
-              },
+                  return SimScannerUI(
+                    onPressed: () => _startBarcodeScanner(context),
+                  );
+                },
+              ),
             ),
           ),
         ),

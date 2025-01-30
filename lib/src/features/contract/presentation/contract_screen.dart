@@ -9,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:insta_image_viewer/insta_image_viewer.dart';
+import 'package:mobilis_smart_pos/src/core/utils/helpers/session_timeout.dart';
 import '../../../core/commom/widgets/custom_appbar_with_deny_contract.dart';
 import '../../../core/commom/widgets/custom_floating_action_button.dart';
 import '../../../core/utils/enums/documents_type.dart';
@@ -391,162 +392,164 @@ class _ContractScreenState extends State<ContractScreen> {
     final bool isPassport = widget.metaData['document_type'] == 'passport';
     final TextRecognizer recognizer = TextRecognizer();
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: CustomAppbarWithDenyContract(
-          title: "contractTitle".tr(context),
-          showProgressIndicator: true,
-          currentStep: 3,
-          allSteps: widget.isMinor ? 8 : 5,
-        ),
-        floatingActionButton: isCaptureDone
-            ? CustomFAB(
-                label: "continuer".tr(context),
-                icon: CupertinoIcons.right_chevron,
-                onPressed: _onFABPressed,
-              )
-            : null,
-        body: SingleChildScrollView(
-          child: Container(
-            width: context.width,
-            padding: EdgeInsets.fromLTRB(24.sp, 32.sp, 24.sp, 96.sp),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  // =============== Document Civil
-                  CivilsDocument(widget: widget),
+    return SessionTimeout(
+      child: SafeArea(
+        child: Scaffold(
+          appBar: CustomAppbarWithDenyContract(
+            title: "contractTitle".tr(context),
+            showProgressIndicator: true,
+            currentStep: 3,
+            allSteps: widget.isMinor ? 8 : 5,
+          ),
+          floatingActionButton: isCaptureDone
+              ? CustomFAB(
+                  label: "continuer".tr(context),
+                  icon: CupertinoIcons.right_chevron,
+                  onPressed: _onFABPressed,
+                )
+              : null,
+          body: SingleChildScrollView(
+            child: Container(
+              width: context.width,
+              padding: EdgeInsets.fromLTRB(24.sp, 32.sp, 24.sp, 96.sp),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    // =============== Document Civil
+                    CivilsDocument(widget: widget),
 
-                  // =============== Info Client
+                    // =============== Info Client
 
-                  Row(
-                    children: [
-                      const Icon(Icons.arrow_right_sharp),
-                      Text(
-                        "infos_client".tr(context),
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium!
-                            .copyWith(decoration: TextDecoration.underline),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 24.h),
-                  Column(
-                    children: [
-                      AppTextFormField(
-                        enabled: false,
-                        disabledValue: widget.metaData['first_name'],
-                        textEditingController: firstNameEditingController,
-                        label: "firstNameLabel".tr(context),
-                        // validationType: InputType.FIRST_NAME,
-                      ),
-                      SizedBox(height: 16.sp),
-                      AppTextFormField(
-                        enabled: false,
-                        disabledValue: widget.metaData['last_name'],
-                        textEditingController: lastNameEditingController,
-                        label: "lastNameLabel".tr(context),
-                      ),
-                      SizedBox(height: 16.sp),
-
-                      AppTextFormField(
-                        enabled: false,
-                        disabledValue: CivilsInformationsConverterHelper.getFormatedGender(
-                            gender: widget.metaData['gender'], context: context),
-                        textEditingController: genderEditingController,
-                        label: "genderLabel".tr(context),
-                      ),
-                      SizedBox(height: 16.sp),
-                      AppTextFormField(
-                        enabled: false,
-                        disabledValue: CivilsInformationsConverterHelper.formatToDisplayDate(
-                            date: widget.metaData['date_of_birth'], context: context),
-                        textEditingController: birthDateEditingController,
-                        label: "birthDateLabel".tr(context),
-                      ),
-                      SizedBox(height: 16.sp),
-                      AppTextFormField(
-                        enabled: false,
-                        disabledValue: widget.metaData['place_of_birth'],
-                        textEditingController: birthPlaceEditingController,
-                        label: "birthPlaceLabel".tr(context),
-                      ),
-                      SizedBox(height: 16.sp),
-                      AppTextFormField(
-                        enabled: false,
-                        disabledValue: widget.metaData['Nationality'],
-                        textEditingController: nationalityEditingController,
-                        label: "nationality".tr(context),
-                      ),
-                      SizedBox(height: 16.sp),
-                      // === Wilaya & daira & commune drop downs
-                      WilayaDropDown(
-                        items: _wilayas,
-                        onChanged: (value) {
-                          _filterCommunes(value);
-                        },
-                      ),
-                      SizedBox(height: 16.sp),
-                      CommuneDropDown(
-                        items: _filteredCommunes,
-                        selectedValue: _selectedCommune,
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedCommune = value;
-                          });
-                        },
-                      ),
-                      SizedBox(height: 16.sp),
-                      AppTextFormField(
-                        isLatinOnly: true,
-                        label: "streetLabel".tr(context),
-                        validationType: InputType.ADDRESS,
-                        textEditingController: addressEditingController,
-                      ),
-                      SizedBox(height: 16.sp),
-                      AppTextFormField(
-                        isRequired: false,
-                        label: "email".tr(context),
-                        validationType: InputType.EMAIL,
-                        textEditingController: emailEditingController,
-                      ),
-                      SizedBox(height: 16.sp),
-                      rectoImage != null
-                          ? InstaImageViewer(child: Image.file(rectoImage!))
-                          : UploadImageField(
-                              icon: FontAwesomeIcons.camera,
-                              label: isPassport ? "passport".tr(context) : "recto".tr(context),
-                              onTap: () async {
-                                return await captureDocument(
-                                  recognizer: recognizer,
-                                  docType: isPassport
-                                      ? DocumentsType.passport
-                                      : DocumentsType.frontIdCard,
-                                  context: context,
-                                );
-                              }),
-                      if (!isPassport && rectoImage != null)
-                        Column(
-                          children: [
-                            SizedBox(height: 16.sp),
-                            versoImage != null
-                                ? InstaImageViewer(child: Image.file(versoImage!))
-                                : UploadImageField(
-                                    icon: FontAwesomeIcons.camera,
-                                    label: "verso".tr(context),
-                                    onTap: () async {
-                                      return await captureDocument(
-                                          recognizer: recognizer,
-                                          docType: DocumentsType.backIdCard,
-                                          context: context);
-                                    }),
-                          ],
+                    Row(
+                      children: [
+                        const Icon(Icons.arrow_right_sharp),
+                        Text(
+                          "infos_client".tr(context),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(decoration: TextDecoration.underline),
                         ),
-                      SizedBox(height: 48.sp),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                    SizedBox(height: 24.h),
+                    Column(
+                      children: [
+                        AppTextFormField(
+                          enabled: false,
+                          disabledValue: widget.metaData['first_name'],
+                          textEditingController: firstNameEditingController,
+                          label: "firstNameLabel".tr(context),
+                          // validationType: InputType.FIRST_NAME,
+                        ),
+                        SizedBox(height: 16.sp),
+                        AppTextFormField(
+                          enabled: false,
+                          disabledValue: widget.metaData['last_name'],
+                          textEditingController: lastNameEditingController,
+                          label: "lastNameLabel".tr(context),
+                        ),
+                        SizedBox(height: 16.sp),
+
+                        AppTextFormField(
+                          enabled: false,
+                          disabledValue: CivilsInformationsConverterHelper.getFormatedGender(
+                              gender: widget.metaData['gender'], context: context),
+                          textEditingController: genderEditingController,
+                          label: "genderLabel".tr(context),
+                        ),
+                        SizedBox(height: 16.sp),
+                        AppTextFormField(
+                          enabled: false,
+                          disabledValue: CivilsInformationsConverterHelper.formatToDisplayDate(
+                              date: widget.metaData['date_of_birth'], context: context),
+                          textEditingController: birthDateEditingController,
+                          label: "birthDateLabel".tr(context),
+                        ),
+                        SizedBox(height: 16.sp),
+                        AppTextFormField(
+                          enabled: false,
+                          disabledValue: widget.metaData['place_of_birth'],
+                          textEditingController: birthPlaceEditingController,
+                          label: "birthPlaceLabel".tr(context),
+                        ),
+                        SizedBox(height: 16.sp),
+                        AppTextFormField(
+                          enabled: false,
+                          disabledValue: widget.metaData['Nationality'],
+                          textEditingController: nationalityEditingController,
+                          label: "nationality".tr(context),
+                        ),
+                        SizedBox(height: 16.sp),
+                        // === Wilaya & daira & commune drop downs
+                        WilayaDropDown(
+                          items: _wilayas,
+                          onChanged: (value) {
+                            _filterCommunes(value);
+                          },
+                        ),
+                        SizedBox(height: 16.sp),
+                        CommuneDropDown(
+                          items: _filteredCommunes,
+                          selectedValue: _selectedCommune,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedCommune = value;
+                            });
+                          },
+                        ),
+                        SizedBox(height: 16.sp),
+                        AppTextFormField(
+                          isLatinOnly: true,
+                          label: "streetLabel".tr(context),
+                          validationType: InputType.ADDRESS,
+                          textEditingController: addressEditingController,
+                        ),
+                        SizedBox(height: 16.sp),
+                        AppTextFormField(
+                          isRequired: false,
+                          label: "email".tr(context),
+                          validationType: InputType.EMAIL,
+                          textEditingController: emailEditingController,
+                        ),
+                        SizedBox(height: 16.sp),
+                        rectoImage != null
+                            ? InstaImageViewer(child: Image.file(rectoImage!))
+                            : UploadImageField(
+                                icon: FontAwesomeIcons.camera,
+                                label: isPassport ? "passport".tr(context) : "recto".tr(context),
+                                onTap: () async {
+                                  return await captureDocument(
+                                    recognizer: recognizer,
+                                    docType: isPassport
+                                        ? DocumentsType.passport
+                                        : DocumentsType.frontIdCard,
+                                    context: context,
+                                  );
+                                }),
+                        if (!isPassport && rectoImage != null)
+                          Column(
+                            children: [
+                              SizedBox(height: 16.sp),
+                              versoImage != null
+                                  ? InstaImageViewer(child: Image.file(versoImage!))
+                                  : UploadImageField(
+                                      icon: FontAwesomeIcons.camera,
+                                      label: "verso".tr(context),
+                                      onTap: () async {
+                                        return await captureDocument(
+                                            recognizer: recognizer,
+                                            docType: DocumentsType.backIdCard,
+                                            context: context);
+                                      }),
+                            ],
+                          ),
+                        SizedBox(height: 48.sp),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

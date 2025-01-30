@@ -9,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/permissions_helper.dart';
+import 'package:mobilis_smart_pos/src/core/utils/helpers/session_timeout.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/trigger_sms_params_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/sms_cubit.dart';
 import '../../../core/commom/widgets/custom_app_bar.dart';
@@ -267,219 +268,219 @@ class _SignatureScreenState extends State<SignatureScreen> {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<ContractCubit>();
-    return SafeArea(
-      child: Scaffold(
-        appBar: CustomAppBar(title: "signature".tr(context)),
-        body: SingleChildScrollView(
-          child: Container(
-            width: context.width,
-            padding: EdgeInsets.all(32.sp),
-            child: BlocConsumer<SmsCubit, SmsState>(
-              listener: (context, state) {
-                if (state is TriggerSmsFailure) {
-                  setState(() {
-                    smsLoading = false;
-                  });
-                  AppToasts.showWarningToast(
-                      message: "activation_failed".tr(context), context: context);
-                  Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
-                }
-              },
-              builder: (context, state) {
-                return BlocConsumer<ContractCubit, ContractState>(
-                  listener: (context, state) {
-                    if (state is EditContractFailed) {
-                      AppToasts.showErrorToast(
-                          message: state.message.tr(context), context: context);
-                      Navigator.of(context).pop();
-                    }
-                    if (state is GenerateContractFailed) {
-                      AppToasts.showErrorToast(
-                          message: state.message.tr(context), context: context);
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                          Routes.main,
-                          arguments: {'index': 1, 'fromSignin': true},
-                          (route) => false);
-                    }
-                    if (state is GenerateContractSuccess) {
-                      Navigator.of(context)
-                          .pushNamedAndRemoveUntil(Routes.contractGenerated, (route) => false);
-                    }
+    return SessionTimeout(
+      child: SafeArea(
+        child: Scaffold(
+          appBar: CustomAppBar(title: "signature".tr(context)),
+          body: SingleChildScrollView(
+            child: Container(
+              width: context.width,
+              padding: EdgeInsets.all(32.sp),
+              child: BlocConsumer<SmsCubit, SmsState>(
+                listener: (context, state) {
+                  if (state is TriggerSmsFailure) {
+                    setState(() {
+                      smsLoading = false;
+                    });
+                    AppToasts.showWarningToast(
+                        message: "activation_failed".tr(context), context: context);
+                    Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
+                  }
+                },
+                builder: (context, state) {
+                  return BlocConsumer<ContractCubit, ContractState>(
+                    listener: (context, state) {
+                      if (state is EditContractFailed) {
+                        AppToasts.showErrorToast(
+                            message: state.message.tr(context), context: context);
+                        Navigator.of(context).pop();
+                      }
+                      if (state is GenerateContractFailed) {
+                        AppToasts.showErrorToast(
+                            message: state.message.tr(context), context: context);
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                            Routes.main,
+                            arguments: {'index': 1, 'fromSignin': true},
+                            (route) => false);
+                      }
+                      if (state is GenerateContractSuccess) {
+                        Navigator.of(context)
+                            .pushNamedAndRemoveUntil(Routes.contractGenerated, (route) => false);
+                      }
 
-                    if (state is EditContractSuccess) {
-                      final response = state.editContractResponseEntity;
-                      setState(() {
-                        generateContractParamsEntity = GenerateContractParamsEntity(
-                          clientId: response.clientId,
-                          invoiceId: response.invoiceId,
-                          subsId: response.subscriptionId,
-                          contractCode: response.contractCode,
-                          dsaMessage: dsaMessage,
+                      if (state is EditContractSuccess) {
+                        final response = state.editContractResponseEntity;
+                        setState(() {
+                          generateContractParamsEntity = GenerateContractParamsEntity(
+                            clientId: response.clientId,
+                            invoiceId: response.invoiceId,
+                            subsId: response.subscriptionId,
+                            contractCode: response.contractCode,
+                            dsaMessage: dsaMessage,
+                          );
+                        });
+                        debugPrint(
+                            "================ STATE IS SUCCESS ==============================  ");
+                        final smsParams = TriggerSmsParamsEntity(
+                            id: generateContractParamsEntity.invoiceId,
+                            msisdnAPN: senderPhoneNumber,
+                            formattedSmsString:
+                                '892130${widget.contract.serialNumber}${widget.formattedSmsCode}');
+                        context.read<SmsCubit>().triggerSms(smsParams: smsParams);
+                        setState(() {
+                          smsLoading = true;
+                        });
+                        _startSmsTimer();
+                      }
+                    },
+                    builder: (context, state) {
+                      if (state is EditContractLoading) {
+                        return Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                height: 32.sp,
+                                width: 32.sp,
+                                child: const CircularProgressIndicator(),
+                              ),
+                              SizedBox(height: 16.sp),
+                              Text(
+                                "generating".tr(context),
+                                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                    color: AppColors.primary, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
                         );
-                      });
-                      debugPrint(
-                          "================ STATE IS SUCCESS ==============================  ");
-                      final smsParams = TriggerSmsParamsEntity(
-                          id: generateContractParamsEntity.invoiceId,
-                          msisdnAPN: senderPhoneNumber,
-                          formattedSmsString:
-                              '892130${widget.contract.serialNumber}${widget.formattedSmsCode}');
-                      context.read<SmsCubit>().triggerSms(smsParams: smsParams);
-                      setState(() {
-                        smsLoading = true;
-                      });
-                      _startSmsTimer();
-                    }
-                  },
-                  builder: (context, state) {
-                    if (state is EditContractLoading) {
-                      return Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SizedBox(
+                      }
+                      if (state is GenerateContractLoading) {
+                        return SizedBox(
+                          height: context.height - 100.sp,
+                          child: Center(
+                            child: SizedBox(
                               height: 32.sp,
                               width: 32.sp,
                               child: const CircularProgressIndicator(),
                             ),
-                            SizedBox(height: 16.sp),
-                            Text(
-                              "generating".tr(context),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-                    if (state is GenerateContractLoading) {
-                      return SizedBox(
-                        height: context.height - 100.sp,
-                        child: Center(
-                          child: SizedBox(
-                            height: 32.sp,
-                            width: 32.sp,
-                            child: const CircularProgressIndicator(),
                           ),
-                        ),
-                      );
-                    }
-                    return smsLoading
-                        ? SizedBox(
-                            height: context.height,
-                            width: context.width,
-                            child: Center(
-                              child: Column(
-                                children: [
-                                  Text(
-                                    "please_wait".tr(context),
-                                    style: Theme.of(context).textTheme.bodyLarge,
-                                  ),
-                                  SizedBox(height: 12.sp),
-                                  LottieBuilder.asset(
-                                    AppImages.smsAnim1,
-                                    height: 350.sp,
-                                    width: 350.sp,
-                                  )
-                                ],
-                              ),
-                            ),
-                          )
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Column(
-                                children: [
-                                  const ConditionsOfUse(
-                                    desc: AppStrings.arabicAgrement,
-                                  ),
-                                  SizedBox(height: 12.sp),
-                                  Text(
-                                    "الجزائر، في $currentDateAr\nأنا، الممضي أسفله، أؤكد أنني قرأت و وافقت على كامل شروط البيع العامة",
-                                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                        color: AppColors.primary, fontWeight: FontWeight.bold),
-                                  ),
-                                  SizedBox(height: 32.h),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(width: 1, color: AppColors.secondary),
+                        );
+                      }
+                      return smsLoading
+                          ? SizedBox(
+                              height: context.height,
+                              width: context.width,
+                              child: Center(
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      "please_wait".tr(context),
+                                      style: Theme.of(context).textTheme.bodyLarge,
                                     ),
-                                    height: 200.h,
-                                    width: 300.w,
-                                    child: SfSignaturePad(
-                                      key: _signaturePadKey,
-                                      minimumStrokeWidth: 5,
-                                      maximumStrokeWidth: 6,
-                                      strokeColor: Colors.black,
-                                      backgroundColor: Colors.white,
-                                      onDrawStart: () {
+                                    SizedBox(height: 12.sp),
+                                    LottieBuilder.asset(
+                                      AppImages.smsAnim1,
+                                      height: 350.sp,
+                                      width: 350.sp,
+                                    )
+                                  ],
+                                ),
+                              ),
+                            )
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Column(
+                                  children: [
+                                    const ConditionsOfUse(
+                                      desc: AppStrings.arabicAgrement,
+                                    ),
+                                    SizedBox(height: 12.sp),
+                                    Text(
+                                      "الجزائر، في $currentDateAr\nأنا، الممضي أسفله، أؤكد أنني قرأت و وافقت على كامل شروط البيع العامة",
+                                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                          color: AppColors.primary, fontWeight: FontWeight.bold),
+                                    ),
+                                    SizedBox(height: 32.h),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(width: 1, color: AppColors.secondary),
+                                      ),
+                                      height: 200.h,
+                                      width: 300.w,
+                                      child: SfSignaturePad(
+                                        key: _signaturePadKey,
+                                        minimumStrokeWidth: 5,
+                                        maximumStrokeWidth: 6,
+                                        strokeColor: Colors.black,
+                                        backgroundColor: Colors.white,
+                                        onDrawStart: () {
+                                          setState(() {
+                                            isSignatureValidated = true;
+                                          });
+                                          return false;
+                                        },
+                                      ),
+                                    ),
+                                    EraseSignatureButton(
+                                      onPressed: () {
                                         setState(() {
-                                          isSignatureValidated = true;
+                                          isSignatureValidated = false;
                                         });
-                                        return false;
+                                        _signaturePadKey.currentState!.clear();
                                       },
                                     ),
-                                  ),
-                                  EraseSignatureButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        isSignatureValidated = false;
-                                      });
-                                      _signaturePadKey.currentState!.clear();
-                                    },
-                                  ),
-                                  SizedBox(height: 24.sp),
-                                  CheckboxListTile(
-                                    title: Text(
-                                      "أوافق على إدراج توقيعي في العقد الخاص بي و كذلك في وثيقة الشروط العامة للبيع",
-                                      style: Theme.of(context).textTheme.bodySmall,
+                                    SizedBox(height: 24.sp),
+                                    CheckboxListTile(
+                                      title: Text(
+                                        "أوافق على إدراج توقيعي في العقد الخاص بي و كذلك في وثيقة الشروط العامة للبيع",
+                                        style: Theme.of(context).textTheme.bodySmall,
+                                      ),
+                                      value: _isConditionOfSignatureChecked,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _isConditionOfSignatureChecked = true;
+                                        });
+                                      },
                                     ),
-                                    value: _isConditionOfSignatureChecked,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _isConditionOfSignatureChecked = true;
-                                      });
-                                    },
-                                  ),
-                                  // SizedBox(height: 24.sp),
-                                ],
-                              ),
-                              SizedBox(height: 64.h),
-                              ElevatedButton(
-                                child: Text("confrim_sell".tr(context)),
-                                onPressed: () async {
-                                  bool hasPermission = await _requestSmsPermission();
-                                  if (!hasPermission) {
-                                    _showPermissionDeniedDialog(context);
-                                    return;
-                                  }
+                                    // SizedBox(height: 24.sp),
+                                  ],
+                                ),
+                                SizedBox(height: 64.h),
+                                ElevatedButton(
+                                  child: Text("confrim_sell".tr(context)),
+                                  onPressed: () async {
+                                    bool hasPermission = await _requestSmsPermission();
+                                    if (!hasPermission) {
+                                      _showPermissionDeniedDialog(context);
+                                      return;
+                                    }
 
-                                  if (!isSignatureValidated) {
-                                    AppToasts.showErrorToast(
-                                      message: "required_signature".tr(context),
-                                      context: context,
-                                    );
-                                    return;
-                                  }
+                                    if (!isSignatureValidated) {
+                                      AppToasts.showErrorToast(
+                                        message: "required_signature".tr(context),
+                                        context: context,
+                                      );
+                                      return;
+                                    }
 
-                                  if (!_isConditionOfSignatureChecked) {
-                                    AppToasts.showErrorToast(
-                                      message: "signature_approve".tr(context),
-                                      context: context,
-                                    );
-                                    return;
-                                  }
-                                  _checkPermissionsAndShowDialog(context, cubit);
-                                },
-                              ),
-                            ],
-                          );
-                  },
-                );
-              },
+                                    if (!_isConditionOfSignatureChecked) {
+                                      AppToasts.showErrorToast(
+                                        message: "signature_approve".tr(context),
+                                        context: context,
+                                      );
+                                      return;
+                                    }
+                                    _checkPermissionsAndShowDialog(context, cubit);
+                                  },
+                                ),
+                              ],
+                            );
+                    },
+                  );
+                },
+              ),
             ),
           ),
         ),
