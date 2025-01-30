@@ -19,7 +19,6 @@ import 'package:mobilis_smart_pos/src/core/utils/enums/documents_type.dart';
 import 'package:mobilis_smart_pos/src/core/utils/enums/input_type.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/civils_informations_converter_helper.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/dialog_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/json_loader_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/toast_helper.dart';
@@ -184,7 +183,7 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
                         message: "rasd_minor_message".tr(context),
                         context: context,
                       );
-                      return;
+                      // return;
                     }
                   } catch (e) {
                     return;

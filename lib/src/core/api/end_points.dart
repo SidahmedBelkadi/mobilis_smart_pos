@@ -38,6 +38,7 @@ class EndPoints {
   static const String rasdGenerateContrcat = "$baseUrl/contract-rasd/attributeMSISDN";
   static const String rasdTriggerSms = "$baseUrl/contract-rasd/triggerSMS";
   static const String uploadClient = "$baseUrl/file/client";
+  static const String uploadClientRasd = "$baseUrl/file/client_rasd";
   static const String getAllOffers = "$baseUrl/subscription-type/all";
   static const String triggerSms = "$baseUrl/contract/triggerSMS";
   static const String retryTriggerSms = "$baseUrl/contract/triggerSMS/retry";

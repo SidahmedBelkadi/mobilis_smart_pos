@@ -348,8 +348,10 @@ class _RasdSignatureScreenState extends State<RasdSignatureScreen> {
 
     if (match != null) {
       final phoneNumber = match.group(2);
-
-      if (phoneNumber != null) {
+      final dsaICCID = match.group(1);
+      final iccid = "892130${widget.rasdParams.serialNumber}";
+      debugPrint("=================== COMPOSED ICCID : $iccid ");
+      if (phoneNumber != null && iccid == dsaICCID) {
         generateContractParamsEntity.msisdn = phoneNumber;
 
         cubit.rasdGenerateContract(

@@ -218,7 +218,7 @@ class ContractRemoteDataSourceImpl implements ContractRemoteDataSource {
     final pdvCode = di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials()!.pdvCode!;
 
     final uploadResponse = await dioConsumer.put(
-      "${EndPoints.uploadClient}/$pdvCode",
+      "${EndPoints.uploadClientRasd}/$pdvCode",
       body: formData,
       formDataIsEnabled: true,
     );

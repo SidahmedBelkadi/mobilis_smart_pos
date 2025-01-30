@@ -134,13 +134,16 @@ class _SignatureScreenState extends State<SignatureScreen> {
 
     final RegExp regExp = RegExp(r'La carte SIM (\d+) est activee, avec le numero (2136\d{8})');
     final RegExp regExp2 = RegExp(r'Activation en cours');
+
     final match = regExp.firstMatch(message);
     final cubit = context.read<ContractCubit>();
 
     if (match != null) {
       final phoneNumber = match.group(2);
-
-      if (phoneNumber != null) {
+      final dsaICCID = match.group(1);
+      final iccid = "892130${widget.contract.serialNumber}";
+      debugPrint("=================== COMPOSED ICCID : $iccid ");
+      if (phoneNumber != null && dsaICCID == iccid) {
         generateContractParamsEntity.msisdn = phoneNumber;
         cubit.attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
       }
