@@ -15,11 +15,13 @@ import 'package:mobilis_smart_pos/src/features/contract/domain/use_cases/trigger
 import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/rasd/rasd_contract_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/rasd/rasd_sms_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/sms_cubit.dart';
+import 'package:mobilis_smart_pos/src/features/home/data/data_sources/home_remote_data_source.dart';
+import 'package:mobilis_smart_pos/src/features/home/data/repository/home_repository_impl.dart';
+import 'package:mobilis_smart_pos/src/features/home/domain/repository/home_repository.dart';
+import 'package:mobilis_smart_pos/src/features/home/domain/use_cases/load_banners_use_case.dart';
+import 'package:mobilis_smart_pos/src/features/home/presentation/cubit/home_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/invoices/domain/use_cases/retry_activation_use_case.dart';
 import 'package:mobilis_smart_pos/src/features/invoices/presentation/cubit/retry_activation/retry_activation_cubit.dart';
-import '../features/profile/domain/user_cases/get_pdv_images_use_case.dart';
-import '../features/sign_in/domain/use_cases/approve_contract_use_case.dart';
-import '../services/upgrader_service.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -55,6 +57,7 @@ import '../features/main/presentation/cubits/cubit/locale_cubit.dart';
 import '../features/profile/data/data_sources/profile_data_source.dart';
 import '../features/profile/data/reopsitories/profile_repository_impl.dart';
 import '../features/profile/domain/repositories/profile_repository.dart';
+import '../features/profile/domain/user_cases/get_pdv_images_use_case.dart';
 import '../features/profile/domain/user_cases/profile_use_case.dart';
 import '../features/profile/domain/user_cases/update_profile_use_case.dart';
 import '../features/profile/presentation/cubit/profile_cubit.dart';
@@ -62,6 +65,7 @@ import '../features/sign_in/data/data_sources/sign_in_remote_data_source.dart';
 import '../features/sign_in/data/data_sources/smart_pos_local_storage.dart';
 import '../features/sign_in/data/repositories/sign_in_repository_impl.dart';
 import '../features/sign_in/domain/repositories/sign_in_repository.dart';
+import '../features/sign_in/domain/use_cases/approve_contract_use_case.dart';
 import '../features/sign_in/domain/use_cases/sign_in_use_case.dart';
 import '../features/sign_in/domain/use_cases/verify_otp_use_case.dart';
 import '../features/sign_in/presentation/cubit/sign_in_cubit.dart';
@@ -69,12 +73,14 @@ import '../features/sign_out/data/data_sources/sign_out_data_source.dart';
 import '../features/sign_out/data/repositories/sign_out_repository_impl.dart';
 import '../features/sign_out/domain/repositories/sign_out_repository.dart';
 import '../features/sign_out/domain/use_cases/sign_out_use_case.dart';
+import '../services/upgrader_service.dart';
 
 final serviceLocator = GetIt.instance;
 
 Future<void> initializeAppDependencies() async {
   // ================ EXTERNAL ================ //
-  final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  final SharedPreferences sharedPreferences =
+      await SharedPreferences.getInstance();
   const FlutterSecureStorage secureStorage = FlutterSecureStorage();
   serviceLocator.registerLazySingleton(() => secureStorage);
   serviceLocator.registerLazySingleton(() => sharedPreferences);
@@ -100,11 +106,12 @@ Future<void> initializeAppDependencies() async {
   ));
   // serviceLocator.registerLazySingleton<DioConsumer>(() => DioConsumer(client: dio));
 
-  serviceLocator.registerLazySingleton(() => UpgraderService(dio: serviceLocator()));
+  serviceLocator
+      .registerLazySingleton(() => UpgraderService(dio: serviceLocator()));
 
   // =============== CORE ====================== //
-  serviceLocator
-      .registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(connectivity: Connectivity()));
+  serviceLocator.registerLazySingleton<NetworkInfo>(
+      () => NetworkInfoImpl(connectivity: Connectivity()));
 
   // =============== UTILS ====================== //
   serviceLocator.registerLazySingleton(
@@ -130,15 +137,16 @@ Future<void> initializeAppDependencies() async {
       () => ResetPasswordRemoteDataSourceImpl(dioConsumer: serviceLocator()));
   serviceLocator.registerLazySingleton<InvoicesRemoteDataSource>(
       () => InvoicesRemoteDataSourceImpl(dioConsumer: serviceLocator()));
-  serviceLocator
-      .registerLazySingleton<OcrDataSource>(() => OcrDataSourceImpl(dioConsumer: serviceLocator()));
+  serviceLocator.registerLazySingleton<OcrDataSource>(
+      () => OcrDataSourceImpl(dioConsumer: serviceLocator()));
 
   serviceLocator.registerLazySingleton<ProfileDataSource>(
       () => ProfileDataSourceImpl(dioConsumer: serviceLocator()));
 
   serviceLocator.registerLazySingleton<OffersRemoteDataSource>(
       () => OffersRemoteDataSourceImpl(dio: serviceLocator()));
-
+  serviceLocator.registerLazySingleton<HomeRemoteDataSource>(
+      () => HomeRemoteDataSourceImpl(dioConsumer: serviceLocator()));
   // ================ REPOSITORIES ================ //
 
   serviceLocator.registerLazySingleton<SignInRepository>(
@@ -195,32 +203,61 @@ Future<void> initializeAppDependencies() async {
     ),
   );
 
+  serviceLocator.registerLazySingleton<HomeRepository>(
+    () => HomeRepositoryImpl(
+      networkInfo: serviceLocator(),
+      remoteDataSource: serviceLocator(),
+    ),
+  );
+
   // ================ USE CASES ================ //
 
-  serviceLocator.registerLazySingleton(() => SignInUseCase(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton(() => VerifyOtpUseCase(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton(() => ApproveContractUseCase(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton(() => SignOutUseCase(repository: serviceLocator()));
   serviceLocator
-      .registerLazySingleton(() => CheckBeforeEditContractUseCase(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton(() => EditContractUseCase(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton(() => GenerateContractUseCase(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton(() => ResetPasswordUseCase(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton(() => ResetPasswordOTPUseCase(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton(() => GetInvoicesUseCase(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton(() => RetryActivationUseCase(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton(() => GetProfileInfoUseCase(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton(() => ProcessIdCardUseCase(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton(() => ProcessPassportUseCase(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton(() => UpdateProfileUseCase(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton(() => GetPdvImagesUseCase(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton(() => GetAllOffersUseCase(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton(() => TrigggerSmsUseCase(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton(() => RetryTrigggerSmsUseCase(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton(() => RasdEditContractUseCase(repository: serviceLocator()));
-  serviceLocator
-      .registerLazySingleton(() => RasdGenerateContractUseCase(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton(() => RasdTrigggerSmsUseCase(repository: serviceLocator()));
+      .registerLazySingleton(() => SignInUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => VerifyOtpUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => ApproveContractUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => SignOutUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => CheckBeforeEditContractUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => EditContractUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => GenerateContractUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => ResetPasswordUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => ResetPasswordOTPUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => GetInvoicesUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => RetryActivationUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => GetProfileInfoUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => ProcessIdCardUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => ProcessPassportUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => UpdateProfileUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => GetPdvImagesUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => GetAllOffersUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => TrigggerSmsUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => RetryTrigggerSmsUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => RasdEditContractUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => RasdGenerateContractUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => RasdTrigggerSmsUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => LoadBannersUseCase(repository: serviceLocator()));
   // ================ BLOCS ================ //
 
   serviceLocator.registerFactory(() => SignInCubit(
@@ -265,12 +302,13 @@ Future<void> initializeAppDependencies() async {
       imagesUseCase: serviceLocator(),
     ),
   );
-  serviceLocator.registerFactory(
-      () => OcrCubit(idCardUseCase: serviceLocator(), passportUseCase: serviceLocator()));
+  serviceLocator.registerFactory(() => OcrCubit(
+      idCardUseCase: serviceLocator(), passportUseCase: serviceLocator()));
 
-  serviceLocator.registerFactory(() => OffersCubit(offersUseCase: serviceLocator()));
   serviceLocator
-      .registerFactory(() => SmsCubit(useCase: serviceLocator(), retryUseCase: serviceLocator()));
+      .registerFactory(() => OffersCubit(offersUseCase: serviceLocator()));
+  serviceLocator.registerFactory(() =>
+      SmsCubit(useCase: serviceLocator(), retryUseCase: serviceLocator()));
 
   serviceLocator.registerFactory(() => RasdContractCubit(
         rasdEditContractUseCase: serviceLocator(),
@@ -281,5 +319,9 @@ Future<void> initializeAppDependencies() async {
   serviceLocator.registerFactory(() => RasdSmsCubit(
         rasdTrigggerSmsUseCase: serviceLocator(),
         smartPosLocalStorage: serviceLocator(),
+      ));
+
+  serviceLocator.registerFactory(() => HomeCubit(
+        useCase: serviceLocator(),
       ));
 }

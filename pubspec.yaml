@@ -80,6 +80,8 @@ dependencies:
   dropdown_search: ^6.0.1
   json_pretty: ^1.0.4
   image: ^4.3.0
+  cached_network_image: ^3.4.1
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:

@@ -1,11 +1,13 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'widgets/CustomCuvedEdges.dart';
-import '../../main/presentation/widgets/drawer.dart';
-import '../../sign_in/data/data_sources/smart_pos_local_storage.dart';
+import 'package:mobilis_smart_pos/src/features/home/presentation/cubit/home_cubit.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../config/routing/app_routes.dart';
 import '../../../core/utils/helpers/app_localization_helper.dart';
@@ -13,6 +15,9 @@ import '../../../core/utils/helpers/media_query_values.dart';
 import '../../../core/utils/ressources/app_colors.dart';
 import '../../../core/utils/ressources/app_images.dart';
 import '../../../dependency_injection/injection_container.dart' as di;
+import '../../main/presentation/widgets/drawer.dart';
+import '../../sign_in/data/data_sources/smart_pos_local_storage.dart';
+import 'widgets/CustomCuvedEdges.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,6 +31,7 @@ class _MyHomePageState extends State<HomeScreen> {
 
   @override
   void initState() {
+    context.read<HomeCubit>().loadHomeBannersUrls();
     super.initState();
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: AppColors.primary,
@@ -36,7 +42,8 @@ class _MyHomePageState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final storedCredentials = di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials();
+    final storedCredentials =
+        di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials();
     String? businessName = '';
     if (storedCredentials != null && storedCredentials.businessName != null) {
       businessName = storedCredentials.businessName;
@@ -64,15 +71,25 @@ class _MyHomePageState extends State<HomeScreen> {
                             children: [
                               Text(
                                 "welcome".tr(context),
-                                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                                    color: context.isDarkMode ? Colors.white : Colors.black),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .copyWith(
+                                        color: context.isDarkMode
+                                            ? Colors.white
+                                            : Colors.black),
                               ),
                               Flexible(
                                   child: Text(
                                 businessName ?? "",
                                 overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                                    color: context.isDarkMode ? Colors.white : Colors.black),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall!
+                                    .copyWith(
+                                        color: context.isDarkMode
+                                            ? Colors.white
+                                            : Colors.black),
                               )),
                             ],
                           ),
@@ -83,7 +100,9 @@ class _MyHomePageState extends State<HomeScreen> {
                           },
                           child: FaIcon(
                             Icons.menu,
-                            color: context.isDarkMode ? Colors.white : Colors.black,
+                            color: context.isDarkMode
+                                ? Colors.white
+                                : Colors.black,
                           ),
                         )
                       ],
@@ -100,65 +119,44 @@ class _MyHomePageState extends State<HomeScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  SizedBox(
-                    height: 220.sp,
-                    width: context.width,
-                    child: HomeBanner(
-                      banners: const [
-                        AppImages.ban3,
-                        AppImages.bannerOmra,
-                        AppImages.bannerTestMail1,
-                      ],
-                      currentIndex: currentIndex,
-                      onPageChanged: (index) {
-                        setState(() {
-                          currentIndex = index;
-                        });
-                      },
-                    ),
+                  BlocBuilder<HomeCubit, HomeState>(
+                    builder: (context, state) {
+                      if (state is HomeBannersLoading) {
+                        return const BannersSkeleton();
+                      }
+                      if (state is HomeBannersLoadedSuccessfully) {
+                        return SizedBox(
+                          height: 220.sp,
+                          width: context.width,
+                          child: HomeBanner(
+                            banners: state.bannersUrls,
+                            currentIndex: currentIndex,
+                            onPageChanged: (index) {
+                              setState(() {
+                                currentIndex = index;
+                              });
+                            },
+                          ),
+                        );
+                      }
+
+                      return SizedBox(
+                        height: 220.sp,
+                        width: context.width,
+                        child: HomeBanner(
+                          isNetworkBanners: false,
+                          banners: const [AppImages.ban4],
+                          currentIndex: currentIndex,
+                          onPageChanged: (index) {
+                            setState(() {
+                              currentIndex = index;
+                            });
+                          },
+                        ),
+                      );
+                    },
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          HomeIcon(
-                            onTap: () => {},
-                            image: AppImages.paymentFactures,
-                            title: "mesFactures".tr(context),
-                          ),
-                          SizedBox(width: 32.sp),
-                          HomeIcon(
-                            image: AppImages.ereselli,
-                            title: "erselli".tr(context),
-                            onTap: () {},
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 24.h),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          HomeIcon(
-                            image: AppImages.activations,
-                            title: "mesActivations".tr(context),
-                            onTap: () => Navigator.of(context)
-                                .pushReplacementNamed(Routes.main, arguments: {'index': 1}),
-                          ),
-                          SizedBox(width: 32.sp),
-                          HomeIcon(
-                            image: AppImages.operations,
-                            title: "mesOperations".tr(context),
-                            onTap: () => Navigator.of(context).pushNamed(Routes.invoices),
-                          ),
-                        ],
-                      ),
-                    ],
-                  )
+                  const HomeIcons()
                 ],
               ),
             ),
@@ -169,16 +167,70 @@ class _MyHomePageState extends State<HomeScreen> {
   }
 }
 
+class HomeIcons extends StatelessWidget {
+  const HomeIcons({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            HomeIcon(
+              onTap: () => {},
+              image: AppImages.paymentFactures,
+              title: "mesFactures".tr(context),
+            ),
+            SizedBox(width: 32.sp),
+            HomeIcon(
+              image: AppImages.ereselli,
+              title: "erselli".tr(context),
+              onTap: () {},
+            ),
+          ],
+        ),
+        SizedBox(height: 24.h),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            HomeIcon(
+              image: AppImages.activations,
+              title: "mesActivations".tr(context),
+              onTap: () => Navigator.of(context)
+                  .pushReplacementNamed(Routes.main, arguments: {'index': 1}),
+            ),
+            SizedBox(width: 32.sp),
+            HomeIcon(
+              image: AppImages.operations,
+              title: "mesOperations".tr(context),
+              onTap: () => Navigator.of(context).pushNamed(Routes.invoices),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
 class HomeBanner extends StatelessWidget {
   final List<String> banners;
   final int currentIndex;
   final ValueChanged<int> onPageChanged;
+  final bool isNetworkBanners;
 
   const HomeBanner({
     super.key,
     required this.banners,
     required this.currentIndex,
     required this.onPageChanged,
+    this.isNetworkBanners = true,
   });
 
   @override
@@ -191,10 +243,45 @@ class HomeBanner extends StatelessWidget {
               .map(
                 (imageUrl) => ClipRRect(
                   borderRadius: BorderRadius.circular(16.0.sp),
-                  child: Image(
-                    image: AssetImage(imageUrl),
-                    fit: BoxFit.fill,
-                  ),
+                  child: isNetworkBanners
+                      ? CachedNetworkImage(
+                          imageUrl: "http://192.168.1.12:3002$imageUrl",
+                          imageBuilder: (context, imageProvider) => Container(
+                                width: context.width,
+                                height: 220.h,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.rectangle,
+                                  borderRadius: BorderRadius.circular(12.0),
+                                  image: DecorationImage(
+                                    image: imageProvider,
+                                    fit: BoxFit.fill,
+                                  ),
+                                ),
+                              ),
+                          progressIndicatorBuilder:
+                              (context, url, downloadProgress) {
+                            return Shimmer.fromColors(
+                              baseColor: context.isDarkMode
+                                  ? AppColors.darkerGrey
+                                  : AppColors.grey,
+                              highlightColor: context.isDarkMode
+                                  ? AppColors.darkGrey
+                                  : AppColors.lightGrey,
+                              child: Container(
+                                width: context.width,
+                                height: 220.sp,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.rectangle,
+                                  borderRadius: BorderRadius.circular(12.0),
+                                  color: Colors.white,
+                                ),
+                              ),
+                            );
+                          })
+                      : Image.asset(
+                          imageUrl,
+                          fit: BoxFit.fill,
+                        ),
                 ),
               )
               .toList(),
@@ -226,6 +313,46 @@ class HomeBanner extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class BannersSkeleton extends StatelessWidget {
+  const BannersSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Skeletonizer(
+      child: SizedBox(
+        height: 220.sp,
+        width: context.width,
+        child: Column(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16.0.sp),
+              child: Image.asset(AppImages.banner7),
+            ),
+            SizedBox(height: 24.0.h), // Adjust the height as needed
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                3,
+                (index) => Container(
+                  height: 6.h,
+                  width: 8.w,
+                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                  decoration: BoxDecoration(
+                    color: context.isDarkMode
+                        ? AppColors.darkerGrey
+                        : AppColors.grey,
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 }

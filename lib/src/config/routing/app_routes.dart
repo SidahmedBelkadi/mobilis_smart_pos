@@ -9,12 +9,8 @@ import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/rasd/
 import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/sms_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/contract/presentation/rasd_bar_code_scanner.dart';
 import 'package:mobilis_smart_pos/src/features/contract/presentation/rasd_signature_screen.dart';
+import 'package:mobilis_smart_pos/src/features/home/presentation/cubit/home_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/invoices/presentation/cubit/retry_activation/retry_activation_cubit.dart';
-import '../../features/contract/presentation/parent_contract_screen.dart';
-import '../../features/contract/presentation/parent_preparation_screen.dart';
-import '../../features/profile/presentation/cubit/profile_cubit.dart';
-import '../../features/profile/presentation/pdv_folder_screen.dart';
-import '../../features/profile/presentation/update_pdv_folder.dart';
 
 import '../../core/animation/routes_animation_manager.dart';
 import '../../dependency_injection/injection_container.dart';
@@ -35,6 +31,8 @@ import '../../features/contract/presentation/nfc/nfc_preparation_screen.dart';
 import '../../features/contract/presentation/nfc/nfc_reader_screen.dart';
 import '../../features/contract/presentation/ocr/mrz_ocr_screen.dart';
 import '../../features/contract/presentation/ocr/parent_mrz_ocr.dart';
+import '../../features/contract/presentation/parent_contract_screen.dart';
+import '../../features/contract/presentation/parent_preparation_screen.dart';
 import '../../features/contract/presentation/signature_screen.dart';
 import '../../features/e-payment/presentation/e-payment_screen.dart';
 import '../../features/e-rselli/presentation/e-rselli_screen.dart';
@@ -47,6 +45,9 @@ import '../../features/invoices/presentation/invoices_screen.dart';
 import '../../features/main/presentation/main_screen.dart';
 import '../../features/on_boarding/presentation/on_boarding_screen.dart';
 import '../../features/on_boarding/presentation/pdv_engagments_screen.dart';
+import '../../features/profile/presentation/cubit/profile_cubit.dart';
+import '../../features/profile/presentation/pdv_folder_screen.dart';
+import '../../features/profile/presentation/update_pdv_folder.dart';
 import '../../features/profile/presentation/widget/password_update.dart';
 import '../../features/sign_in/domain/entities/sign_in_request_params.dart';
 import '../../features/sign_in/presentation/cubit/sign_in_cubit.dart';
@@ -121,14 +122,18 @@ class AppRoutes {
       case Routes.main:
         final params = args as Map<String, dynamic>?;
         return RoutesAnimationManager.slideFromRightTransition(
-          MainScreen(
-            index: params?['index'],
-            fromSignin: params?['fromSignin'],
+          BlocProvider(
+            create: (context) => serviceLocator<HomeCubit>(),
+            child: MainScreen(
+              index: params?['index'],
+              fromSignin: params?['fromSignin'],
+            ),
           ),
         );
 
       case Routes.contractGenerated:
-        return RoutesAnimationManager.slideFromRightTransition(const ContractGenerated());
+        return RoutesAnimationManager.slideFromRightTransition(
+            const ContractGenerated());
 
       case Routes.signIn:
         return RoutesAnimationManager.slideFromRightTransition(
@@ -204,7 +209,8 @@ class AppRoutes {
         return RoutesAnimationManager.slideFromRightTransition(
           ParentMrzOCRScreen(
             documentType: params['documentType'],
-            minorContract: params['minorContract'] as ContractRequestParamsEntitiy,
+            minorContract:
+                params['minorContract'] as ContractRequestParamsEntitiy,
             minorRecto: params['minorRecto'] as File?,
             minorVerso: params['minorVerso'] as File?,
             minorIsPassport: params['minorIsPassport'] as bool,
@@ -236,7 +242,8 @@ class AppRoutes {
             dateOfBirth: params['dateOfBirth'],
             dateOfExpiry: params['dateOfExpiry'],
             docType: params['docType'],
-            minorContract: params['minorContract'] as ContractRequestParamsEntitiy,
+            minorContract:
+                params['minorContract'] as ContractRequestParamsEntitiy,
             minorRecto: params['minorRecto'] as File?,
             minorVerso: params['minorVerso'] as File?,
             minorIsPassport: params['minorIsPassport'] as bool,
@@ -267,7 +274,8 @@ class AppRoutes {
             dateOfExpiry: params['dateOfExpiry'],
             docType: params['docType'],
             isMinor: params['isMinor'],
-            minorContract: params['minorContract'] as ContractRequestParamsEntitiy?,
+            minorContract:
+                params['minorContract'] as ContractRequestParamsEntitiy?,
             minorRecto: params['minorRecto'] as File?,
             minorVerso: params['minorVerso'] as File?,
             minorIsPassport: params['minorIsPassport'] as bool?,
@@ -332,7 +340,8 @@ class AppRoutes {
           MultiBlocProvider(
             providers: [
               BlocProvider(
-                create: (_) => serviceLocator<InvoicesCubit>()..getInvoices(isFirstTime: true),
+                create: (_) => serviceLocator<InvoicesCubit>()
+                  ..getInvoices(isFirstTime: true),
               ),
               BlocProvider(
                 create: (context) => serviceLocator<RetryActivationCubit>(),
