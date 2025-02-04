@@ -190,7 +190,7 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
                           message: "rasd_minor_message".tr(context),
                           context: context,
                         );
-                        // return;
+                        return;
                       }
                     } catch (e) {
                       return;
@@ -327,18 +327,12 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
                               child: AbsorbPointer(
                                 child: AppTextFormField(
                                   enabled: true,
-                                  label: 'expirationDateLabel'.tr(context),
+                                  label: 'issuingDateLabel'.tr(context),
                                   textEditingController: fechaDeExpedicionController,
                                 ),
                               ),
                             ),
-                            SizedBox(height: 16.sp),
-                            AppTextFormField(
-                              isRequired: false,
-                              label: "email".tr(context),
-                              validationType: InputType.EMAIL,
-                              textEditingController: emailEditingController,
-                            ),
+
                             SizedBox(height: 16.sp),
                             // === Wilaya & daira & commune drop downs
                             WilayaDropDown(
@@ -363,6 +357,13 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
                               label: "streetLabel".tr(context),
                               validationType: InputType.ADDRESS,
                               textEditingController: addressEditingController,
+                            ),
+                            SizedBox(height: 16.sp),
+                            AppTextFormField(
+                              isRequired: false,
+                              label: "email".tr(context),
+                              validationType: InputType.EMAIL,
+                              textEditingController: emailEditingController,
                             ),
                             SizedBox(height: 32.sp),
 
@@ -536,8 +537,8 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
       File file = File(imagesPath[0]);
       File preProcessFile = file;
       // Preprocess the image (convert to grayscale)
-      preProcessFile = convertToGrayscale(file);
-      preProcessFile = reduceNoise(file);
+      // preProcessFile = convertToGrayscale(file);
+      // preProcessFile = reduceNoise(file);
 
       // Use the preprocessed image for OCR
       final inputImage = InputImage.fromFile(preProcessFile);

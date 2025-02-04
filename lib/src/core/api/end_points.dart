@@ -5,7 +5,7 @@ class EndPoints {
 
   static const String ocrBaseUrl = String.fromEnvironment("OCR_BASE_URL");
 
-  static const String baseUrl = "https://ms-pos.mobilis.dz/api1/app";
+  static const String baseUrl = "https://ms-pos.mobilis.dz/api2/app";
 
   // static const String baseUrl = "http://172.20.10.5:3002/api2/app";
 

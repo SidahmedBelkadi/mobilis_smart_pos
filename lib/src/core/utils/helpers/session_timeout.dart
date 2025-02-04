@@ -31,6 +31,9 @@ class _SessionTimeoutState extends State<SessionTimeout> {
     // Reset remaining time to 10 minutes
     _remainingTime = 720;
 
+    debugPrint(
+        "***************** ======= | TIMER RESTRATED : $_remainingTime ======= | *********************");
+
     // Start the periodic countdown timer to print remaining time every second
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_remainingTime > 0) {
@@ -67,7 +70,6 @@ class _SessionTimeoutState extends State<SessionTimeout> {
     return Listener(
       behavior: HitTestBehavior.translucent,
       onPointerDown: (event) {
-        debugPrint("***************** ======= | TIMER RESTRATED ======= | *********************");
         _startTimer();
       },
       child: BlocConsumer<SignOutCubit, SignOutState>(

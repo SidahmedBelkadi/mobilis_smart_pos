@@ -84,7 +84,7 @@ class UpgraderService {
         }
       }
 
-      return false; // Versions are identical
+      return true; // Versions are identical
     } else {
       return true;
     }

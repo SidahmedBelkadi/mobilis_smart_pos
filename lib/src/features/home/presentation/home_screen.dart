@@ -105,7 +105,6 @@ class _MyHomePageState extends State<HomeScreen> {
                     width: context.width,
                     child: HomeBanner(
                       banners: const [
-                        AppImages.bannerBonus,
                         AppImages.ban3,
                         AppImages.bannerOmra,
                         AppImages.bannerTestMail1,

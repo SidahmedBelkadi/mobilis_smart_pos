@@ -11,10 +11,10 @@ class InsecureDevice extends StatefulWidget {
   const InsecureDevice({super.key});
 
   @override
-  _InsecureDeviceState createState() => _InsecureDeviceState();
+  InsecureDeviceState createState() => InsecureDeviceState();
 }
 
-class _InsecureDeviceState extends State<InsecureDevice> {
+class InsecureDeviceState extends State<InsecureDevice> {
   int _remainingTime = 5; // 5 seconds countdown
 
   @override
@@ -47,8 +47,7 @@ class _InsecureDeviceState extends State<InsecureDevice> {
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.red,
-            systemOverlayStyle:
-                const SystemUiOverlayStyle(statusBarColor: Colors.red),
+            systemOverlayStyle: const SystemUiOverlayStyle(statusBarColor: Colors.red),
           ),
           backgroundColor: Colors.red,
           body: Center(
