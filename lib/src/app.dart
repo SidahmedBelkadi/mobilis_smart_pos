@@ -22,68 +22,89 @@ class SmartPos extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final initialRouteHelper = di.serviceLocator<InitialRouteHelper>();
-
     return ScreenUtilInit(
       // Resolution of pixel 6 pro (Android Studio)
       designSize: const Size(384, 832),
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return MultiBlocProvider(
-          providers: [
-            BlocProvider(
-              create: (context) => LocaleCubit()..getSavedLanguage(),
-            ),
-            BlocProvider(
-              create: (context) => ThemeCubit()..getSavedTheme(),
-            ),
-            BlocProvider(
-              create: (_) => SignOutCubit(
-                localDataSource: di.serviceLocator<SmartPosLocalStorage>(),
-                useCase: di.serviceLocator<SignOutUseCase>(),
-              ),
-            ),
-          ],
-          child: BlocBuilder<LocaleCubit, ChangeLocalState>(
-            builder: (context, localeState) {
-              return BlocBuilder<ThemeCubit, ChangeThemeState>(
-                builder: (context, themeState) {
-                  if (!di.serviceLocator.isRegistered<DioConsumer>()) {
-                    di.serviceLocator.registerLazySingleton<DioConsumer>(
-                      () => DioConsumer(client: di.serviceLocator(), context: context),
-                    );
-                  }
+        return const AppConfigMultiBlocProvider(
+          child: LocaleAndThemeBlocBuilder(),
+        );
+      },
+    );
+  }
+}
 
-                  return MaterialApp(
-                    navigatorKey: navigatorKey,
-                    debugShowCheckedModeBanner: true,
-                    title: 'MOBILIS SMART POS',
-                    theme: themeState.theme.name == AppThemes.darkTheme.name
-                        ? smartDealerThemeDark(localeState.locale)
-                        : smartDealerTheme(localeState.locale),
-                    onGenerateRoute: AppRoutes.onGenerateRoute,
-                    initialRoute: initialRouteHelper.determineInitialRoute(),
+class AppConfigMultiBlocProvider extends StatelessWidget {
+  const AppConfigMultiBlocProvider({
+    super.key,
+    required this.child,
+  });
 
-                    // ==== Localization ==== //
-                    locale: localeState.locale,
-                    supportedLocales: supportedLocales,
-                    localizationsDelegates: localizationsDelegates,
-                    localeResolutionCallback: (deviceLocale, supportedLocales) {
-                      for (var locale in supportedLocales) {
-                        if (deviceLocale != null &&
-                            (deviceLocale.languageCode == locale.languageCode)) {
-                          return deviceLocale;
-                        }
-                      }
-                      return const Locale("ar");
-                    },
-                    // ==== Localization ==== //
-                  );
-                },
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(providers: [
+      BlocProvider(
+        create: (context) => LocaleCubit()..getSavedLanguage(),
+      ),
+      BlocProvider(
+        create: (context) => ThemeCubit()..getSavedTheme(),
+      ),
+      BlocProvider(
+        create: (_) => SignOutCubit(
+          localDataSource: di.serviceLocator<SmartPosLocalStorage>(),
+          useCase: di.serviceLocator<SignOutUseCase>(),
+        ),
+      ),
+    ], child: child);
+  }
+}
+
+class LocaleAndThemeBlocBuilder extends StatelessWidget {
+  const LocaleAndThemeBlocBuilder({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final initialRouteHelper = di.serviceLocator<InitialRouteHelper>();
+
+    return BlocBuilder<LocaleCubit, ChangeLocalState>(
+      builder: (context, localeState) {
+        return BlocBuilder<ThemeCubit, ChangeThemeState>(
+          builder: (context, themeState) {
+            if (!di.serviceLocator.isRegistered<DioConsumer>()) {
+              di.serviceLocator.registerLazySingleton<DioConsumer>(
+                () => DioConsumer(client: di.serviceLocator(), context: context),
               );
-            },
-          ),
+            }
+
+            return MaterialApp(
+              navigatorKey: navigatorKey,
+              debugShowCheckedModeBanner: true,
+              title: 'MOBILIS SMART POS',
+              theme: themeState.theme.name == AppThemes.darkTheme.name
+                  ? smartDealerThemeDark(localeState.locale)
+                  : smartDealerTheme(localeState.locale),
+              onGenerateRoute: AppRoutes.onGenerateRoute,
+              initialRoute: initialRouteHelper.determineInitialRoute(),
+
+              // ==== Localization ==== //
+              locale: localeState.locale,
+              supportedLocales: supportedLocales,
+              localizationsDelegates: localizationsDelegates,
+              localeResolutionCallback: (deviceLocale, supportedLocales) {
+                for (var locale in supportedLocales) {
+                  if (deviceLocale != null && (deviceLocale.languageCode == locale.languageCode)) {
+                    return deviceLocale;
+                  }
+                }
+                return const Locale("ar");
+              },
+              // ==== Localization ==== //
+            );
+          },
         );
       },
     );
