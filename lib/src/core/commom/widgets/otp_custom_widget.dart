@@ -18,9 +18,7 @@ class OTPCustomWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const focusedBorderColor = AppColors.primary;
-    final fillColor = context.isDarkMode
-        ? Colors.black
-        : const Color.fromRGBO(243, 246, 249, 0);
+    final fillColor = context.isDarkMode ? Colors.black : const Color.fromRGBO(243, 246, 249, 0);
     const borderColor = AppColors.secondary;
 
     final defaultPinTheme = PinTheme(
@@ -28,9 +26,7 @@ class OTPCustomWidget extends StatelessWidget {
       height: 60.sp,
       textStyle: TextStyle(
         fontSize: 16.sp,
-        color: context.isDarkMode
-            ? AppColors.primary
-            : const Color.fromRGBO(30, 60, 87, 1),
+        color: context.isDarkMode ? AppColors.primary : const Color.fromRGBO(30, 60, 87, 1),
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(19.sp),
@@ -41,7 +37,7 @@ class OTPCustomWidget extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.ltr,
       child: Pinput(
-        //readOnly: true,
+        readOnly: true,
         controller: controller,
         length: 6,
         obscureText: false,

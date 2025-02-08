@@ -21,15 +21,15 @@ void main() async {
   await di.initializeAppDependencies();
   await NotificationService.init();
 
-  // final bool isNotSafeDevice = await SecurityCheck.checkSecurity();
+  final bool isNotSafeDevice = await SecurityCheck.checkSecurity();
 
   FlutterNativeSplash.remove();
 
   Bloc.observer = PrettyBlocObserver();
 
-  // if (isNotSafeDevice) {
-  //runApp(const InsecureDevice());
-  // } else {
-   runApp(const SmartPos());
-  // }
+  if (isNotSafeDevice) {
+    runApp(const InsecureDevice());
+  } else {
+    runApp(const SmartPos());
+  }
 }
