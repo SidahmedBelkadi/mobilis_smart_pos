@@ -197,6 +197,28 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
                     }
                   }
 
+                  // Check if the document is expired
+                  if (fechaDeExpedicionController.text.isNotEmpty) {
+                    try {
+                      DateTime issueDate =
+                          DateFormat("dd/MM/yyyy").parse(fechaDeExpedicionController.text);
+                      DateTime expiryDate = issueDate.add(const Duration(days: 365 * 10));
+                      DateTime now = DateTime.now();
+
+                      if (expiryDate.isBefore(now)) {
+                        AppToasts.showWarningToast(
+                          message: "cardExpiredMessage".tr(context),
+                          context: context,
+                        );
+                        return;
+                      } else {
+                        debugPrint("============= RASD CARD STILL VALIDE");
+                      }
+                    } catch (e) {
+                      return;
+                    }
+                  }
+
                   RasdEditRequestParamsEntity params = RasdEditRequestParamsEntity(
                     firstName: firstNameController.text,
                     birthLastName: lastNameController.text,
