@@ -12,8 +12,10 @@ class HomeRepositoryImpl implements HomeRepository {
   final NetworkInfo networkInfo;
   final HomeRemoteDataSource remoteDataSource;
 
-  HomeRepositoryImpl(
-      {required this.networkInfo, required this.remoteDataSource});
+  HomeRepositoryImpl({
+    required this.networkInfo,
+    required this.remoteDataSource,
+  });
 
   @override
   Future<Either<Failure, List<String>>> loadBanners() async {
@@ -25,8 +27,8 @@ class HomeRepositoryImpl implements HomeRepository {
         return Left(ServerFailure(message: ErrorHandler.getErrorMessage(e)));
       }
     } else {
-      return const Left(NoInternetConnectionFailure(
-          message: AppApiResponsesMessages.noInternetConnection));
+      return const Left(
+          NoInternetConnectionFailure(message: AppApiResponsesMessages.noInternetConnection));
     }
   }
 }

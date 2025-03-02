@@ -15,7 +15,7 @@ class InsecureDevice extends StatefulWidget {
 }
 
 class InsecureDeviceState extends State<InsecureDevice> {
-  int _remainingTime = 5; // 5 seconds countdown
+  int _remainingTime = 5;
 
   @override
   void initState() {

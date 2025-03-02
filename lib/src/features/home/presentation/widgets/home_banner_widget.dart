@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -36,7 +35,7 @@ class HomeBanner extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16.0.sp),
                     child: isNetworkBanners
                         ? CachedNetworkImage(
-                            imageUrl: "http://192.168.1.12:3002$imageUrl",
+                            imageUrl: "http://ms-pos.mobilis.dz$imageUrl",
                             imageBuilder: (context, imageProvider) => Container(
                                   width: context.width,
                                   height: 220.h,

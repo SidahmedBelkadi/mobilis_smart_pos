@@ -5,9 +5,9 @@ class EndPoints {
 
   static const String ocrBaseUrl = String.fromEnvironment("OCR_BASE_URL");
 
-  // static const String baseUrl = "https://ms-pos.mobilis.dz/api2/app";
+  static const String baseUrl = "https://ms-pos.mobilis.dz/api2/app";
 
-  static const String baseUrl = "http://192.168.1.12:3002/api2/app";
+  // static const String baseUrl = "http://192.168.1.12:3002/api2/app";
 
   // ============== APK ================== //
   static const String downloadApk = "https://ms-pos.mobilis.dz/apk";
@@ -32,13 +32,11 @@ class EndPoints {
   static const String getBanners = "$baseUrl/folder/banners";
 
   // ================== CLIENT ================= //
-  static const String checkBeforeEditContract =
-      "$baseUrl/contract/check-before-edit";
+  static const String checkBeforeEditContract = "$baseUrl/contract/check-before-edit";
   static const String editContract = "$baseUrl/contract/edit";
   static const String rasdEditContract = "$baseUrl/contract-rasd/edit";
   static const String generateContrcat = "$baseUrl/contract/attributeMSISDN";
-  static const String rasdGenerateContrcat =
-      "$baseUrl/contract-rasd/attributeMSISDN";
+  static const String rasdGenerateContrcat = "$baseUrl/contract-rasd/attributeMSISDN";
   static const String rasdTriggerSms = "$baseUrl/contract-rasd/triggerSMS";
   static const String uploadClient = "$baseUrl/file/client";
   static const String uploadClientRasd = "$baseUrl/file/client_rasd";
