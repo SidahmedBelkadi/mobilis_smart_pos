@@ -25,6 +25,7 @@ class OTPCustomWidget extends StatefulWidget {
 
 class _OTPCustomWidgetState extends State<OTPCustomWidget> with WidgetsBindingObserver {
   bool _hasPermission = false;
+  bool _isCheckingPermission = true;
 
   @override
   void initState() {
@@ -42,7 +43,6 @@ class _OTPCustomWidgetState extends State<OTPCustomWidget> with WidgetsBindingOb
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // Check permission again after returning from settings
       Permission.sms.status.then((status) {
         if (status.isGranted) {
           navigatorKey.currentState?.pushNamedAndRemoveUntil(Routes.signIn, (context) => false);
@@ -52,9 +52,14 @@ class _OTPCustomWidgetState extends State<OTPCustomWidget> with WidgetsBindingOb
   }
 
   Future<void> _checkPermission() async {
+    setState(() {
+      _isCheckingPermission = true;
+    });
+
     final status = await Permission.sms.status;
     setState(() {
       _hasPermission = status.isGranted;
+      _isCheckingPermission = false;
     });
   }
 
@@ -121,42 +126,11 @@ class _OTPCustomWidgetState extends State<OTPCustomWidget> with WidgetsBindingOb
       ),
     );
 
+    final shouldShowWarning = !_hasPermission && !_isCheckingPermission;
+
     return Column(
       children: [
-        if (!_hasPermission) ...[
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 8.sp),
-            margin: EdgeInsets.only(bottom: 12.sp),
-            decoration: BoxDecoration(
-              color: AppColors.secondaryLight,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.primary),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.warning_amber_rounded, color: Colors.amber),
-                SizedBox(width: 8.sp),
-                Expanded(
-                  child: Text(
-                    "auto_otp_warning".tr(context),
-                    style: Theme.of(context).textTheme.labelMedium!.copyWith(color: Colors.black),
-                  ),
-                ),
-                TextButton(
-                  onPressed: _requestPermission,
-                  child: Text(
-                    "grant".tr(context),
-                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                          color: AppColors.primary,
-                          decoration: TextDecoration.underline,
-                          decorationColor: AppColors.primary,
-                        ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ],
+        if (shouldShowWarning) _buildPermissionWarning(context),
         Directionality(
           textDirection: TextDirection.ltr,
           child: Pinput(
@@ -199,6 +173,41 @@ class _OTPCustomWidgetState extends State<OTPCustomWidget> with WidgetsBindingOb
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildPermissionWarning(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 8.sp),
+      margin: EdgeInsets.only(bottom: 12.sp),
+      decoration: BoxDecoration(
+        color: AppColors.secondaryLight,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.primary),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.warning_amber_rounded, color: Colors.amber),
+          SizedBox(width: 8.sp),
+          Expanded(
+            child: Text(
+              "auto_otp_warning".tr(context),
+              style: Theme.of(context).textTheme.labelMedium!.copyWith(color: Colors.black),
+            ),
+          ),
+          TextButton(
+            onPressed: _requestPermission,
+            child: Text(
+              "grant".tr(context),
+              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                    color: AppColors.primary,
+                    decoration: TextDecoration.underline,
+                    decorationColor: AppColors.primary,
+                  ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

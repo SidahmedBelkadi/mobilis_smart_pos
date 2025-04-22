@@ -7,7 +7,6 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:pretty_bloc_observer/pretty_bloc_observer.dart';
 import 'src/core/utils/helpers/insecure_device_checker.dart';
 import 'src/core/utils/helpers/security_helper.dart';
-import 'src/services/notification_service.dart';
 
 import 'src/app.dart';
 import 'src/dependency_injection/injection_container.dart' as di;
@@ -19,7 +18,6 @@ void main() async {
   await Future.delayed(const Duration(milliseconds: 150));
 
   await di.initializeAppDependencies();
-  await NotificationService.init();
 
   final bool isNotSafeDevice = await SecurityCheck.checkSecurity();
 
