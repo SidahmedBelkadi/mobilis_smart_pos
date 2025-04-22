@@ -179,7 +179,7 @@ class _ProfilePasswordUpdateState extends State<ProfilePasswordUpdateScreen> {
                         ? SizedBox(
                             height: 32.sp,
                             width: 32.sp,
-                            child: const CircularProgressIndicator(
+                            child: CircularProgressIndicator(
                               color: AppColors.primary,
                             ),
                           )

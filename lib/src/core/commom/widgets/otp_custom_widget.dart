@@ -17,9 +17,9 @@ class OTPCustomWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const focusedBorderColor = AppColors.primary;
+    final focusedBorderColor = AppColors.primary;
     final fillColor = context.isDarkMode ? Colors.black : const Color.fromRGBO(243, 246, 249, 0);
-    const borderColor = AppColors.secondary;
+    final borderColor = AppColors.secondary;
 
     final defaultPinTheme = PinTheme(
       width: 60.sp,

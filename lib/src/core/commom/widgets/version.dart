@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/helpers/media_query_values.dart';
 import 'package:package_info_plus/package_info_plus.dart'; // Import package_info_plus
 
-import '../../utils/helpers/app_localization_helper.dart';
 import '../../utils/ressources/app_colors.dart';
 
 class VersionWidget extends StatefulWidget {
@@ -41,25 +40,20 @@ class _VersionWidgetState extends State<VersionWidget> {
         border: Border.all(color: context.isDarkMode ? AppColors.primary : AppColors.secondary),
       ),
       padding: EdgeInsets.symmetric(horizontal: 4.sp, vertical: 4.sp),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            "version".tr(context),
-            style: Theme.of(context)
-                .textTheme
-                .labelSmall!
-                .copyWith(color: context.isDarkMode ? Colors.white : AppColors.primary),
-          ),
-          SizedBox(width: 4.sp),
-          Text(
-            _appVersion.isNotEmpty ? _appVersion : '1.0.0',
-            style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                  color: context.isDarkMode ? Colors.white : AppColors.primary,
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-        ],
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 5.sp),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _appVersion.isNotEmpty ? _appVersion : '1.0.0',
+              style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                    color: context.isDarkMode ? Colors.white : AppColors.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ],
+        ),
       ),
     );
   }

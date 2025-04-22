@@ -39,7 +39,7 @@ abstract class AppDialog {
               TextButton(
                 onPressed: onPressed,
                 child: Text(acceptName.tr(context),
-                    style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                    style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -62,7 +62,7 @@ abstract class AppDialog {
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text(
+              child: Text(
                 "yes",
                 style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
               ),

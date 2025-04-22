@@ -39,7 +39,7 @@ ThemeData smartDealerTheme(Locale locale) {
       elevatedButtonTheme: elevatedButtonThemeData,
 
       /// Progress Indicator Theme
-      progressIndicatorTheme: const ProgressIndicatorThemeData(
+      progressIndicatorTheme: ProgressIndicatorThemeData(
         color: AppColors.primary,
       ),
       bottomSheetTheme: const BottomSheetThemeData(backgroundColor: Colors.white),
@@ -74,7 +74,7 @@ ThemeData smartDealerThemeDark(Locale locale) {
       elevatedButtonTheme: elevatedButtonThemeDataDark,
 
       /// Progress Indicator Theme
-      progressIndicatorTheme: const ProgressIndicatorThemeData(
+      progressIndicatorTheme: ProgressIndicatorThemeData(
         color: AppColors.primary,
       ),
       bottomSheetTheme: const BottomSheetThemeData(backgroundColor: Colors.black),

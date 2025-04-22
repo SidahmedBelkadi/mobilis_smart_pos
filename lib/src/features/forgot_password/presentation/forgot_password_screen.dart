@@ -50,7 +50,7 @@ class ForgotPasswordScreen extends StatelessWidget {
               return SizedBox(
                 height: 32.sp,
                 width: 32.sp,
-                child: const CircularProgressIndicator(
+                child: CircularProgressIndicator(
                   color: AppColors.primary,
                 ),
               );
@@ -58,8 +58,9 @@ class ForgotPasswordScreen extends StatelessWidget {
             return FloatingActionButton(
               backgroundColor: AppColors.primary,
               onPressed: () => _onFABPressed(context, cubit),
-              child:  FaIcon(
-                FontAwesomeIcons.arrowRight, color : context.isDarkMode ? Colors.black : Colors.white ,
+              child: FaIcon(
+                FontAwesomeIcons.arrowRight,
+                color: context.isDarkMode ? Colors.black : Colors.white,
               ),
             );
           },
@@ -77,37 +78,39 @@ class ForgotPasswordScreen extends StatelessWidget {
                   width: 300.w,
                 ),
                 if (msisdn == null)
-                Text(
-                  "phoneNumber".tr(context),
-                  textAlign: TextAlign.center,
-                  style:
-                      Theme.of(context).textTheme.headlineSmall!.copyWith(color: AppColors.primary),
-                ),
+                  Text(
+                    "phoneNumber".tr(context),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineSmall!
+                        .copyWith(color: AppColors.primary),
+                  ),
                 SizedBox(height: 64.h),
                 Form(
                   key: cubit.formKey,
                   child: Directionality(
                     textDirection: TextDirection.ltr,
-                    child: msisdn != null ?
-                    AppTextFormField(
-                      enabled: false,
-                      disabledValue: msisdn?.replaceFirst("213", "") ,
-                      label: "msisdnLabel".tr(context),
-                      prefixText: "(+213 🇩🇿)  ",
-                      keyboardType: TextInputType.phone,
-                      suffixIcon: Icons.phone_android,
-                      textEditingController: cubit.phoneController,
-                    ):
-                    AppTextFormField(
-                      enabled: msisdn == null,
-                      disabledValue: msisdn?.replaceFirst("213", "") ,
-                      label: "msisdnLabel".tr(context),
-                      prefixText: "(+213 🇩🇿)  ",
-                      validationType: InputType.PHONE,
-                      keyboardType: TextInputType.phone,
-                      suffixIcon: Icons.phone_android,
-                      textEditingController: cubit.phoneController,
-                    ),
+                    child: msisdn != null
+                        ? AppTextFormField(
+                            enabled: false,
+                            disabledValue: msisdn?.replaceFirst("213", ""),
+                            label: "msisdnLabel".tr(context),
+                            prefixText: "(+213 🇩🇿)  ",
+                            keyboardType: TextInputType.phone,
+                            suffixIcon: Icons.phone_android,
+                            textEditingController: cubit.phoneController,
+                          )
+                        : AppTextFormField(
+                            enabled: msisdn == null,
+                            disabledValue: msisdn?.replaceFirst("213", ""),
+                            label: "msisdnLabel".tr(context),
+                            prefixText: "(+213 🇩🇿)  ",
+                            validationType: InputType.PHONE,
+                            keyboardType: TextInputType.phone,
+                            suffixIcon: Icons.phone_android,
+                            textEditingController: cubit.phoneController,
+                          ),
                   ),
                 ),
               ],

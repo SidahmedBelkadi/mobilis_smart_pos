@@ -1,0 +1,2 @@
+/Users/pc/workspace/mobilis/mobilis_smart_pos/android/app/.cxx/Debug/ujr1l276/armeabi-v7a/CMakeFiles/rebuild_cache.dir
+/Users/pc/workspace/mobilis/mobilis_smart_pos/android/app/.cxx/Debug/ujr1l276/armeabi-v7a/CMakeFiles/edit_cache.dir

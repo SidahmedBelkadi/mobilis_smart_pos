@@ -9,7 +9,7 @@ class InvoiceStatusEnum {
 
   const InvoiceStatusEnum._(this.name, this.color, this.backgroundColor);
 
-  static const InvoiceStatusEnum success = InvoiceStatusEnum._(
+  static InvoiceStatusEnum success = InvoiceStatusEnum._(
     "success",
     AppColors.inProgressTextColor,
     AppColors.secondaryLight,
@@ -33,5 +33,5 @@ class InvoiceStatusEnum {
     AppColors.darkerGrey,
   );
 
-  static const List<InvoiceStatusEnum> values = [success, failed, pending, skeleton];
+  static List<InvoiceStatusEnum> values = [success, failed, pending, skeleton];
 }

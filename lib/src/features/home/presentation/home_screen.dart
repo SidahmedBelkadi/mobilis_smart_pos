@@ -25,7 +25,7 @@ class _MyHomePageState extends State<HomeScreen> {
   void initState() {
     context.read<HomeCubit>().loadHomeBannersUrls();
     super.initState();
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: AppColors.primary,
       statusBarBrightness: Brightness.dark,
       statusBarIconBrightness: Brightness.dark,

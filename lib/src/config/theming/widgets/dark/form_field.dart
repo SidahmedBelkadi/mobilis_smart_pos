@@ -17,7 +17,7 @@ InputDecorationTheme inputDecorationThemeDark = InputDecorationTheme(
   ),
   focusedBorder: OutlineInputBorder(
     borderRadius: BorderRadius.circular(12.0.r),
-    borderSide: const BorderSide(color: AppColors.primary, width: 2),
+    borderSide: BorderSide(color: AppColors.primary, width: 2),
   ),
   errorBorder: OutlineInputBorder(
     borderRadius: BorderRadius.circular(12.0.r),
@@ -27,10 +27,8 @@ InputDecorationTheme inputDecorationThemeDark = InputDecorationTheme(
     borderRadius: BorderRadius.circular(12.0.r),
     borderSide: const BorderSide(color: Colors.red, width: 2),
   ),
-  errorStyle: TextStyle(
-      fontSize: 10.sp, color: Colors.red, overflow: TextOverflow.visible),
-  floatingLabelStyle:
-      WidgetStateTextStyle.resolveWith((Set<WidgetState> states) {
+  errorStyle: TextStyle(fontSize: 10.sp, color: Colors.red, overflow: TextOverflow.visible),
+  floatingLabelStyle: WidgetStateTextStyle.resolveWith((Set<WidgetState> states) {
     if (states.contains(WidgetState.error)) {
       return TextStyle(color: Colors.red, fontSize: 12.sp);
     }

@@ -332,7 +332,7 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
                                 labelText: "genderLabel".tr(context),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12.0.r),
-                                  borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                                  borderSide: BorderSide(color: AppColors.primary, width: 2),
                                 ),
                               ),
                             ),

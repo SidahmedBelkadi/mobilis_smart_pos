@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../../core/utils/ressources/app_colors.dart';
 
-AppBarTheme appBarTheme = const AppBarTheme(
+AppBarTheme appBarTheme = AppBarTheme(
   systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: AppColors.primary),
   elevation: 0,
   scrolledUnderElevation: 0,

@@ -71,7 +71,7 @@ class _SignInScreenState extends State<SignInScreen> {
             listener: (context, state) {},
             builder: (context, state) {
               return PopupMenuButton<String>(
-                icon: const FaIcon(FontAwesomeIcons.language, color: Colors.green),
+                icon: FaIcon(FontAwesomeIcons.language, color: AppColors.primary),
                 onSelected: (value) {
                   context
                       .read<LocaleCubit>()

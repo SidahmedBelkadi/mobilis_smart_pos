@@ -5,7 +5,7 @@ import 'package:toastification/toastification.dart';
 import '../ressources/app_colors.dart';
 
 abstract class AppToasts {
-  static const progressBarTheme =
+  static final progressBarTheme =
       ProgressIndicatorThemeData(refreshBackgroundColor: AppColors.secondary);
 
   static void showSuccessToast({required String message, required BuildContext context}) {
