@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 import 'package:diacritic/diacritic.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +9,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:insta_image_viewer/insta_image_viewer.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/session_timeout.dart';
+import 'package:mobilis_smart_pos/src/services/native_camera_scanner.dart';
 import '../../../core/commom/widgets/custom_appbar_with_deny_contract.dart';
 import '../../../core/commom/widgets/custom_floating_action_button.dart';
 import '../../../core/utils/enums/documents_type.dart';
@@ -337,9 +337,9 @@ class _ContractScreenState extends State<ContractScreen> {
     required DocumentsType docType,
     required BuildContext context,
   }) async {
-    final imagesPath =
-        await CunningDocumentScanner.getPictures(noOfPages: 1, isGalleryImportAllowed: false);
-    if (imagesPath != null && imagesPath.isNotEmpty) {
+    final imagesPath = await NativeDocumentScanner.getPictures();
+
+    if (imagesPath.isNotEmpty) {
       File file = File(imagesPath[0]);
       final validated = await checkDocument(recognizer: recognizer, file: file, docType: docType);
       if (validated) {

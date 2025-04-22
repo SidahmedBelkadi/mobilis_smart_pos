@@ -75,7 +75,6 @@ class _OTPCustomWidgetState extends State<OTPCustomWidget> with WidgetsBindingOb
         _hasPermission = true;
       });
     } else if (result.isPermanentlyDenied) {
-      // If permission is permanently denied, show a dialog or redirect to settings
       await showDialog(
         context: context,
         builder: (context) => AlertDialog(

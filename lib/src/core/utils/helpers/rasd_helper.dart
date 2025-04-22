@@ -1,11 +1,11 @@
 import 'dart:io';
 
-import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:mobilis_smart_pos/src/core/utils/enums/documents_type.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/toast_helper.dart';
+import 'package:mobilis_smart_pos/src/services/native_camera_scanner.dart';
 
 class RASD {
   RASD._();
@@ -15,10 +15,9 @@ class RASD {
     required DocumentsType docType,
     required BuildContext context,
   }) async {
-    final imagesPath =
-        await CunningDocumentScanner.getPictures(noOfPages: 1, isGalleryImportAllowed: false);
+    final imagesPath = await NativeDocumentScanner.getPictures();
 
-    if (imagesPath != null && imagesPath.isNotEmpty) {
+    if (imagesPath.isNotEmpty) {
       File file = File(imagesPath[0]);
 
       final inputImage = InputImage.fromFile(file);

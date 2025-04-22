@@ -1,12 +1,12 @@
 import 'dart:io';
 
-import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:lottie/lottie.dart';
+import 'package:mobilis_smart_pos/src/services/native_camera_scanner.dart';
 import '../../../core/commom/widgets/custom_app_bar.dart';
 import '../../../core/commom/widgets/custom_floating_action_button.dart';
 import '../../../core/utils/helpers/app_localization_helper.dart';
@@ -89,9 +89,9 @@ class _UpdatePdvFolderState extends State<UpdatePdvFolder> {
       required DocumentsType docType,
       required BuildContext context,
     }) async {
-      final imagesPath =
-          await CunningDocumentScanner.getPictures(noOfPages: 1, isGalleryImportAllowed: false);
-      if (imagesPath != null && imagesPath.isNotEmpty) {
+      final imagesPath = await NativeDocumentScanner.getPictures();
+
+      if (imagesPath.isNotEmpty) {
         File file = File(imagesPath[0]);
         final validated = await checkDocument(recognizer: recognizer, file: file, docType: docType);
         if (validated) {

@@ -225,14 +225,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
-  cunning_document_scanner:
-    dependency: "direct main"
-    description:
-      name: cunning_document_scanner
-      sha256: bf590e8c8c8a4903ba7873c4f22b67e976604853f11065f594cb19b408bd25ef
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.3"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -454,14 +446,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.4.1"
-  flutter_doc_scanner:
-    dependency: "direct main"
-    description:
-      name: flutter_doc_scanner
-      sha256: "4a1dd77d37004ee8b9bdbb7437b0c970706d51b74ddd9806d491420d066d255d"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.16"
   flutter_hooks:
     dependency: transitive
     description:
@@ -645,14 +629,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_zxing:
-    dependency: "direct main"
-    description:
-      name: flutter_zxing
-      sha256: "7ced1ebb196a5361964f03af37a8f51120271982698ff7befe34f7e35f0babbc"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.7.0"
   font_awesome_flutter:
     dependency: "direct main"
     description:
@@ -1013,14 +989,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.6"
-  mobile_scanner:
-    dependency: "direct main"
-    description:
-      name: mobile_scanner
-      sha256: "728828a798d1a2ee506beb652ca23d974c542c96ed03dcbd5eaf97bef96cdaad"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.0.2"
   nested:
     dependency: transitive
     description:
@@ -1301,14 +1269,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.2"
-  qr_code_scanner:
-    dependency: "direct main"
-    description:
-      name: qr_code_scanner
-      sha256: f23b68d893505a424f0bd2e324ebea71ed88465d572d26bb8d2e78a4749591fd
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.1"
   readmore:
     dependency: "direct main"
     description:

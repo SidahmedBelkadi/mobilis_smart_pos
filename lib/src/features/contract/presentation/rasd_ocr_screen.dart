@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -28,6 +27,7 @@ import 'package:mobilis_smart_pos/src/features/contract/domain/entities/commune_
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/rasd_request_params_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/wilaya_entity.dart';
 import 'package:mobilis_smart_pos/src/features/profile/presentation/widget/upload_image_field.dart';
+import 'package:mobilis_smart_pos/src/services/native_camera_scanner.dart';
 import 'package:mobilis_smart_pos/src/services/screenshot_service.dart';
 
 class RasdOcrScreen extends StatefulWidget {
@@ -552,10 +552,9 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
     required DocumentsType docType,
     required BuildContext context,
   }) async {
-    final imagesPath =
-        await CunningDocumentScanner.getPictures(noOfPages: 1, isGalleryImportAllowed: false);
+    final imagesPath = await NativeDocumentScanner.getPictures();
 
-    if (imagesPath != null && imagesPath.isNotEmpty) {
+    if (imagesPath.isNotEmpty) {
       File file = File(imagesPath[0]);
       File preProcessFile = file;
       // Preprocess the image (convert to grayscale)

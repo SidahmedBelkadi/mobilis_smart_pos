@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.nfc.NfcAdapter;
@@ -26,6 +27,10 @@ import androidx.core.content.ContextCompat;
 import com.ai_univers.smart_point_of_sale.Reader.NFCResultCallback;
 import com.ai_univers.smart_point_of_sale.Reader.vision.BarcodeScannerActivity;
 import com.ai_univers.smart_point_of_sale.Reader.vision.ScanActivity;
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanner;
+import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions;
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanning;
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult;
 
 import org.json.JSONObject;
 
@@ -51,6 +56,8 @@ public class MainActivity extends FlutterActivity {
     private boolean resultSent = false;
     private static final int OCR_REQUEST_CODE = 1001;
     private static final int BARCODE_REQUEST_CODE = 2002;
+    private static final int MLKIT_SCANNER_REQUEST_CODE = 5555;
+
 
 
     private MethodChannel.Result pendingResult;
@@ -125,9 +132,11 @@ public class MainActivity extends FlutterActivity {
                                     openBrowser(url);
                                     result.success(null);
                                 }else if (call.method.equals("getSimOperators")) {
-                                    // Fetch SIM operators
                                     List<String> simOperators = getSimOperators();
                                     result.success(simOperators);
+                                }else if (call.method.equals("startDocumentScanner")) {
+                                    pendingResult = result;
+                                    startDocumentScanner();
                                 }
                             }
                         }
@@ -167,6 +176,27 @@ public class MainActivity extends FlutterActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == MLKIT_SCANNER_REQUEST_CODE && pendingResult != null) {
+            if (resultCode == Activity.RESULT_OK && data != null) {
+                GmsDocumentScanningResult scanResult = GmsDocumentScanningResult.fromActivityResultIntent(data);
+
+                if (scanResult != null && scanResult.getPages() != null && !scanResult.getPages().isEmpty()) {
+                    Uri imageUri = scanResult.getPages().get(0).getImageUri(); // Only one page
+
+                    HashMap<String, Object> resultMap = new HashMap<>();
+                    resultMap.put("imageUri", imageUri.toString());
+                    pendingResult.success(resultMap);
+                } else {
+                    pendingResult.error("NO_RESULT", "Scan returned no pages", null);
+                }
+            } else {
+                pendingResult.error("SCAN_CANCELLED", "User cancelled scan", null);
+            }
+
+            pendingResult = null;
+        }
+
 
         if (requestCode == BARCODE_REQUEST_CODE) {
             if (barCodePendingResult != null) {
@@ -243,6 +273,37 @@ public class MainActivity extends FlutterActivity {
         Intent intent = new Intent(this, BarcodeScannerActivity.class);
         startActivityForResult(intent, BARCODE_REQUEST_CODE);
     }
+
+    private void startDocumentScanner() {
+        GmsDocumentScannerOptions options =
+                new GmsDocumentScannerOptions.Builder()
+                        .setGalleryImportAllowed(false)
+                        .setPageLimit(1)
+                        .setResultFormats(GmsDocumentScannerOptions.RESULT_FORMAT_JPEG)
+                        .setScannerMode(GmsDocumentScannerOptions.SCANNER_MODE_BASE)
+                        .build();
+
+        GmsDocumentScanner scanner = GmsDocumentScanning.getClient(options);
+
+        scanner.getStartScanIntent(MainActivity.this)
+                .addOnSuccessListener(intentSender -> {
+                    try {
+                        startIntentSenderForResult(intentSender, MLKIT_SCANNER_REQUEST_CODE, null, 0, 0, 0);
+                    } catch (IntentSender.SendIntentException e) {
+                        if (pendingResult != null) {
+                            pendingResult.error("SEND_INTENT_FAILED", e.getMessage(), null);
+                            pendingResult = null;
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    if (pendingResult != null) {
+                        pendingResult.error("SCAN_FAILED", e.getMessage(), null);
+                        pendingResult = null;
+                    }
+                });
+    }
+
 
 
     private void startNfcReading(MethodChannel.Result result) {
