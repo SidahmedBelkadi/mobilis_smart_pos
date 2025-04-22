@@ -1,5 +1,5 @@
 import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/material.dart';
 import 'package:mobilis_smart_pos/src/features/home/domain/use_cases/load_banners_use_case.dart';
 
 part 'home_state.dart';

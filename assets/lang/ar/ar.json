@@ -334,5 +334,10 @@
   "nationality_with_point": " الجنسية : ",
   "coming_soon": "قريبا !!",
   "select_sexe": "يرجى تحديد الجنس للمتابعة.",
-  "rasd_minor_message": "الزبون قاصر"
+  "rasd_minor_message": "الزبون قاصر",
+  "auto_otp_warning": "تحتاج Smart POS إلى إذن الرسائل القصيرة (SMS) لاكتشاف رمز التحقق تلقائيًا",
+  "grant": "السماح",
+  "permission_required": "الإذن مطلوب",
+  "please_enable_sms_permission": "يرجى تفعيل إذن الرسائل القصيرة من الإعدادات لاكتشاف الرمز تلقائيًا.",
+  "cancel": "إلغاء"
 }

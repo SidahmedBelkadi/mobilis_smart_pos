@@ -334,5 +334,10 @@
   "nationality_with_point": "Nationalité : ",
   "coming_soon": "Prochainement !!",
   "select_sexe": "Veuillez sélectionner votre sexe pour continuer",
-  "rasd_minor_message": "Le client est mineur"
+  "rasd_minor_message": "Le client est mineur",
+  "auto_otp_warning": "Smart POS a besoin de l'autorisation SMS pour détecter automatiquement le code de vérification",
+  "grant": "Autoriser",
+  "permission_required": "Autorisation requise",
+  "please_enable_sms_permission": "Veuillez activer l'autorisation SMS dans les paramètres pour détecter automatiquement le code.",
+  "cancel": "Annuler"
 }
