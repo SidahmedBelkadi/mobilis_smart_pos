@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus
   file_selector_windows
+  flutter_doc_scanner
   flutter_secure_storage_windows
   flutter_timezone
   geolocator_windows
