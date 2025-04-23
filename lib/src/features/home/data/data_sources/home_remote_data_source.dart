@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:mobilis_smart_pos/src/core/api/dio_consumer.dart';
 import 'package:mobilis_smart_pos/src/core/api/end_points.dart';
 
@@ -18,8 +17,6 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
     final response = await dioConsumer.get(EndPoints.getBanners);
     final Map<String, dynamic> decodedJson = jsonDecode(response);
     final List<String> bannersUrls = List<String>.from(decodedJson['imageUrls']);
-
-    debugPrint("=============== $bannersUrls");
     return bannersUrls;
   }
 }
