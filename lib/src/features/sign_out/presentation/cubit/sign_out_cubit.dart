@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
+import 'package:mobilis_smart_pos/src/app.dart';
 import '../../../../config/routing/app_routes.dart';
 
 import '../../../../dependency_injection/injection_container.dart' as di;
@@ -31,7 +32,7 @@ class SignOutCubit extends Cubit<SignOutState> with WidgetsBindingObserver {
       result.fold(
         (failure) async {
           await di.serviceLocator<SmartPosLocalStorage>().clearLoginCredentials();
-          Navigator.of(context).pushNamedAndRemoveUntil(Routes.signIn, (route) => false);
+          navigatorKey.currentState?.pushNamedAndRemoveUntil(Routes.signIn, (route) => false);
         },
         (_) async {
           await localDataSource.clearLoginCredentials();
@@ -40,7 +41,7 @@ class SignOutCubit extends Cubit<SignOutState> with WidgetsBindingObserver {
       );
     } else {
       await di.serviceLocator<SmartPosLocalStorage>().clearLoginCredentials();
-      Navigator.of(context).pushNamedAndRemoveUntil(Routes.signIn, (route) => false);
+      navigatorKey.currentState?.pushNamedAndRemoveUntil(Routes.signIn, (route) => false);
     }
   }
 }
