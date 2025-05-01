@@ -4,13 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/session_timeout.dart';
-import 'package:mobilis_smart_pos/src/features/bar_code/presentation/loading_barier.dart';
 import 'package:mobilis_smart_pos/src/features/bar_code/presentation/ui.dart';
 import '../../../config/routing/app_routes.dart';
 import '../../../core/commom/widgets/custom_appbar_with_deny_contract.dart';
 import '../../../core/utils/helpers/app_localization_helper.dart';
 import '../../../core/utils/helpers/media_query_values.dart';
-import '../../../core/utils/helpers/toast_helper.dart';
 import '../../contract/domain/entities/contract_request_params_entitiy.dart';
 import '../../contract/presentation/cubit/contract_cubit.dart';
 
@@ -41,7 +39,6 @@ class SimScannerScreen extends StatefulWidget {
 }
 
 late ContractCubit cubit;
-late ContractRequestParamsEntitiy newContract;
 String? selectedOfferName;
 
 class SimScannerScreenState extends State<SimScannerScreen> {
@@ -63,40 +60,8 @@ class SimScannerScreenState extends State<SimScannerScreen> {
             child: SizedBox(
               height: context.height - 56.sp,
               width: context.width,
-              child: BlocConsumer<ContractCubit, ContractState>(
-                listener: (context, state) {
-                  if (state is CheckBeforeEditContractSuccess) {
-                    Navigator.of(context).pushNamed(
-                      Routes.signatureScreen,
-                      arguments: {
-                        'contract': newContract,
-                        'formattedSmsCode': state.formattedStringWithoutSpaces,
-                        'recto': widget.recto,
-                        'verso': widget.verso,
-                        'isPassport': widget.isPassport,
-                        'parentRecto': widget.parentRecto,
-                        'parentVerso': widget.parentVerso,
-                        'justificatif': widget.justificatif,
-                        'parentIsPassport': widget.parentIsPassport
-                      },
-                    );
-                  }
-                  if (state is CheckBeforeEditContractFailed) {
-                    AppToasts.showErrorToast(
-                      message: state.message.tr(context),
-                      context: context,
-                    );
-                  }
-                },
-                builder: (context, state) {
-                  if (state is CheckBeforeEditContractLoading) {
-                    return const LoadingBarrier();
-                  }
-
-                  return SimScannerUI(
-                    onPressed: () => _startBarcodeScanner(context),
-                  );
-                },
+              child: SimScannerUI(
+                onPressed: () => _startBarcodeScanner(context),
               ),
             ),
           ),
@@ -154,15 +119,8 @@ class SimScannerScreenState extends State<SimScannerScreen> {
             ),
             ElevatedButton(
               child: Text('yes'.tr(context)),
-              onPressed: () async {
-                Navigator.of(context).pop();
-                final Map? selectedOffer =
-                    await Navigator.of(context).pushNamed(Routes.offers) as Map?;
-
-                if (selectedOffer != null) {
-                  // ignore: use_build_context_synchronously
-                  _continueWithBarcode(context, barcode, selectedOffer['offerId']);
-                }
+              onPressed: () {
+                _continueWithBarcode(context, barcode);
               },
             ),
           ],
@@ -171,16 +129,25 @@ class SimScannerScreenState extends State<SimScannerScreen> {
     );
   }
 
-  void _continueWithBarcode(BuildContext context, String barcode, int selectedOfferId) {
-    setState(() {
-      newContract = widget.contract.copyWith(
-        serialNumber: int.parse(barcode),
-        subscriptionId: selectedOfferId,
-      );
-    });
+  void _continueWithBarcode(BuildContext context, String barcode) {
+    final ContractRequestParamsEntitiy newContract = widget.contract.copyWith(
+      serialNumber: int.parse(barcode),
+    );
 
-    cubit.checkBeforeEditContract(
-      contract: newContract,
+    Navigator.of(context).pushNamed(
+      Routes.signatureScreen,
+      arguments: {
+        'contract': newContract,
+        'formattedSmsCode':
+            '', // TODO : Ask Sarah about this, Cuz now it's empty since we're not doing check before edit
+        'recto': widget.recto,
+        'verso': widget.verso,
+        'isPassport': widget.isPassport,
+        'parentRecto': widget.parentRecto,
+        'parentVerso': widget.parentVerso,
+        'justificatif': widget.justificatif,
+        'parentIsPassport': widget.parentIsPassport
+      },
     );
   }
 }
