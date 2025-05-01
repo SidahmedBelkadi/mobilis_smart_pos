@@ -5,7 +5,7 @@ class EndPoints {
 
   static const String ocrBaseUrl = String.fromEnvironment("OCR_BASE_URL");
 
-  static const String baseUrl = "https://ms-pos.mobilis.dz/api2/app";
+  static const String baseUrl = String.fromEnvironment("BASE_URL");
   static bool get isApi1 => baseUrl.contains('api1');
 
   // ============== APK ================== //
@@ -42,8 +42,6 @@ class EndPoints {
   static const String getAllOffers = "$baseUrl/subscription-type/all";
   static const String triggerSms = "$baseUrl/contract/triggerSMS";
   static const String retryTriggerSms = "$baseUrl/contract/triggerSMS/retry";
-
-  // static const String retriveCGV = "http://172.20.10.5:3002/api2/subscription-type";
 
   // ================== OCR =================== //
   static const String processId = "$ocrBaseUrl/process_id";

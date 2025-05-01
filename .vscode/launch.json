@@ -5,18 +5,18 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Mobilis Smart POS -- DEV",
+      "name": "Mobilis Smart POS -- Local",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
-      "args": ["--dart-define-from-file=env/dev.json"]
+      "args": ["--dart-define-from-file=env/local.json"]
     },
     {
-      "name": "Mobilis Smart POS -- STG (ICOSNET)",
+      "name": "Mobilis Smart POS -- Pré-Prod",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
-      "args": ["--dart-define-from-file=env/stg.json"]
+      "args": ["--dart-define-from-file=env/pré-prod.json"]
     },
     {
       "name": "Mobilis Smart POS -- PROD",
