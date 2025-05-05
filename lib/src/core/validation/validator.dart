@@ -19,6 +19,7 @@ class Validator {
 
     if (value.isNotEmpty) {
       switch (type) {
+        case InputType.NONE:
         case InputType.FIRST_NAME:
           if (!RegExp(ValidationPatterns.namePattern).hasMatch(value)) {
             return "firstNameError".tr(context);

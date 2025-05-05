@@ -441,7 +441,7 @@ class _ContractScreenState extends State<ContractScreen> {
                           disabledValue: widget.metaData['first_name'],
                           textEditingController: firstNameEditingController,
                           label: "firstNameLabel".tr(context),
-                          // validationType: InputType.FIRST_NAME,
+                          validationType: InputType.NONE,
                         ),
                         SizedBox(height: 16.sp),
                         AppTextFormField(
@@ -449,6 +449,7 @@ class _ContractScreenState extends State<ContractScreen> {
                           disabledValue: widget.metaData['last_name'],
                           textEditingController: lastNameEditingController,
                           label: "lastNameLabel".tr(context),
+                          validationType: InputType.NONE,
                         ),
                         SizedBox(height: 16.sp),
 

@@ -159,7 +159,6 @@ public class DzNfcModel {
         String expiryDate = mrzInfo.getDateOfExpiry();
         String gender = String.valueOf(mrzInfo.getGender());
 
-
         String firstName = cleanUpName(rawFirstName);
         String lastName = cleanUpName(rawLastName);
         String firstNameAr = "N/A";
@@ -213,8 +212,15 @@ public class DzNfcModel {
     }
 
     private String cleanUpName(String rawName) {
-        return rawName.replace("<", " ").trim().replaceAll("\\s+", " ");
+        String cleaned = rawName.replace("<", " ").trim().replaceAll("\\s+", " ");
+
+        if (cleaned.equals("/") || cleaned.equals("\\")) {
+            return "SNP";
+        }
+
+        return cleaned;
     }
+
 
     private String formatDateOfBirth(String date) {
         SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
