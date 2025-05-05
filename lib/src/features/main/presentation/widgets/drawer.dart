@@ -4,9 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mobilis_smart_pos/src/core/commom/widgets/version.dart';
-import 'package:mobilis_smart_pos/src/features/main/presentation/widgets/sim_card_slot_tile.dart';
-import 'package:mobilis_smart_pos/src/features/sign_in/data/data_sources/smart_pos_local_storage.dart';
-import '../../../../dependency_injection/injection_container.dart' as di;
 import '../../../../core/utils/enums/themes_enum.dart';
 import '../../../../core/utils/ressources/app_colors.dart';
 import '../cubits/cubit/theme_cubit.dart';
@@ -30,60 +27,9 @@ class HomeDrawer extends StatefulWidget {
 }
 
 class _HomeDrawerState extends State<HomeDrawer> {
-  static const MethodChannel _platform = MethodChannel('channel');
-  List<String?> _simOperators = ["...", "..."];
-
-  int _preferedSlot = 0;
-
   @override
   void initState() {
     super.initState();
-    _fetchSimOperators();
-    _getPreferedSlot();
-  }
-
-  _getPreferedSlot() {
-    final slot = di.serviceLocator<SmartPosLocalStorage>().getPreferedSlot();
-    if (slot != null) {
-      setState(() {
-        _preferedSlot = slot;
-      });
-    } else {
-      _preferedSlot = 0;
-    }
-  }
-
-  Future<void> _setPreferedSlot({required int slot}) async {
-    setState(() {
-      _preferedSlot = slot;
-    });
-    await di.serviceLocator<SmartPosLocalStorage>().setPreferedSlot(slot: slot);
-  }
-
-  Future<void> _fetchSimOperators() async {
-    try {
-      final operators = await _platform.invokeMethod<List<dynamic>>('getSimOperators');
-      setState(() {
-        _simOperators = operators?.cast<String?>() ?? [];
-      });
-    } catch (e) {
-      debugPrint("===== $e");
-      setState(() {
-        _simOperators = [];
-      });
-    }
-  }
-
-  _getSlotName(String value, BuildContext context) {
-    if (value.toLowerCase() == "mobilis") {
-      if (context.isArabicLocale) {
-        return "موبيليس";
-      } else {
-        return "Mobilis";
-      }
-    } else {
-      return "another_slot".tr(context);
-    }
   }
 
   @override

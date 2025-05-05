@@ -7,9 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'package:lottie/lottie.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/session_timeout.dart';
-import 'package:mobilis_smart_pos/src/core/utils/ressources/app_images.dart';
 import '../../../core/commom/widgets/custom_app_bar.dart';
 import '../../../services/screenshot_service.dart';
 import 'package:path_provider/path_provider.dart';
@@ -135,7 +133,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
                   }
                 },
                 builder: (context, state) {
-                  if (true) {
+                  if (isEditContractLoading) {
                     return const ContractLoading();
                   }
                   if (isGenerateContractLoading) {

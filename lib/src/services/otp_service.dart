@@ -1,6 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:screen_protector/screen_protector.dart';
+import 'package:flutter/foundation.dart';
 
 class ScreenshotService {
   static const platform = MethodChannel('otp_receiver');

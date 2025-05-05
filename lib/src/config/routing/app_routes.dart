@@ -14,10 +14,7 @@ import 'package:mobilis_smart_pos/src/features/invoices/presentation/cubit/retry
 
 import '../../core/animation/routes_animation_manager.dart';
 import '../../dependency_injection/injection_container.dart';
-import '../../features/OCR/presentation/cubit/ocr_cubit.dart';
-import '../../features/OCR/presentation/id_ocr_screen.dart';
 import '../../features/OCR/presentation/ocr_preparation_screen.dart';
-import '../../features/OCR/presentation/passport_ocr_screen.dart';
 import '../../features/bar_code/presentation/bar_code_screen.dart';
 import '../../features/contract/domain/entities/contract_request_params_entitiy.dart';
 import '../../features/contract/presentation/choose_card_option_screen.dart';
@@ -298,20 +295,6 @@ class AppRoutes {
 
         return RoutesAnimationManager.slideFromRightTransition(
           OcrPreparationScreen(isPassport: params['isPassport'] as bool),
-        );
-      case Routes.ocrPassport:
-        return RoutesAnimationManager.slideFromRightTransition(
-          BlocProvider(
-            create: (_) => serviceLocator<OcrCubit>(),
-            child: const PassportOcrScreen(),
-          ),
-        );
-      case Routes.ocrIdCard:
-        return RoutesAnimationManager.slideFromRightTransition(
-          BlocProvider(
-            create: (_) => serviceLocator<OcrCubit>(),
-            child: const IdCardOcrScreen(),
-          ),
         );
       case Routes.home:
         return RoutesAnimationManager.slideFromRightTransition(
