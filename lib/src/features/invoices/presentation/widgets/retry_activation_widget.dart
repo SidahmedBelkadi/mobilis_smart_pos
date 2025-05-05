@@ -150,14 +150,15 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
 
   _generateContract({required String phoneNumber, required String dsaMessage}) async {
     final params = GenerateContractParamsEntity(
-        clientId: widget.invoiceEntity.clientId,
-        invoiceId: widget.invoiceEntity.id,
-        subsId: widget.invoiceEntity.subId,
-        contractCode: widget.invoiceEntity.contractCode,
-        dsaMessage: dsaMessage,
-        msisdn: phoneNumber);
+      // clientId: widget.invoiceEntity.clientId,
+      invoiceId: widget.invoiceEntity.id,
+      subsId: widget.invoiceEntity.subId,
+      //  contractCode: widget.invoiceEntity.contractCode,
+      //  dsaMessage: dsaMessage,
+      // msisdn: phoneNumber,
+    );
 
-    await context.read<ContractCubit>().attributeMsisdnAndGenerateContract(params: params);
+    await context.read<ContractCubit>().generateContract(params: params);
   }
 }
 

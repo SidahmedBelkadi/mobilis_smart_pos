@@ -113,7 +113,7 @@ class ContractRequestParamsEntitiy {
       "Issue_place": issuingPlace
     };
     final Map<String, dynamic> subscription = {
-      "Subscription_type_ID": subscriptionId ?? 1,
+      // "Subscription_type_ID": subscriptionId ?? 1,
       "Start_date": DateTime.now().toIso8601String(),
       "End_date": DateTime.now()
           .add(
@@ -193,56 +193,6 @@ class ContractRequestParamsEntitiy {
       "invoice": invoice,
     };
   }
-
-  // ContractRequestParamsEntitiy copyWith({
-  //   String? firstName,
-  //   String? lastName,
-  //   String? gender,
-  //   String? birthDate,
-  //   String? birthPlace,
-  //   String? nationality,
-  //   int? wilayaId,
-  //   String? daira,
-  //   String? commune,
-  //   String? street,
-  //   String? folderUrl,
-  //   String? nin,
-  //   String? documentType,
-  //   String? documentNumber,
-  //   String? issuingCountry,
-  //   String? issuingPlace,
-  //   String? issueDate,
-  //   String? bloodGroup,
-  //   String? msisdn,
-  //   String? email,
-  //   int? pdvId,
-  //   int? serialNumber,
-  // }) {
-  //   return ContractRequestParamsEntitiy(
-  //     firstName: firstName ?? this.firstName,
-  //     lastName: lastName ?? this.lastName,
-  //     gender: gender ?? this.gender,
-  //     birthDate: birthDate ?? this.birthDate,
-  //     birthPlace: birthPlace ?? this.birthPlace,
-  //     nationality: nationality ?? this.nationality,
-  //     wilayaId: wilayaId ?? this.wilayaId,
-  //     daira: daira ?? this.daira,
-  //     commune: commune ?? this.commune,
-  //     street: street ?? this.street,
-  //     folderUrl: folderUrl ?? this.folderUrl,
-  //     nin: nin ?? this.nin,
-  //     documentType: documentType ?? this.documentType,
-  //     documentNumber: documentNumber ?? this.documentNumber,
-  //     issuingCountry: issuingCountry ?? this.issuingCountry,
-  //     issuingPlace: issuingPlace ?? this.issuingPlace,
-  //     issueDate: issueDate ?? this.issueDate,
-  //     bloodGroup: bloodGroup ?? this.bloodGroup,
-  //     email: email ?? this.email,
-  //     pdvId: pdvId ?? this.pdvId,
-  //     employeeId: employeeId ?? this.employeeId,
-  //     serialNumber: serialNumber ?? this.serialNumber,
-  //   );
-  // }
 
   ContractRequestParamsEntitiy copyWith({
     String? firstName,

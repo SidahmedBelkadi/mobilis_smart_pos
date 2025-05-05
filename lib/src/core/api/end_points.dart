@@ -34,7 +34,7 @@ class EndPoints {
   static const String checkBeforeEditContract = "$baseUrl/contract/check-before-edit";
   static const String editContract = "$baseUrl/contract/edit";
   static const String rasdEditContract = "$baseUrl/contract-rasd/edit";
-  static const String generateContrcat = "$baseUrl/contract/attributeMSISDN";
+  static const String generateContrcat = "$baseUrl/contract/generate";
   static const String rasdGenerateContrcat = "$baseUrl/contract-rasd/attributeMSISDN";
   static const String rasdTriggerSms = "$baseUrl/contract-rasd/triggerSMS";
   static const String uploadClient = "$baseUrl/file/client";

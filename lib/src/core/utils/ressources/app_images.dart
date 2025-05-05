@@ -52,6 +52,7 @@ class AppImages {
   static const emptyBox = "$animationDir/empty_box.json";
   static const smsAnim1 = "$animationDir/send_sms1.json";
   static const smsAnim2 = "$animationDir/send_sms2.json";
+  static const activationLoading = "$animationDir/loading_anim.json";
 
   // ============== GIF =============//
   static const barCodeGif = "$gifDir/bar_code.gif";

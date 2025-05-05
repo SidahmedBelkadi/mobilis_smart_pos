@@ -89,7 +89,7 @@ class ContractCubit extends Cubit<ContractState> {
     }
   }
 
-  Future<void> attributeMsisdnAndGenerateContract({
+  Future<void> generateContract({
     required GenerateContractParamsEntity params,
   }) async {
     emit(GenerateContractLoading());

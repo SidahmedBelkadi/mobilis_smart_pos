@@ -155,18 +155,9 @@ class ContractRemoteDataSourceImpl implements ContractRemoteDataSource {
   Future<GenerateContractResponseModel> generateContrat({
     required GenerateContractParamsEntity generateContractParams,
   }) async {
-    final Map<String, dynamic> body = {
-      "msisdn": generateContractParams.msisdn,
-      "CC_code": generateContractParams.contractCode,
-      "message": generateContractParams.dsaMessage,
-    };
-    final clientId = generateContractParams.clientId;
     final invoiceId = generateContractParams.invoiceId;
     final subId = generateContractParams.subsId;
-    final response = await dioConsumer.post(
-      "${EndPoints.generateContrcat}/$clientId/$invoiceId/$subId",
-      body: body,
-    );
+    final response = await dioConsumer.get("${EndPoints.generateContrcat}/$invoiceId/$subId");
 
     return GenerateContractResponseModel.fromJson(json: jsonDecode(response));
   }

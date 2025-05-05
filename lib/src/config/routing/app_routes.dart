@@ -132,8 +132,7 @@ class AppRoutes {
         );
 
       case Routes.contractGenerated:
-        return RoutesAnimationManager.slideFromRightTransition(
-            const ContractGenerated());
+        return RoutesAnimationManager.slideFromRightTransition(const ContractGenerated());
 
       case Routes.signIn:
         return RoutesAnimationManager.slideFromRightTransition(
@@ -209,8 +208,7 @@ class AppRoutes {
         return RoutesAnimationManager.slideFromRightTransition(
           ParentMrzOCRScreen(
             documentType: params['documentType'],
-            minorContract:
-                params['minorContract'] as ContractRequestParamsEntitiy,
+            minorContract: params['minorContract'] as ContractRequestParamsEntitiy,
             minorRecto: params['minorRecto'] as File?,
             minorVerso: params['minorVerso'] as File?,
             minorIsPassport: params['minorIsPassport'] as bool,
@@ -242,8 +240,7 @@ class AppRoutes {
             dateOfBirth: params['dateOfBirth'],
             dateOfExpiry: params['dateOfExpiry'],
             docType: params['docType'],
-            minorContract:
-                params['minorContract'] as ContractRequestParamsEntitiy,
+            minorContract: params['minorContract'] as ContractRequestParamsEntitiy,
             minorRecto: params['minorRecto'] as File?,
             minorVerso: params['minorVerso'] as File?,
             minorIsPassport: params['minorIsPassport'] as bool,
@@ -274,8 +271,7 @@ class AppRoutes {
             dateOfExpiry: params['dateOfExpiry'],
             docType: params['docType'],
             isMinor: params['isMinor'],
-            minorContract:
-                params['minorContract'] as ContractRequestParamsEntitiy?,
+            minorContract: params['minorContract'] as ContractRequestParamsEntitiy?,
             minorRecto: params['minorRecto'] as File?,
             minorVerso: params['minorVerso'] as File?,
             minorIsPassport: params['minorIsPassport'] as bool?,
@@ -340,8 +336,7 @@ class AppRoutes {
           MultiBlocProvider(
             providers: [
               BlocProvider(
-                create: (_) => serviceLocator<InvoicesCubit>()
-                  ..getInvoices(isFirstTime: true),
+                create: (_) => serviceLocator<InvoicesCubit>()..getInvoices(isFirstTime: true),
               ),
               BlocProvider(
                 create: (context) => serviceLocator<RetryActivationCubit>(),
@@ -437,7 +432,6 @@ class AppRoutes {
             ],
             child: SignatureScreen(
               contract: params['contract'] as ContractRequestParamsEntitiy,
-              formattedSmsCode: params['formattedSmsCode'] as String,
               recto: params['recto'] as File?,
               verso: params['verso'] as File?,
               isPassport: params['isPassport'] as bool,

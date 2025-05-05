@@ -138,8 +138,6 @@ class SimScannerScreenState extends State<SimScannerScreen> {
       Routes.signatureScreen,
       arguments: {
         'contract': newContract,
-        'formattedSmsCode':
-            '', // TODO : Ask Sarah about this, Cuz now it's empty since we're not doing check before edit
         'recto': widget.recto,
         'verso': widget.verso,
         'isPassport': widget.isPassport,
