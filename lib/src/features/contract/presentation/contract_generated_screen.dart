@@ -16,8 +16,7 @@ class ContractGenerated extends StatelessWidget {
     return SessionTimeout(
       child: PopScope(
         canPop: false,
-        child: SafeArea(
-            child: Scaffold(
+        child: Scaffold(
           body: Column(
             children: [
               Center(
@@ -46,7 +45,7 @@ class ContractGenerated extends StatelessWidget {
               )),
             ],
           ),
-        )),
+        ),
       ),
     );
   }

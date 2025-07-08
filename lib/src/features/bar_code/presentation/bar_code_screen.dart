@@ -56,48 +56,46 @@ class SimScannerScreenState extends State<SimScannerScreen> {
   @override
   Widget build(BuildContext context) {
     return SessionTimeout(
-      child: SafeArea(
-        child: Scaffold(
-          appBar: _buildBarCodeScreenAppBar(context),
-          body: SingleChildScrollView(
-            child: SizedBox(
-              height: context.height - 56.sp,
-              width: context.width,
-              child: BlocConsumer<ContractCubit, ContractState>(
-                listener: (context, state) {
-                  if (state is CheckBeforeEditContractSuccess) {
-                    Navigator.of(context).pushNamed(
-                      Routes.signatureScreen,
-                      arguments: {
-                        'contract': newContract,
-                        'formattedSmsCode': state.formattedStringWithoutSpaces,
-                        'recto': widget.recto,
-                        'verso': widget.verso,
-                        'isPassport': widget.isPassport,
-                        'parentRecto': widget.parentRecto,
-                        'parentVerso': widget.parentVerso,
-                        'justificatif': widget.justificatif,
-                        'parentIsPassport': widget.parentIsPassport
-                      },
-                    );
-                  }
-                  if (state is CheckBeforeEditContractFailed) {
-                    AppToasts.showErrorToast(
-                      message: state.message.tr(context),
-                      context: context,
-                    );
-                  }
-                },
-                builder: (context, state) {
-                  if (state is CheckBeforeEditContractLoading) {
-                    return const LoadingBarrier();
-                  }
-
-                  return SimScannerUI(
-                    onPressed: () => _startBarcodeScanner(context),
+      child: Scaffold(
+        appBar: _buildBarCodeScreenAppBar(context),
+        body: SingleChildScrollView(
+          child: SizedBox(
+            height: context.height - 56.sp,
+            width: context.width,
+            child: BlocConsumer<ContractCubit, ContractState>(
+              listener: (context, state) {
+                if (state is CheckBeforeEditContractSuccess) {
+                  Navigator.of(context).pushNamed(
+                    Routes.signatureScreen,
+                    arguments: {
+                      'contract': newContract,
+                      'formattedSmsCode': state.formattedStringWithoutSpaces,
+                      'recto': widget.recto,
+                      'verso': widget.verso,
+                      'isPassport': widget.isPassport,
+                      'parentRecto': widget.parentRecto,
+                      'parentVerso': widget.parentVerso,
+                      'justificatif': widget.justificatif,
+                      'parentIsPassport': widget.parentIsPassport
+                    },
                   );
-                },
-              ),
+                }
+                if (state is CheckBeforeEditContractFailed) {
+                  AppToasts.showErrorToast(
+                    message: state.message.tr(context),
+                    context: context,
+                  );
+                }
+              },
+              builder: (context, state) {
+                if (state is CheckBeforeEditContractLoading) {
+                  return const LoadingBarrier();
+                }
+
+                return SimScannerUI(
+                  onPressed: () => _startBarcodeScanner(context),
+                );
+              },
             ),
           ),
         ),

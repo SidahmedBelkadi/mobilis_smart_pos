@@ -125,43 +125,41 @@ class _NfcReaderScreenState extends State<NfcReaderScreen> {
   @override
   Widget build(BuildContext context) {
     return SessionTimeout(
-      child: SafeArea(
-        child: Scaffold(
-          appBar: CustomAppBar(
-            title: "scan_nfc".tr(context),
-            showProgressIndicator: true,
-            currentStep: widget.minorRecto != null ? 5 : 2,
-            allSteps: widget.minorRecto != null ? 8 : 5,
-          ),
-          body: SingleChildScrollView(
-            padding: EdgeInsets.all(24.sp),
-            child: _isLoading
-                ? Container(
-                    height: context.height - 200.sp,
-                    alignment: Alignment.center,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const LinearProgressIndicator(),
-                        SizedBox(height: 12.sp),
-                        Text(
-                          'reading'.tr(context),
-                          style: Theme.of(context).textTheme.bodyMedium,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  )
-                : Column(
+      child: Scaffold(
+        appBar: CustomAppBar(
+          title: "scan_nfc".tr(context),
+          showProgressIndicator: true,
+          currentStep: widget.minorRecto != null ? 5 : 2,
+          allSteps: widget.minorRecto != null ? 8 : 5,
+        ),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(24.sp),
+          child: _isLoading
+              ? Container(
+                  height: context.height - 200.sp,
+                  alignment: Alignment.center,
+                  child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      SizedBox(height: 16.sp),
-                      const ScanInstruction(),
-                      SizedBox(height: 16.sp),
-                      LottieBuilder.asset(AppImages.nfc),
+                      const LinearProgressIndicator(),
+                      SizedBox(height: 12.sp),
+                      Text(
+                        'reading'.tr(context),
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        textAlign: TextAlign.center,
+                      ),
                     ],
                   ),
-          ),
+                )
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(height: 16.sp),
+                    const ScanInstruction(),
+                    SizedBox(height: 16.sp),
+                    LottieBuilder.asset(AppImages.nfc),
+                  ],
+                ),
         ),
       ),
     );

@@ -32,73 +32,71 @@ class _OffersPageState extends State<OffersPage> {
   @override
   Widget build(BuildContext context) {
     return SessionTimeout(
-      child: SafeArea(
-        child: Scaffold(
-          floatingActionButton: selectedOfferID != null && selectedOfferName != null
-              ? CustomFAB(
-                  label: '',
-                  icon: FontAwesomeIcons.check,
-                  onPressed: () {
-                    Navigator.of(context).pop(
-                      {
-                        'offerId': selectedOfferID,
-                        'offerName': selectedOfferName,
-                      },
-                    );
-                  },
-                )
-              : null,
-          body: Padding(
-            padding: EdgeInsets.all(24.sp),
-            child: BlocBuilder<OffersCubit, OffersState>(
-              builder: (context, state) {
-                if (state is GetAllOffersLoading) {
-                  return const OffersSkeleton();
-                }
-                if (state is GetAllOffersFailure) {
-                  return const ErrorGettingOffers();
-                }
-                if (state is GetAllOffersSuccess) {
-                  final offers = state.offers;
-                  return Padding(
-                    padding: EdgeInsets.all(16.0.sp),
-                    child: Column(
-                      children: [
-                        Text(
-                          "offers".tr(context),
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                        SizedBox(height: 24.sp),
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: offers.length,
-                            itemBuilder: (_, index) {
-                              final OfferEntity offer = offers[index];
-                              return OfferItem(
-                                title: offer.name,
-                                price: context.isArabicLocale
-                                    ? offer.formattedPriceAr
-                                    : offer.formattedPrice,
-                                onTap: () {
-                                  setState(() {
-                                    selectedOfferName = offer.name;
-                                    selectedOfferID = offer.id;
-                                  });
-                                },
-                                isSelected:
-                                    selectedOfferName == offer.name && selectedOfferID == offer.id,
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
+      child: Scaffold(
+        floatingActionButton: selectedOfferID != null && selectedOfferName != null
+            ? CustomFAB(
+                label: '',
+                icon: FontAwesomeIcons.check,
+                onPressed: () {
+                  Navigator.of(context).pop(
+                    {
+                      'offerId': selectedOfferID,
+                      'offerName': selectedOfferName,
+                    },
                   );
-                }
-                return const SizedBox.shrink();
-              },
-            ),
+                },
+              )
+            : null,
+        body: Padding(
+          padding: EdgeInsets.all(24.sp),
+          child: BlocBuilder<OffersCubit, OffersState>(
+            builder: (context, state) {
+              if (state is GetAllOffersLoading) {
+                return const OffersSkeleton();
+              }
+              if (state is GetAllOffersFailure) {
+                return const ErrorGettingOffers();
+              }
+              if (state is GetAllOffersSuccess) {
+                final offers = state.offers;
+                return Padding(
+                  padding: EdgeInsets.all(16.0.sp),
+                  child: Column(
+                    children: [
+                      Text(
+                        "offers".tr(context),
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      SizedBox(height: 24.sp),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: offers.length,
+                          itemBuilder: (_, index) {
+                            final OfferEntity offer = offers[index];
+                            return OfferItem(
+                              title: offer.name,
+                              price: context.isArabicLocale
+                                  ? offer.formattedPriceAr
+                                  : offer.formattedPrice,
+                              onTap: () {
+                                setState(() {
+                                  selectedOfferName = offer.name;
+                                  selectedOfferID = offer.id;
+                                });
+                              },
+                              isSelected:
+                                  selectedOfferName == offer.name && selectedOfferID == offer.id,
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            },
           ),
         ),
       ),

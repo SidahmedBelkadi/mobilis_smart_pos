@@ -37,29 +37,27 @@ class _NfcPreparationScreenState extends State<NfcPreparationScreen> {
   @override
   Widget build(BuildContext context) {
     return SessionTimeout(
-      child: SafeArea(
-        child: Scaffold(
-          body: Padding(
-            padding: EdgeInsets.all(32.sp),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  AppStrings.nfcPreparationText,
-                  style:
-                      Theme.of(context).textTheme.headlineSmall!.copyWith(color: AppColors.primary),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 32.sp),
-                Lottie.asset(AppImages.nfcAnimation, height: 300.h, width: 350.w),
-                SizedBox(height: 32.sp),
-                ElevatedButton(
-                    onPressed: () async {
-                      await NfcPreparationScreen._channel.invokeMethod('NFC');
-                    },
-                    child: const Text("Start Scan")),
-              ],
-            ),
+      child: Scaffold(
+        body: Padding(
+          padding: EdgeInsets.all(32.sp),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                AppStrings.nfcPreparationText,
+                style:
+                    Theme.of(context).textTheme.headlineSmall!.copyWith(color: AppColors.primary),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 32.sp),
+              Lottie.asset(AppImages.nfcAnimation, height: 300.h, width: 350.w),
+              SizedBox(height: 32.sp),
+              ElevatedButton(
+                  onPressed: () async {
+                    await NfcPreparationScreen._channel.invokeMethod('NFC');
+                  },
+                  child: const Text("Start Scan")),
+            ],
           ),
         ),
       ),

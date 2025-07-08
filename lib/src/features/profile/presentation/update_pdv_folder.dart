@@ -169,178 +169,174 @@ class _UpdatePdvFolderState extends State<UpdatePdvFolder> {
       return false;
     }
 
-    return SafeArea(
-      child: Scaffold(
-        floatingActionButton: _areAllDocumentsUploaded()
-            ? CustomFAB(
-                label: "update_now".tr(context),
-                icon: FontAwesomeIcons.upload,
-                onPressed: () {
-                  context.read<ProfileCubit>().updateProfileInfo(
-                        isPassport: isPassport,
-                        recto: recto!,
-                        verso: verso,
-                        commercialRgister: commercialRegister!,
-                        nif: nif!,
-                      );
-                },
-              )
-            : null,
-        appBar: CustomAppBar(title: "update_my_folder".tr(context)),
-        body: Container(
-          height: context.height,
-          width: context.width,
-          padding: EdgeInsets.all(24.sp),
-          child: BlocConsumer<ProfileCubit, ProfileState>(
-            listener: (context, state) {
-              if (state is UpdateProfileInfoLoading) {
-                setState(() {
-                  isUploading = true;
-                });
-              }
-              if (state is UpdateProfielInfoSuccess) {
-                AppToasts.showSuccessToast(
-                  message: "files_uploaded_successfully".tr(context),
-                  context: context,
-                );
-                Navigator.of(context).pushReplacementNamed(
-                  Routes.pdvFolder,
-                );
-              }
-              if (state is UpdateProfileInfoFailure) {
-                AppToasts.showErrorToast(
-                  message: "server_error_occurred".tr(context),
-                  context: context,
-                );
-              }
-            },
-            builder: (context, state) {
-              if (state is UpdateProfileInfoLoading) {
-                return Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      LottieBuilder.asset(
-                        AppImages.uploading,
-                        height: 180.sp,
-                        width: 200,
-                      ),
-                      SizedBox(height: 16.sp),
-                      Text(
-                        "uploading".tr(context),
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      )
-                    ],
-                  ),
-                );
-              }
-              return ListView(
-                children: [
-                  if (!_areAllDocumentsUploaded()) const PersonnelFilesUpdateNotice(),
-                  SizedBox(height: 16.sp),
-                  isIdCard
-                      ? Column(
-                          children: [
-                            recto != null
-                                ? Image.file(
-                                    recto!,
-                                    height: 180.sp,
-                                    width: context.width,
-                                  )
-                                : UploadImageField(
-                                    label: "recto".tr(context),
-                                    onTap: () {
-                                      captureDocument(
-                                          recognizer: recognizer,
-                                          docType: DocumentsType.frontIdCard,
-                                          context: context);
-                                    },
-                                    icon: FontAwesomeIcons.camera,
-                                  ),
-                            SizedBox(height: 24.sp),
-                            verso != null
-                                ? Image.file(
-                                    verso!,
-                                    height: 180.sp,
-                                    width: context.width,
-                                  )
-                                : UploadImageField(
-                                    label: "verso".tr(context),
-                                    onTap: () {
-                                      captureDocument(
-                                          recognizer: recognizer,
-                                          docType: DocumentsType.backIdCard,
-                                          context: context);
-                                    },
-                                    icon: FontAwesomeIcons.camera,
-                                  ),
-                          ],
-                        )
-                      : SizedBox(),
-                  if (isPassport)
-                    recto != null
-                        ? Image.file(
-                            recto!,
-                            height: 180.sp,
-                            width: context.width,
-                          )
-                        : UploadImageField(
-                            label: "Passport",
-                            onTap: () {
-                              captureDocument(
-                                  recognizer: recognizer,
-                                  docType: DocumentsType.passport,
-                                  context: context);
-                            },
-                            icon: FontAwesomeIcons.camera,
-                          ),
-                  if (!isPassport && !isIdCard)
-                    UploadImageField(
-                      label: "identity_card_or_passport".tr(context),
-                      onTap: () => _showDrawer(context),
-                      icon: FontAwesomeIcons.camera,
-                    ),
-                  SizedBox(height: 24.sp),
-                  commercialRegister != null
-                      ? Image.file(
-                          commercialRegister!,
-                          height: 180.sp,
-                          width: context.width,
-                        )
-                      : UploadImageField(
-                          label: "commercial_register".tr(context),
-                          onTap: () {
-                            captureDocument(
-                                recognizer: recognizer,
-                                docType: DocumentsType.commercialRegister,
-                                context: context);
-                          },
-                          icon: FontAwesomeIcons.camera,
-                        ),
-                  SizedBox(height: 24.sp),
-                  nif != null
-                      ? Image.file(
-                          nif!,
-                          height: 180.sp,
-                          width: context.width,
-                        )
-                      : UploadImageField(
-                          label: "nif".tr(context),
-                          onTap: () {
-                            captureDocument(
-                                recognizer: recognizer,
-                                docType: DocumentsType.nif,
-                                context: context);
-                          },
-                          icon: FontAwesomeIcons.camera,
-                        ),
-                  SizedBox(
-                    height: 80,
-                  ),
-                ],
+    return Scaffold(
+      floatingActionButton: _areAllDocumentsUploaded()
+          ? CustomFAB(
+              label: "update_now".tr(context),
+              icon: FontAwesomeIcons.upload,
+              onPressed: () {
+                context.read<ProfileCubit>().updateProfileInfo(
+                      isPassport: isPassport,
+                      recto: recto!,
+                      verso: verso,
+                      commercialRgister: commercialRegister!,
+                      nif: nif!,
+                    );
+              },
+            )
+          : null,
+      appBar: CustomAppBar(title: "update_my_folder".tr(context)),
+      body: Container(
+        height: context.height,
+        width: context.width,
+        padding: EdgeInsets.all(24.sp),
+        child: BlocConsumer<ProfileCubit, ProfileState>(
+          listener: (context, state) {
+            if (state is UpdateProfileInfoLoading) {
+              setState(() {
+                isUploading = true;
+              });
+            }
+            if (state is UpdateProfielInfoSuccess) {
+              AppToasts.showSuccessToast(
+                message: "files_uploaded_successfully".tr(context),
+                context: context,
               );
-            },
-          ),
+              Navigator.of(context).pushReplacementNamed(
+                Routes.pdvFolder,
+              );
+            }
+            if (state is UpdateProfileInfoFailure) {
+              AppToasts.showErrorToast(
+                message: "server_error_occurred".tr(context),
+                context: context,
+              );
+            }
+          },
+          builder: (context, state) {
+            if (state is UpdateProfileInfoLoading) {
+              return Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    LottieBuilder.asset(
+                      AppImages.uploading,
+                      height: 180.sp,
+                      width: 200,
+                    ),
+                    SizedBox(height: 16.sp),
+                    Text(
+                      "uploading".tr(context),
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    )
+                  ],
+                ),
+              );
+            }
+            return ListView(
+              children: [
+                if (!_areAllDocumentsUploaded()) const PersonnelFilesUpdateNotice(),
+                SizedBox(height: 16.sp),
+                isIdCard
+                    ? Column(
+                        children: [
+                          recto != null
+                              ? Image.file(
+                                  recto!,
+                                  height: 180.sp,
+                                  width: context.width,
+                                )
+                              : UploadImageField(
+                                  label: "recto".tr(context),
+                                  onTap: () {
+                                    captureDocument(
+                                        recognizer: recognizer,
+                                        docType: DocumentsType.frontIdCard,
+                                        context: context);
+                                  },
+                                  icon: FontAwesomeIcons.camera,
+                                ),
+                          SizedBox(height: 24.sp),
+                          verso != null
+                              ? Image.file(
+                                  verso!,
+                                  height: 180.sp,
+                                  width: context.width,
+                                )
+                              : UploadImageField(
+                                  label: "verso".tr(context),
+                                  onTap: () {
+                                    captureDocument(
+                                        recognizer: recognizer,
+                                        docType: DocumentsType.backIdCard,
+                                        context: context);
+                                  },
+                                  icon: FontAwesomeIcons.camera,
+                                ),
+                        ],
+                      )
+                    : SizedBox(),
+                if (isPassport)
+                  recto != null
+                      ? Image.file(
+                          recto!,
+                          height: 180.sp,
+                          width: context.width,
+                        )
+                      : UploadImageField(
+                          label: "Passport",
+                          onTap: () {
+                            captureDocument(
+                                recognizer: recognizer,
+                                docType: DocumentsType.passport,
+                                context: context);
+                          },
+                          icon: FontAwesomeIcons.camera,
+                        ),
+                if (!isPassport && !isIdCard)
+                  UploadImageField(
+                    label: "identity_card_or_passport".tr(context),
+                    onTap: () => _showDrawer(context),
+                    icon: FontAwesomeIcons.camera,
+                  ),
+                SizedBox(height: 24.sp),
+                commercialRegister != null
+                    ? Image.file(
+                        commercialRegister!,
+                        height: 180.sp,
+                        width: context.width,
+                      )
+                    : UploadImageField(
+                        label: "commercial_register".tr(context),
+                        onTap: () {
+                          captureDocument(
+                              recognizer: recognizer,
+                              docType: DocumentsType.commercialRegister,
+                              context: context);
+                        },
+                        icon: FontAwesomeIcons.camera,
+                      ),
+                SizedBox(height: 24.sp),
+                nif != null
+                    ? Image.file(
+                        nif!,
+                        height: 180.sp,
+                        width: context.width,
+                      )
+                    : UploadImageField(
+                        label: "nif".tr(context),
+                        onTap: () {
+                          captureDocument(
+                              recognizer: recognizer, docType: DocumentsType.nif, context: context);
+                        },
+                        icon: FontAwesomeIcons.camera,
+                      ),
+                SizedBox(
+                  height: 80,
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
