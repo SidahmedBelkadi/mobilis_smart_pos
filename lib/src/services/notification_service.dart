@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:rxdart/rxdart.dart';
@@ -99,23 +100,15 @@ class NotificationService {
       lastPasswordChange.second,
     );
 
-    // For development purposes, simulate expiry by adding a few minutes
-    /* final expiryDate = tz.TZDateTime(
-      tz.local,
-      lastPasswordChangeAdjusted.year,
-      lastPasswordChangeAdjusted.month + 6,
-      lastPasswordChangeAdjusted.day,
-      9,
-      00,
-      00,
-    );*/
-
     final expiryDate = lastPasswordChangeAdjusted.add(const Duration(days: 180));
-
+    debugPrint("################### Expiry Date: $expiryDate");
     return expiryDate;
   }
 
   static tz.TZDateTime calculateNotificationDate(tz.TZDateTime expiryDate) {
+    debugPrint(
+        "################### Notification : ${expiryDate.subtract(const Duration(days: 15))}");
+
     return expiryDate.subtract(const Duration(days: 15));
   }
 

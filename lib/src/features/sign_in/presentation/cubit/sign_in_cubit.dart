@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:mobilis_smart_pos/src/features/sign_in/domain/entities/password_age_entity.dart';
 import '../../data/data_sources/smart_pos_local_storage.dart';
 import '../../domain/entities/sign_in_approve_contract_params.dart';
 import '../../domain/entities/sign_in_otp_request_params.dart';
@@ -90,27 +91,58 @@ class SignInCubit extends Cubit<SignInState> {
       (signInOTPResponseEntity) async {
         await localDataSource.clearLoginCredentials();
         await localDataSource.saveLoginCredentials(signInResponseEntity: signInOTPResponseEntity);
-        emit(OTPSuccessful(signInOTPResponseEntity: signInOTPResponseEntity));
-        //     final passwordAge = signInOTPResponseEntity.passwordAge;
-        //     if (passwordAge != null) {
-        //       // Calculate expiry and notification dates
-        //       final expiryDate = NotificationService.calculateExpiryDate(passwordAge.toMap());
-        //       final notificationDate = NotificationService.calculateNotificationDate(expiryDate);
+        final PasswordAge? passwordAge = signInOTPResponseEntity.passwordAge;
+        if (passwordAge != null) {
+          //! For development purpose only
+          emit(OTPSuccessful(
+              signInOTPResponseEntity: signInOTPResponseEntity,
+              passwordNotification: const PasswordExpiryNotification(
+                  shouldShow: true,
+                  message: "Your password will expire in 15 days. Please change it.")));
 
-        //       await NotificationService.cancelAll();
+          // final now = DateTime.now();
 
-        //       // Schedule a new notification
-        //       await NotificationService.schedulePasswordExpiryNotification(
-        //         notificationDate,
-        //         'Rappel',
-        //         'Votre mot de passe expirera dans 15 jours. Veuillez le changer.',
-        //       );
+          // final lastChangedDate = now
+          //     .subtract(Duration(
+          //       days: passwordAge.days,
+          //       hours: passwordAge.hours,
+          //       minutes: passwordAge.minutes,
+          //       seconds: passwordAge.seconds,
+          //     ))
+          //     .subtract(
+          //       Duration(days: passwordAge.months * 30),
+          //     ) // still approximate
+          //     // Todo : Ask backend dev to send DateTime
+          //     //? : (since months vary in length (28–31 days))
+          //     .subtract(Duration(days: passwordAge.years * 365));
 
-        //       // Save the new notification date
-        //       await di
-        //           .serviceLocator<SmartPosLocalStorage>()
-        //           .saveScheduledNotificationDate(notificationDate);
-        //     }
+          // final expiryDate = lastChangedDate.add(const Duration(days: 180));
+          // final remainingDuration = expiryDate.difference(now);
+          // final int remainingDays = remainingDuration.inDays;
+
+          // final bool isWithin15Days = remainingDays <= 15;
+          // final bool isWithinLastWeek = remainingDays <= 7;
+
+          // final bool shouldShowPasswordExpiryNotification = isWithin15Days || isWithinLastWeek;
+
+          // debugPrint("#### 🔐 Last password changed on: $lastChangedDate");
+          // debugPrint("#### 📆 Expiry date: $expiryDate");
+          // debugPrint("#### ⏳ Remaining days: $remainingDays");
+          // debugPrint("#### 🔔 Show notification? $shouldShowPasswordExpiryNotification");
+          // if (shouldShowPasswordExpiryNotification) {
+          //   emit(
+          //     OTPSuccessful(
+          //       signInOTPResponseEntity: signInOTPResponseEntity,
+          //       passwordNotification: PasswordExpiryNotification(
+          //           shouldShow: true, message: "Your password will expire in $remainingDays days."),
+          //     ),
+          //   );
+          // } else {
+          //   emit(OTPSuccessful(signInOTPResponseEntity: signInOTPResponseEntity));
+          // }
+        } else {
+          emit(OTPSuccessful(signInOTPResponseEntity: signInOTPResponseEntity));
+        }
       },
     );
   }

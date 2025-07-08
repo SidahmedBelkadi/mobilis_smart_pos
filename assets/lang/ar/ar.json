@@ -339,5 +339,7 @@
   "grant": "السماح",
   "permission_required": "الإذن مطلوب",
   "please_enable_sms_permission": "يرجى تفعيل إذن الرسائل القصيرة من الإعدادات لاكتشاف الرمز تلقائيًا.",
-  "cancel": "إلغاء"
+  "cancel": "إلغاء",
+  "password_expiry_title": "Expiration du mot de passe",
+  "password_expiry_message": "Rappel : votre mot de passe expirera dans 15 jours. Mettez-le à jour dès maintenant pour conserver l'accès."
 }

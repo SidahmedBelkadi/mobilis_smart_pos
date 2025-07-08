@@ -124,6 +124,7 @@ class AppRoutes {
             child: MainScreen(
               index: params?['index'],
               fromSignin: params?['fromSignin'],
+              passwordExpiryNotification: params?['passwordNotification'],
             ),
           ),
         );

@@ -8,9 +8,9 @@ class AppColors {
   static const _secondaryDefault = Color.fromARGB(255, 146, 219, 97);
   static const _secondaryLightDefault = Color.fromARGB(255, 238, 255, 226);
 
-  static const _primaryGrey = Colors.grey;
-  static const _secondaryGrey = Color(0xFFB0BEC5);
-  static const _secondaryLightGrey = Color(0xFFECEFF1);
+  static const _primaryGrey = Colors.green;
+  static const _secondaryGrey = Color.fromARGB(255, 146, 219, 97);
+  static const _secondaryLightGrey = Color.fromARGB(255, 238, 255, 226);
 
   // Conditional getters
   static Color get primary => EndPoints.isApi1 ? _primaryGrey : _primaryDefault;

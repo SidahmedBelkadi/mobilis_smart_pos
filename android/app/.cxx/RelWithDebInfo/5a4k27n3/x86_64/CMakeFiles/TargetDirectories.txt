@@ -1,0 +1,2 @@
+/Users/pc/workspace/mobilis/mobilis_smart_pos/android/app/.cxx/RelWithDebInfo/5a4k27n3/x86_64/CMakeFiles/rebuild_cache.dir
+/Users/pc/workspace/mobilis/mobilis_smart_pos/android/app/.cxx/RelWithDebInfo/5a4k27n3/x86_64/CMakeFiles/edit_cache.dir

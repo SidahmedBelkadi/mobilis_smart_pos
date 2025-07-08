@@ -60,7 +60,9 @@ final class EnableButton extends SignInState {
 final class OTPSuccessful extends SignInState {
   final SignInOTPResponseEntity signInOTPResponseEntity;
 
-  const OTPSuccessful({required this.signInOTPResponseEntity});
+  const OTPSuccessful({required this.signInOTPResponseEntity, this.passwordNotification});
+
+  final PasswordExpiryNotification? passwordNotification;
 
   @override
   List<Object> get props => [signInOTPResponseEntity];
@@ -76,7 +78,6 @@ final class OTPFailed extends SignInState {
 }
 
 final class OTPLoading extends SignInState {}
-
 
 // ----------- APPROVE THE CONTRACT --------------- //
 final class ApproveContractSuccessful extends SignInState {
@@ -98,3 +99,13 @@ final class ApproveContractFailed extends SignInState {
 }
 
 final class ApproveContractLoading extends SignInState {}
+
+class PasswordExpiryNotification {
+  final bool shouldShow;
+  final String message;
+
+  const PasswordExpiryNotification({
+    required this.shouldShow,
+    required this.message,
+  });
+}

@@ -339,5 +339,7 @@
   "grant": "Grant",
   "permission_required": "Permission Required",
   "please_enable_sms_permission": "Please enable SMS permission from settings to auto-detect the code.",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "password_expiry_title": "Password Expiry",
+  "password_expiry_message": "Reminder: Your password will expire in 15 days. Update it now to maintain access."
 }

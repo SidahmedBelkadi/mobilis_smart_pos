@@ -138,13 +138,14 @@ class _OTPCustomWidgetState extends State<OTPCustomWidget> with WidgetsBindingOb
             length: 6,
             obscureText: false,
             autofocus: false,
-            readOnly: true, // User cannot type manually
+            readOnly: false, // User cannot type manually
             validator: (value) {
               if (value == null || value.isEmpty) return '';
               if (value.length != 6) return '';
               if (!RegExp(r'^\d+$').hasMatch(value)) return '';
               return null;
             },
+
             hapticFeedbackType: HapticFeedbackType.heavyImpact,
             focusedPinTheme: defaultPinTheme.copyWith(
               decoration: defaultPinTheme.decoration!.copyWith(

@@ -3,7 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:mobilis_smart_pos/src/config/routing/app_routes.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/session_timeout.dart';
+import 'package:mobilis_smart_pos/src/features/sign_in/presentation/cubit/sign_in_cubit.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import '../../../core/api/end_points.dart';
 import '../../../core/utils/helpers/app_localization_helper.dart';
 import '../../../core/utils/helpers/media_query_values.dart';
@@ -21,10 +25,11 @@ import 'widgets/bottom_nav.dart';
 import 'widgets/drawer.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key, this.index = 0, this.fromSignin});
+  const MainScreen({super.key, this.index = 0, this.fromSignin, this.passwordExpiryNotification});
 
   final int? index;
   final bool? fromSignin;
+  final PasswordExpiryNotification? passwordExpiryNotification;
 
   @override
   State<MainScreen> createState() => _MyHomePageState();
@@ -61,6 +66,11 @@ class _MyHomePageState extends State<MainScreen> {
     } else {
       screenIndex = widget.index ?? 0;
     }
+    if (widget.passwordExpiryNotification?.shouldShow == true) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showPasswordExpiryDialog(widget.passwordExpiryNotification!.message);
+      });
+    }
     if (widget.fromSignin == null) {
       checkForUpdate();
     }
@@ -82,6 +92,29 @@ class _MyHomePageState extends State<MainScreen> {
     } catch (e) {
       debugPrint('Error opening browser: $e');
     }
+  }
+
+  void _showPasswordExpiryDialog(String message) {
+    QuickAlert.show(
+      context: context,
+      type: QuickAlertType.info,
+      barrierDismissible: false,
+      confirmBtnColor: AppColors.primary,
+      cancelBtnText: 'ok'.tr(context),
+      showCancelBtn: true,
+      confirmBtnText: 'changeButtonLabel'.tr(context),
+      onConfirmBtnTap: () {
+        Navigator.of(context).pushNamed(
+          Routes.changePassword,
+          arguments: {
+            'isFromMainScreen': true,
+            'isFromSignIn': widget.fromSignin ?? false,
+          },
+        );
+      },
+      text: message,
+      title: "Password Expiry",
+    );
   }
 
   void _showUpdateDialog() {
@@ -119,6 +152,10 @@ class _MyHomePageState extends State<MainScreen> {
       child: PopScope(
         canPop: false,
         child: Scaffold(
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => _showPasswordExpiryDialog('password_expiry_message'.tr(context)),
+            child: const Icon(Icons.change_circle),
+          ),
           drawer: const HomeDrawer(),
           bottomNavigationBar: CustomAppBottomNavBar(
             currentIndex: screenIndex,

@@ -1,0 +1,28 @@
+{
+  "buildFiles": [
+    "/Users/pc/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/pc/Library/Android/sdk/cmake/3.18.1/bin/ninja",
+      "-C",
+      "/Users/pc/workspace/mobilis/mobilis_smart_pos/android/app/.cxx/RelWithDebInfo/5a4k27n3/x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/pc/Library/Android/sdk/cmake/3.18.1/bin/ninja",
+    "-C",
+    "/Users/pc/workspace/mobilis/mobilis_smart_pos/android/app/.cxx/RelWithDebInfo/5a4k27n3/x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {},
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "/Users/pc/Library/Android/sdk/ndk/26.3.11579264/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang.lld",
+      "cppCompilerExecutable": "/Users/pc/Library/Android/sdk/ndk/26.3.11579264/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++.lld"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": []
+}
