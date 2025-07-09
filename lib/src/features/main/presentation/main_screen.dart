@@ -3,7 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:mobilis_smart_pos/src/config/routing/app_routes.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/session_timeout.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import '../../../core/api/end_points.dart';
 import '../../../core/utils/helpers/app_localization_helper.dart';
 import '../../../core/utils/helpers/media_query_values.dart';
@@ -21,10 +24,11 @@ import 'widgets/bottom_nav.dart';
 import 'widgets/drawer.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key, this.index = 0, this.fromSignin});
+  const MainScreen({super.key, this.index = 0, this.fromSignin, this.hasToChangePassowrd = false});
 
   final int? index;
   final bool? fromSignin;
+  final bool? hasToChangePassowrd;
 
   @override
   State<MainScreen> createState() => _MyHomePageState();
@@ -56,6 +60,8 @@ class _MyHomePageState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
+    _checkForPassowrdExpiryAlert();
+
     if (widget.index == null) {
       screenIndex = 0;
     } else {
@@ -64,6 +70,27 @@ class _MyHomePageState extends State<MainScreen> {
     if (widget.fromSignin == null) {
       checkForUpdate();
     }
+  }
+
+  _checkForPassowrdExpiryAlert() async {
+    await Future.delayed(const Duration(seconds: 3));
+    // if (widget.hasToChangePassowrd == true) {
+    QuickAlert.show(
+        context: context,
+        type: QuickAlertType.info,
+        title: "password_expired".tr(context),
+        text: "password_expired_instruction".tr(context),
+        barrierDismissible: true,
+        barrierColor: Colors.black.withOpacity(.8),
+        backgroundColor: context.isDarkMode ? AppColors.darkerGrey : Colors.white,
+        textColor: context.isDarkMode ? Colors.white : Colors.black,
+        titleColor: context.isDarkMode ? Colors.white : Colors.black,
+        confirmBtnColor: AppColors.primary,
+        confirmBtnText: "changeButtonLabel".tr(context),
+        onConfirmBtnTap: () {
+          Navigator.of(context).pushNamed(Routes.changePassword);
+        });
+    // }
   }
 
   Future<void> checkForUpdate() async {

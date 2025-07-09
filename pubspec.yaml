@@ -71,6 +71,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   screen_protector: ^1.4.2+1
+  quickalert: ^1.1.0
 
 dev_dependencies:
   flutter_test:

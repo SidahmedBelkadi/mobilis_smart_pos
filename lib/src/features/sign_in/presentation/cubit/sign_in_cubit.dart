@@ -91,7 +91,8 @@ class SignInCubit extends Cubit<SignInState> {
         await localDataSource.clearLoginCredentials();
         await localDataSource.saveLoginCredentials(signInResponseEntity: signInOTPResponseEntity);
         emit(OTPSuccessful(signInOTPResponseEntity: signInOTPResponseEntity));
-        //     final passwordAge = signInOTPResponseEntity.passwordAge;
+        // final passwordAge = signInOTPResponseEntity.passwordAge;
+
         //     if (passwordAge != null) {
         //       // Calculate expiry and notification dates
         //       final expiryDate = NotificationService.calculateExpiryDate(passwordAge.toMap());

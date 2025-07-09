@@ -92,6 +92,7 @@ class _OTPScreenState extends State<OTPScreen> {
                 listener: (context, state) {
                   if (state is OTPSuccessful) {
                     final bool? isConsent = state.signInOTPResponseEntity.userIsConsent;
+                    final passwordAge = state.signInOTPResponseEntity.passwordAge;
                     if (widget.responseParams.isFirstLogin != null &&
                         widget.responseParams.isFirstLogin == true) {
                       Navigator.of(context).pushNamed(
@@ -103,7 +104,14 @@ class _OTPScreenState extends State<OTPScreen> {
                       return;
                     }
                     if (isConsent != null && isConsent) {
-                      Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
+                      if (passwordAge != null && passwordAge.months == 6) {
+                        // Handle password expiry Alert
+                        Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false,
+                            arguments: {'hasToChangePassowrd': true});
+                      } else {
+                        Navigator.of(context)
+                            .pushNamedAndRemoveUntil(Routes.main, (route) => false);
+                      }
                       return;
                     } else {
                       Navigator.of(context).pushNamedAndRemoveUntil(
