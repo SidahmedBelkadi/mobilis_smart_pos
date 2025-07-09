@@ -74,23 +74,23 @@ class _MyHomePageState extends State<MainScreen> {
 
   _checkForPassowrdExpiryAlert() async {
     await Future.delayed(const Duration(seconds: 3));
-    // if (widget.hasToChangePassowrd == true) {
-    QuickAlert.show(
-        context: context,
-        type: QuickAlertType.info,
-        title: "password_expired".tr(context),
-        text: "password_expired_instruction".tr(context),
-        barrierDismissible: true,
-        barrierColor: Colors.black.withOpacity(.8),
-        backgroundColor: context.isDarkMode ? AppColors.darkerGrey : Colors.white,
-        textColor: context.isDarkMode ? Colors.white : Colors.black,
-        titleColor: context.isDarkMode ? Colors.white : Colors.black,
-        confirmBtnColor: AppColors.primary,
-        confirmBtnText: "changeButtonLabel".tr(context),
-        onConfirmBtnTap: () {
-          Navigator.of(context).pushNamed(Routes.changePassword);
-        });
-    // }
+    if (widget.hasToChangePassowrd == true) {
+      QuickAlert.show(
+          context: context,
+          type: QuickAlertType.info,
+          title: "password_expired".tr(context),
+          text: "password_expired_instruction".tr(context),
+          barrierDismissible: true,
+          barrierColor: Colors.black.withOpacity(.8),
+          backgroundColor: context.isDarkMode ? AppColors.darkerGrey : Colors.white,
+          textColor: context.isDarkMode ? Colors.white : Colors.black,
+          titleColor: context.isDarkMode ? Colors.white : Colors.black,
+          confirmBtnColor: AppColors.primary,
+          confirmBtnText: "changeButtonLabel".tr(context),
+          onConfirmBtnTap: () {
+            Navigator.of(context).pushNamed(Routes.changePassword);
+          });
+    }
   }
 
   Future<void> checkForUpdate() async {
