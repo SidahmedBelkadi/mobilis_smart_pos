@@ -222,7 +222,7 @@ class _ContractScreenState extends State<ContractScreen> {
     firstName = firstName.replaceAll(RegExp(r'-\s*'), ' ');
     String lastName = lastNameEditingController.text.trim();
     lastName = lastName.replaceAll(RegExp(r'-\s*'), ' ');
-    if (lastName.isEmpty || lastName == "") {
+    if (lastName.isEmpty || lastName == "" || lastName == "\\") {
       lastName = "SNP";
     }
     String birthPlace = birthPlaceEditingController.text.trim();

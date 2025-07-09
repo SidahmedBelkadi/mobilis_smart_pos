@@ -20,14 +20,14 @@ class Validator {
     if (value.isNotEmpty) {
       switch (type) {
         case InputType.FIRST_NAME:
-          if (!RegExp(ValidationPatterns.namePattern).hasMatch(value)) {
-            return "firstNameError".tr(context);
-          }
+          // if (!RegExp(ValidationPatterns.namePattern).hasMatch(value)) {
+          //   return "firstNameError".tr(context);
+          // }
           break;
         case InputType.LAST_NAME:
-          if (!RegExp(ValidationPatterns.namePattern).hasMatch(value)) {
-            return "lastNameError".tr(context);
-          }
+          // if (!RegExp(ValidationPatterns.namePattern).hasMatch(value)) {
+          //   return "lastNameError".tr(context);
+          // }
           break;
         case InputType.PHONE:
           if (!RegExp(ValidationPatterns.phonePattern).hasMatch(value)) {
