@@ -57,72 +57,70 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
   Widget build(BuildContext context) {
     final cubit = context.read<ForgotPasswordCubit>();
 
-    return SafeArea(
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: Container(
-            width: context.width,
-            height: context.height,
-            padding: EdgeInsets.all(32.sp),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // ------ OTP Animation
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Container(
+          width: context.width,
+          height: context.height,
+          padding: EdgeInsets.all(32.sp),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // ------ OTP Animation
 
-                LottieBuilder.asset(
-                  AppImages.otp2,
-                  height: 170.h,
-                  width: 170.w,
-                ),
+              LottieBuilder.asset(
+                AppImages.otp2,
+                height: 170.h,
+                width: 170.w,
+              ),
 
-                SizedBox(height: 96.h),
+              SizedBox(height: 96.h),
 
-                // ---- OTP Paragraph
-                Text(
-                  "otp".tr(context),
-                  textAlign: TextAlign.center,
-                  style:
-                      Theme.of(context).textTheme.headlineSmall!.copyWith(color: AppColors.primary),
-                ),
+              // ---- OTP Paragraph
+              Text(
+                "otp".tr(context),
+                textAlign: TextAlign.center,
+                style:
+                    Theme.of(context).textTheme.headlineSmall!.copyWith(color: AppColors.primary),
+              ),
 
-                SizedBox(height: 64.h),
+              SizedBox(height: 64.h),
 
-                // --------- OTP Field & Logic
+              // --------- OTP Field & Logic
 
-                BlocBuilder<ForgotPasswordCubit, ForgotPasswordState>(
-                  builder: (context, state) {
-                    if (state is ResetPasswordLoading) {
-                      return SizedBox(
-                        height: 32.sp,
-                        width: 32.sp,
-                        child: const CircularProgressIndicator(),
-                      );
-                    }
-                    return OTPCustomWidget(
-                      controller: otpController,
-                      onCompleted: (value) async {
-                        await Future.delayed(const Duration(seconds: 1));
-                        showModalBottomSheet(
-                          isDismissible: false,
-                          isScrollControlled: true,
-                          enableDrag: false,
-                          showDragHandle: true,
-                          context: context,
-                          builder: (context) {
-                            return BlocProvider.value(
-                              value: cubit,
-                              child: ForgotPasswordBottomSheet(
-                                  otp: value.trim(), msisdn: widget.msisdn),
-                            );
-                          },
-                        );
-                      },
+              BlocBuilder<ForgotPasswordCubit, ForgotPasswordState>(
+                builder: (context, state) {
+                  if (state is ResetPasswordLoading) {
+                    return SizedBox(
+                      height: 32.sp,
+                      width: 32.sp,
+                      child: const CircularProgressIndicator(),
                     );
-                  },
-                ),
-              ],
-            ),
+                  }
+                  return OTPCustomWidget(
+                    controller: otpController,
+                    onCompleted: (value) async {
+                      await Future.delayed(const Duration(seconds: 1));
+                      showModalBottomSheet(
+                        isDismissible: false,
+                        isScrollControlled: true,
+                        enableDrag: false,
+                        showDragHandle: true,
+                        context: context,
+                        builder: (context) {
+                          return BlocProvider.value(
+                            value: cubit,
+                            child:
+                                ForgotPasswordBottomSheet(otp: value.trim(), msisdn: widget.msisdn),
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
+            ],
           ),
         ),
       ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mobilis_smart_pos/src/core/api/end_points.dart';
 
 class AppColors {
   AppColors._();
@@ -8,17 +7,16 @@ class AppColors {
   static const _secondaryDefault = Color.fromARGB(255, 146, 219, 97);
   static const _secondaryLightDefault = Color.fromARGB(255, 238, 255, 226);
 
-  static const _primaryGrey = Colors.grey;
-  static const _secondaryGrey = Color(0xFFB0BEC5);
-  static const _secondaryLightGrey = Color(0xFFECEFF1);
+  // static const _primaryGrey = Colors.grey;
+  // static const _secondaryGrey = Color(0xFFB0BEC5);
+  // static const _secondaryLightGrey = Color(0xFFECEFF1);
 
   // Conditional getters
-  static Color get primary => EndPoints.isApi1 ? _primaryGrey : _primaryDefault;
+  static Color get primary => _primaryDefault;
 
-  static Color get secondary => EndPoints.isApi1 ? _secondaryGrey : _secondaryDefault;
+  static Color get secondary => _secondaryDefault;
 
-  static Color get secondaryLight =>
-      EndPoints.isApi1 ? _secondaryLightGrey : _secondaryLightDefault;
+  static Color get secondaryLight => _secondaryLightDefault;
 
   static const inputBorder = Color(0xffBABABA);
   static const secondaryText = Color(0xff6E6A7C);
@@ -30,13 +28,13 @@ class AppColors {
   static const taskDescription = Color(0xff24252C99);
   static const taskTitle = Color(0xff24252C);
   static const waitingTextColor = Color(0xffFF7D53);
-  static final inProgressTextColor = EndPoints.isApi1 ? _primaryGrey : _primaryDefault;
+  static const inProgressTextColor = _primaryDefault;
   static const finishedTextColor = Color(0xff0087FF);
   static const inProgressBackgroundColor = categorybackgroundColorGrey;
   static const waittingBackgroundColor = Color(0xffFFE4F2);
   static const finishedBackgroundColor = Color(0xffE3F2FF);
   static const highProiorityColor = waitingTextColor;
-  static final mediumProiorityColor = EndPoints.isApi1 ? _primaryGrey : _primaryDefault;
+  static const mediumProiorityColor = _primaryDefault;
   static const lowProiorityColor = Color(0xff0087FF);
   static const grey = Color(0xffEBE5FF);
 

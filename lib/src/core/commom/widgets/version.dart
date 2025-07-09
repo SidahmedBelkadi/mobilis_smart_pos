@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mobilis_smart_pos/src/core/api/end_points.dart';
 import '../../utils/helpers/media_query_values.dart';
 import 'package:package_info_plus/package_info_plus.dart'; // Import package_info_plus
 
@@ -9,10 +10,10 @@ class VersionWidget extends StatefulWidget {
   const VersionWidget({super.key});
 
   @override
-  _VersionWidgetState createState() => _VersionWidgetState();
+  VersionWidgetState createState() => VersionWidgetState();
 }
 
-class _VersionWidgetState extends State<VersionWidget> {
+class VersionWidgetState extends State<VersionWidget> {
   String _appVersion = ''; // To store the app version
 
   @override
@@ -46,7 +47,7 @@ class _VersionWidgetState extends State<VersionWidget> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              _appVersion.isNotEmpty ? _appVersion : '1.0.0',
+              "${_appVersion.isNotEmpty ? _appVersion : '1.0.0'} ${EndPoints.isApi1 ? ': Pré-Prod' : ''}",
               style: Theme.of(context).textTheme.labelSmall!.copyWith(
                     color: context.isDarkMode ? Colors.white : AppColors.primary,
                     fontWeight: FontWeight.bold,
