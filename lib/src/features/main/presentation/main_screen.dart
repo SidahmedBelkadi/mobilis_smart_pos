@@ -60,7 +60,8 @@ class _MyHomePageState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    _checkForPassowrdExpiryAlert();
+    // Disabled this functionality by client preference
+    // _checkForPassowrdExpiryAlert();
 
     if (widget.index == null) {
       screenIndex = 0;

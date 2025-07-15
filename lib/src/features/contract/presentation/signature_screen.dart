@@ -144,6 +144,8 @@ class _SignatureScreenState extends State<SignatureScreen> {
       final dsaICCID = match.group(1);
       final iccid = "892130${widget.contract.serialNumber}";
       debugPrint("=================== COMPOSED ICCID : $iccid ");
+      debugPrint("=================== Extraced MSISDN : $phoneNumber");
+
       if (phoneNumber != null && dsaICCID == iccid) {
         generateContractParamsEntity.msisdn = phoneNumber;
         cubit.attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
