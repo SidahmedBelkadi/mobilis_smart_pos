@@ -69,61 +69,59 @@ class _ParentPreparationScreenState extends State<ParentPreparationScreen> {
 
     return Scaffold(
       appBar: CustomAppbarWithDenyContract(title: "step02_parent".tr(context)),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Container(
-            padding: EdgeInsets.all(24.sp),
-            height: context.height - 100.sp,
-            width: context.width,
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                LottieBuilder.asset(AppImages.minors),
-                SizedBox(height: 24.sp),
-                Text(
-                  "parent_preparation_instruction".tr(context),
-                  style: Theme.of(context).textTheme.bodyLarge,
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 64.sp),
-                Column(
-                  children: [
-                    AppElevatedButtonWithText(
-                      text: "identityCard".tr(context),
-                      onPressed: () {
-                        startOCR(docType: "id_card");
-                        // Navigator.of(context).pushNamed(Routes.parentMrzOcr, arguments: {
-                        //   'documentType': 'id_card',
-                        //   'minorContract': contract,
-                        //   'minorRecto': recto,
-                        //   'minorVerso': verso,
-                        //   'minorIsPassport': isPassport,
-                        //   'parentIsPassport': false,
-                        // });
-                      },
-                    ),
-                    SizedBox(height: 16.h),
-                    AppElevatedButtonWithText(
-                      text: "passport".tr(context),
-                      onPressed: () {
-                        // TODO :
-                        startOCR(docType: "passport");
-                        // Navigator.of(context).pushNamed(Routes.parentMrzOcr, arguments: {
-                        //   'documentType': 'passport',
-                        //   'minorContract': contract,
-                        //   'minorRecto': recto,
-                        //   'minorVerso': verso,
-                        //   'minorIsPassport': isPassport,
-                        //   'parentIsPassport': true,
-                        // });
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.all(24.sp),
+          height: context.height - 100.sp,
+          width: context.width,
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              LottieBuilder.asset(AppImages.minors),
+              SizedBox(height: 24.sp),
+              Text(
+                "parent_preparation_instruction".tr(context),
+                style: Theme.of(context).textTheme.bodyLarge,
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 64.sp),
+              Column(
+                children: [
+                  AppElevatedButtonWithText(
+                    text: "identityCard".tr(context),
+                    onPressed: () {
+                      startOCR(docType: "id_card");
+                      // Navigator.of(context).pushNamed(Routes.parentMrzOcr, arguments: {
+                      //   'documentType': 'id_card',
+                      //   'minorContract': contract,
+                      //   'minorRecto': recto,
+                      //   'minorVerso': verso,
+                      //   'minorIsPassport': isPassport,
+                      //   'parentIsPassport': false,
+                      // });
+                    },
+                  ),
+                  SizedBox(height: 16.h),
+                  AppElevatedButtonWithText(
+                    text: "passport".tr(context),
+                    onPressed: () {
+                      // TODO :
+                      startOCR(docType: "passport");
+                      // Navigator.of(context).pushNamed(Routes.parentMrzOcr, arguments: {
+                      //   'documentType': 'passport',
+                      //   'minorContract': contract,
+                      //   'minorRecto': recto,
+                      //   'minorVerso': verso,
+                      //   'minorIsPassport': isPassport,
+                      //   'parentIsPassport': true,
+                      // });
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),

@@ -50,7 +50,7 @@ class ContractRequestParamsEntitiy {
 
   // ==== PDV === //
   final int pdvId;
-  int? serialNumber;
+  String? serialNumber;
 
   ContractRequestParamsEntitiy({
     required this.firstName,
@@ -215,7 +215,7 @@ class ContractRequestParamsEntitiy {
     String? bloodGroup,
     String? email,
     int? pdvId,
-    int? serialNumber,
+    String? serialNumber,
     int? employeeId,
     int? subscriptionId,
     String? parentFirstName,

@@ -406,8 +406,7 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: Scaffold(
+    return Scaffold(
       floatingActionButton: isCaptureDone
           ? CustomFAB(
               label: "continuer".tr(context),
@@ -576,7 +575,7 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
               )),
         ),
       ),
-    ));
+    );
   }
 }
 

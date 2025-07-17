@@ -85,73 +85,71 @@ class _PdvFolderScreenState extends State<PdvFolderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: CustomAppBar(title: "my_folder".tr(context)),
-        body: isLoading
-            ? const ImagesSkeleton()
-            : validImagesList.isEmpty
-                ? SizedBox(
-                    width: context.width,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        LottieBuilder.asset(
-                          AppImages.emptyBox,
-                          height: 280.sp,
-                          width: 280.sp,
-                        ),
-                        Text(
-                          "pdv_folder_empty".tr(context),
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                        SizedBox(height: 42.sp),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pushReplacementNamed(Routes.updatePdvFolder);
-                          },
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                "update_now".tr(context),
-                                style: Theme.of(context).textTheme.bodySmall,
-                              ),
-                              SizedBox(width: 8.sp),
-                              Icon(
-                                FontAwesomeIcons.upload,
-                                size: 16.sp,
-                                color: context.isDarkMode ? Colors.white : Colors.black,
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-                : Container(
-                    height: context.height,
-                    width: context.width,
-                    padding: EdgeInsets.symmetric(horizontal: 12.sp, vertical: 24.sp),
-                    child: GridView.builder(
-                      itemCount: validImagesList.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 8.sp,
-                        crossAxisSpacing: 10.sp,
+    return Scaffold(
+      appBar: CustomAppBar(title: "my_folder".tr(context)),
+      body: isLoading
+          ? const ImagesSkeleton()
+          : validImagesList.isEmpty
+              ? SizedBox(
+                  width: context.width,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      LottieBuilder.asset(
+                        AppImages.emptyBox,
+                        height: 280.sp,
+                        width: 280.sp,
                       ),
-                      itemBuilder: (context, index) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12.sp),
-                            border: Border.all(color: Colors.green),
-                          ),
-                          child: BuildImage(url: validImagesList[index]),
-                        );
-                      },
-                    ),
+                      Text(
+                        "pdv_folder_empty".tr(context),
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      SizedBox(height: 42.sp),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pushReplacementNamed(Routes.updatePdvFolder);
+                        },
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "update_now".tr(context),
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            SizedBox(width: 8.sp),
+                            Icon(
+                              FontAwesomeIcons.upload,
+                              size: 16.sp,
+                              color: context.isDarkMode ? Colors.white : Colors.black,
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
                   ),
-      ),
+                )
+              : Container(
+                  height: context.height,
+                  width: context.width,
+                  padding: EdgeInsets.symmetric(horizontal: 12.sp, vertical: 24.sp),
+                  child: GridView.builder(
+                    itemCount: validImagesList.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 8.sp,
+                      crossAxisSpacing: 10.sp,
+                    ),
+                    itemBuilder: (context, index) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12.sp),
+                          border: Border.all(color: Colors.green),
+                        ),
+                        child: BuildImage(url: validImagesList[index]),
+                      );
+                    },
+                  ),
+                ),
     );
   }
 }

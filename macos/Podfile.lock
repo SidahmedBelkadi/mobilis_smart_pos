@@ -1,4 +1,6 @@
 PODS:
+  - app_settings (5.1.1):
+    - FlutterMacOS
   - connectivity_plus (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -32,6 +34,7 @@ PODS:
     - FlutterMacOS
 
 DEPENDENCIES:
+  - app_settings (from `Flutter/ephemeral/.symlinks/plugins/app_settings/macos`)
   - connectivity_plus (from `Flutter/ephemeral/.symlinks/plugins/connectivity_plus/darwin`)
   - device_info_plus (from `Flutter/ephemeral/.symlinks/plugins/device_info_plus/macos`)
   - file_selector_macos (from `Flutter/ephemeral/.symlinks/plugins/file_selector_macos/macos`)
@@ -48,6 +51,8 @@ DEPENDENCIES:
   - url_launcher_macos (from `Flutter/ephemeral/.symlinks/plugins/url_launcher_macos/macos`)
 
 EXTERNAL SOURCES:
+  app_settings:
+    :path: Flutter/ephemeral/.symlinks/plugins/app_settings/macos
   connectivity_plus:
     :path: Flutter/ephemeral/.symlinks/plugins/connectivity_plus/darwin
   device_info_plus:
@@ -78,6 +83,7 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/url_launcher_macos/macos
 
 SPEC CHECKSUMS:
+  app_settings: cd21e176b56f8172043640ade81322a98896bff4
   connectivity_plus: 3f6c9057f4cd64198dc826edfb0542892f825343
   device_info_plus: b0fafc687fb901e2af612763340f1b0d4352f8e5
   file_selector_macos: 585232b688707857504f9cb5f985a7c97fe4dd30

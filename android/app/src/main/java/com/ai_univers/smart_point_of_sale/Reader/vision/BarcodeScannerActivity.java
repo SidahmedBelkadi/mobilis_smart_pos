@@ -125,7 +125,7 @@ public class BarcodeScannerActivity extends AppCompatActivity {
                             
 
                             // Check if the result starts with "892130" and modify it
-                            if (rawValue.startsWith("892130")) {
+                            if (rawValue.startsWith("584000")) {
                                 rawValue = rawValue.substring(6); // Remove the first 6 characters
                             }
 

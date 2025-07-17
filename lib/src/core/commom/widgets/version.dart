@@ -46,7 +46,7 @@ class _VersionWidgetState extends State<VersionWidget> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              _appVersion.isNotEmpty ? _appVersion : '1.0.0',
+              _appVersion.isNotEmpty ? '$_appVersion SSA' : '1.0.0',
               style: Theme.of(context).textTheme.labelSmall!.copyWith(
                     color: context.isDarkMode ? Colors.white : AppColors.primary,
                     fontWeight: FontWeight.bold,

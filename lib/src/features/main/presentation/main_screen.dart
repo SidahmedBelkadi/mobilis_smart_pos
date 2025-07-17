@@ -152,10 +152,6 @@ class _MyHomePageState extends State<MainScreen> {
       child: PopScope(
         canPop: false,
         child: Scaffold(
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => _showPasswordExpiryDialog('password_expiry_message'.tr(context)),
-            child: const Icon(Icons.change_circle),
-          ),
           drawer: const HomeDrawer(),
           bottomNavigationBar: CustomAppBottomNavBar(
             currentIndex: screenIndex,

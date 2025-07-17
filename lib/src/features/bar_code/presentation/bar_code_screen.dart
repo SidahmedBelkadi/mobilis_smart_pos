@@ -53,16 +53,14 @@ class SimScannerScreenState extends State<SimScannerScreen> {
   @override
   Widget build(BuildContext context) {
     return SessionTimeout(
-      child: SafeArea(
-        child: Scaffold(
-          appBar: _buildBarCodeScreenAppBar(context),
-          body: SingleChildScrollView(
-            child: SizedBox(
-              height: context.height - 56.sp,
-              width: context.width,
-              child: SimScannerUI(
-                onPressed: () => _startBarcodeScanner(context),
-              ),
+      child: Scaffold(
+        appBar: _buildBarCodeScreenAppBar(context),
+        body: SingleChildScrollView(
+          child: SizedBox(
+            height: context.height - 56.sp,
+            width: context.width,
+            child: SimScannerUI(
+              onPressed: () => _startBarcodeScanner(context),
             ),
           ),
         ),
@@ -131,7 +129,7 @@ class SimScannerScreenState extends State<SimScannerScreen> {
 
   void _continueWithBarcode(BuildContext context, String barcode) {
     final ContractRequestParamsEntitiy newContract = widget.contract.copyWith(
-      serialNumber: int.parse(barcode),
+      serialNumber: barcode,
     );
 
     Navigator.of(context).pushNamed(

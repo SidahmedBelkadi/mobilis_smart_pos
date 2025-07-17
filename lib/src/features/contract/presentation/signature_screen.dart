@@ -64,7 +64,6 @@ class _SignatureScreenState extends State<SignatureScreen> {
   late File signatureFile;
 
   bool isEditContractLoading = false;
-  bool isGenerateContractLoading = false;
 
   @override
   void initState() {
@@ -82,89 +81,61 @@ class _SignatureScreenState extends State<SignatureScreen> {
   Widget build(BuildContext context) {
     final cubit = context.read<ContractCubit>();
     return SessionTimeout(
-      child: SafeArea(
-        child: Scaffold(
-          appBar: CustomAppBar(title: "signature".tr(context)),
-          body: SingleChildScrollView(
-            child: Container(
-              width: context.width,
-              padding: EdgeInsets.all(32.sp),
-              child: BlocConsumer<ContractCubit, ContractState>(
-                listener: (context, state) {
-                  if (state is EditContractFailed) {
-                    setState(() {
-                      isEditContractLoading = false;
-                    });
-                    AppToasts.showErrorToast(message: state.message.tr(context), context: context);
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
-                  }
-                  if (state is GenerateContractFailed) {
-                    setState(() {
-                      isGenerateContractLoading = false;
-                    });
-                    AppToasts.showErrorToast(message: state.message.tr(context), context: context);
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                        Routes.main, arguments: {'index': 1, 'fromSignin': true}, (route) => false);
-                  }
-                  if (state is GenerateContractSuccess) {
-                    setState(() {
-                      isGenerateContractLoading = false;
-                    });
-                    Navigator.of(context)
-                        .pushNamedAndRemoveUntil(Routes.contractGenerated, (route) => false);
-                  }
+      child: Scaffold(
+        appBar: CustomAppBar(title: "signature".tr(context)),
+        body: SingleChildScrollView(
+          child: Container(
+            width: context.width,
+            padding: EdgeInsets.all(32.sp),
+            child: BlocConsumer<ContractCubit, ContractState>(
+              listener: (context, state) {
+                if (state is EditContractFailed) {
+                  setState(() {
+                    isEditContractLoading = false;
+                  });
+                  AppToasts.showErrorToast(message: state.message.tr(context), context: context);
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                }
 
-                  if (state is EditContractSuccess) {
-                    setState(() {
-                      isEditContractLoading = false;
-                    });
-                    final response = state.editContractResponseEntity;
-                    setState(() {
-                      generateContractParamsEntity = GenerateContractParamsEntity(
-                        invoiceId: response.invoiceId,
-                        subsId: response.subscriptionId,
-                      );
+                if (state is EditContractSuccess) {
+                  setState(() {
+                    isEditContractLoading = false;
+                  });
 
-                      isGenerateContractLoading = true;
+                  Navigator.of(context)
+                      .pushNamedAndRemoveUntil(Routes.contractGenerated, (route) => false);
+                }
+              },
+              builder: (context, state) {
+                if (isEditContractLoading) {
+                  return const ContractLoading();
+                }
+                return Body(
+                  onDrawStart: () {
+                    setState(() {
+                      isSignatureValidated = true;
                     });
-
-                    cubit.generateContract(params: generateContractParamsEntity);
-                  }
-                },
-                builder: (context, state) {
-                  if (isEditContractLoading) {
-                    return const ContractLoading();
-                  }
-                  if (isGenerateContractLoading) {
-                    return const ContractLoading();
-                  }
-                  return Body(
-                    onDrawStart: () {
-                      setState(() {
-                        isSignatureValidated = true;
-                      });
-                      return false;
-                    },
-                    onErasePressed: () {
-                      setState(() {
-                        isSignatureValidated = false;
-                      });
-                      _signaturePadKey.currentState!.clear();
-                    },
-                    isConditionOfSignatureChecked: _isConditionOfSignatureChecked,
-                    onCheckBoxChanged: (value) {
-                      setState(() {
-                        _isConditionOfSignatureChecked = true;
-                      });
-                    },
-                    isSignatureValidated: isSignatureValidated,
-                    showConfirmationDialog: () {
-                      _showConfirmationDialog(context, cubit);
-                    },
-                  );
-                },
-              ),
+                    return false;
+                  },
+                  onErasePressed: () {
+                    setState(() {
+                      isSignatureValidated = false;
+                    });
+                    _signaturePadKey.currentState!.clear();
+                  },
+                  isConditionOfSignatureChecked: _isConditionOfSignatureChecked,
+                  onCheckBoxChanged: (value) {
+                    setState(() {
+                      _isConditionOfSignatureChecked = true;
+                    });
+                  },
+                  isSignatureValidated: isSignatureValidated,
+                  showConfirmationDialog: () {
+                    _showConfirmationDialog(context, cubit);
+                  },
+                );
+              },
             ),
           ),
         ),

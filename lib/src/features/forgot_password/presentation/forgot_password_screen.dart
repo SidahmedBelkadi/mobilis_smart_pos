@@ -23,98 +23,94 @@ class ForgotPasswordScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<ForgotPasswordCubit>();
-    return SafeArea(
-      child: Scaffold(
-        floatingActionButtonLocation: context.isArabicLocale
-            ? FloatingActionButtonLocation.startFloat
-            : FloatingActionButtonLocation.endFloat,
-        floatingActionButton: BlocConsumer<ForgotPasswordCubit, ForgotPasswordState>(
-          listener: (context, state) {
-            if (state is ResetPasswordOTPFailure) {
-              AppToasts.showErrorToast(
-                message: state.message.tr(context),
-                context: context,
-              );
-            }
-            if (state is ResetPasswordOTPSuccess) {
-              AppToasts.showSuccessToast(
-                message: "code_has_been_sent".tr(context),
-                context: context,
-              );
-              Navigator.of(context).pushNamed(Routes.forgotPasswordOTP,
-                  arguments: {'msisdn': cubit.phoneController.text.trim()});
-            }
-          },
-          builder: (context, state) {
-            if (state is ResetPasswordOTPLoading) {
-              return SizedBox(
-                height: 32.sp,
-                width: 32.sp,
-                child: CircularProgressIndicator(
-                  color: AppColors.primary,
-                ),
-              );
-            }
-            return FloatingActionButton(
-              backgroundColor: AppColors.primary,
-              onPressed: () => _onFABPressed(context, cubit),
-              child: FaIcon(
-                FontAwesomeIcons.arrowRight,
-                color: context.isDarkMode ? Colors.black : Colors.white,
+    return Scaffold(
+      floatingActionButtonLocation: context.isArabicLocale
+          ? FloatingActionButtonLocation.startFloat
+          : FloatingActionButtonLocation.endFloat,
+      floatingActionButton: BlocConsumer<ForgotPasswordCubit, ForgotPasswordState>(
+        listener: (context, state) {
+          if (state is ResetPasswordOTPFailure) {
+            AppToasts.showErrorToast(
+              message: state.message.tr(context),
+              context: context,
+            );
+          }
+          if (state is ResetPasswordOTPSuccess) {
+            AppToasts.showSuccessToast(
+              message: "code_has_been_sent".tr(context),
+              context: context,
+            );
+            Navigator.of(context).pushNamed(Routes.forgotPasswordOTP,
+                arguments: {'msisdn': cubit.phoneController.text.trim()});
+          }
+        },
+        builder: (context, state) {
+          if (state is ResetPasswordOTPLoading) {
+            return SizedBox(
+              height: 32.sp,
+              width: 32.sp,
+              child: CircularProgressIndicator(
+                color: AppColors.primary,
               ),
             );
-          },
-        ),
-        body: SingleChildScrollView(
-          child: Container(
-            height: context.height,
-            width: context.width,
-            padding: EdgeInsets.all(24.sp),
-            child: Column(
-              children: [
-                LottieBuilder.asset(
-                  AppImages.phone1,
-                  height: 300.h,
-                  width: 300.w,
-                ),
-                if (msisdn == null)
-                  Text(
-                    "phoneNumber".tr(context),
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineSmall!
-                        .copyWith(color: AppColors.primary),
-                  ),
-                SizedBox(height: 64.h),
-                Form(
-                  key: cubit.formKey,
-                  child: Directionality(
-                    textDirection: TextDirection.ltr,
-                    child: msisdn != null
-                        ? AppTextFormField(
-                            enabled: false,
-                            disabledValue: msisdn?.replaceFirst("213", ""),
-                            label: "msisdnLabel".tr(context),
-                            prefixText: "(+213 🇩🇿)  ",
-                            keyboardType: TextInputType.phone,
-                            suffixIcon: Icons.phone_android,
-                            textEditingController: cubit.phoneController,
-                          )
-                        : AppTextFormField(
-                            enabled: msisdn == null,
-                            disabledValue: msisdn?.replaceFirst("213", ""),
-                            label: "msisdnLabel".tr(context),
-                            prefixText: "(+213 🇩🇿)  ",
-                            validationType: InputType.PHONE,
-                            keyboardType: TextInputType.phone,
-                            suffixIcon: Icons.phone_android,
-                            textEditingController: cubit.phoneController,
-                          ),
-                  ),
-                ),
-              ],
+          }
+          return FloatingActionButton(
+            backgroundColor: AppColors.primary,
+            onPressed: () => _onFABPressed(context, cubit),
+            child: FaIcon(
+              FontAwesomeIcons.arrowRight,
+              color: context.isDarkMode ? Colors.black : Colors.white,
             ),
+          );
+        },
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          height: context.height,
+          width: context.width,
+          padding: EdgeInsets.all(24.sp),
+          child: Column(
+            children: [
+              LottieBuilder.asset(
+                AppImages.phone1,
+                height: 300.h,
+                width: 300.w,
+              ),
+              if (msisdn == null)
+                Text(
+                  "phoneNumber".tr(context),
+                  textAlign: TextAlign.center,
+                  style:
+                      Theme.of(context).textTheme.headlineSmall!.copyWith(color: AppColors.primary),
+                ),
+              SizedBox(height: 64.h),
+              Form(
+                key: cubit.formKey,
+                child: Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: msisdn != null
+                      ? AppTextFormField(
+                          enabled: false,
+                          disabledValue: msisdn?.replaceFirst("213", ""),
+                          label: "msisdnLabel".tr(context),
+                          prefixText: "(+213 🇩🇿)  ",
+                          keyboardType: TextInputType.phone,
+                          suffixIcon: Icons.phone_android,
+                          textEditingController: cubit.phoneController,
+                        )
+                      : AppTextFormField(
+                          enabled: msisdn == null,
+                          disabledValue: msisdn?.replaceFirst("213", ""),
+                          label: "msisdnLabel".tr(context),
+                          prefixText: "(+213 🇩🇿)  ",
+                          validationType: InputType.PHONE,
+                          keyboardType: TextInputType.phone,
+                          suffixIcon: Icons.phone_android,
+                          textEditingController: cubit.phoneController,
+                        ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

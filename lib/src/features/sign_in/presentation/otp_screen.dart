@@ -58,92 +58,89 @@ class _OTPScreenState extends State<OTPScreen> {
   Widget build(BuildContext context) {
     final cubit = context.read<SignInCubit>();
 
-    return SafeArea(
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: Container(
-            width: context.width,
-            height: context.height,
-            padding: EdgeInsets.all(32.sp),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                // ------ OTP Animation
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Container(
+          width: context.width,
+          height: context.height,
+          padding: EdgeInsets.all(32.sp),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              // ------ OTP Animation
 
-                LottieBuilder.asset(
-                  AppImages.otp1,
-                  height: 170.h,
-                  width: 170.w,
-                ),
-                SizedBox(height: 96.h),
+              LottieBuilder.asset(
+                AppImages.otp1,
+                height: 170.h,
+                width: 170.w,
+              ),
+              SizedBox(height: 96.h),
 
-                // ---- OTP Paragraph
-                Text(
-                  "otp".tr(context),
-                  textAlign: TextAlign.center,
-                  style:
-                      Theme.of(context).textTheme.headlineSmall!.copyWith(color: AppColors.primary),
-                ),
+              // ---- OTP Paragraph
+              Text(
+                "otp".tr(context),
+                textAlign: TextAlign.center,
+                style:
+                    Theme.of(context).textTheme.headlineSmall!.copyWith(color: AppColors.primary),
+              ),
 
-                SizedBox(height: 64.h),
+              SizedBox(height: 64.h),
 
-                // --------- OTP Field & Logic
-                BlocConsumer<SignInCubit, SignInState>(
-                  listener: (context, state) {
-                    if (state is OTPSuccessful) {
-                      final bool? isConsent = state.signInOTPResponseEntity.userIsConsent;
-                      if (widget.responseParams.isFirstLogin != null &&
-                          widget.responseParams.isFirstLogin == true) {
-                        Navigator.of(context).pushNamed(
-                          Routes.forgotPassword,
-                          arguments: {
-                            'msisdn': widget.signInParams.phone,
-                          },
-                        );
-                        return;
-                      }
-                      if (isConsent != null && isConsent) {
-                        Navigator.of(context)
-                            .pushNamedAndRemoveUntil(Routes.main, (route) => false);
-                        return;
-                      } else {
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                            Routes.pdvEngagements,
-                            arguments: {
-                              'phone': widget.signInParams.phone,
-                              'refresh_token': state.signInOTPResponseEntity.refreshToken,
-                            },
-                            (route) => false);
-                      }
-                    }
-                    if (state is OTPFailed) {
-                      AppToasts.showErrorToast(
-                        message: state.message.tr(context),
-                        context: context,
+              // --------- OTP Field & Logic
+              BlocConsumer<SignInCubit, SignInState>(
+                listener: (context, state) {
+                  if (state is OTPSuccessful) {
+                    final bool? isConsent = state.signInOTPResponseEntity.userIsConsent;
+                    if (widget.responseParams.isFirstLogin != null &&
+                        widget.responseParams.isFirstLogin == true) {
+                      Navigator.of(context).pushNamed(
+                        Routes.forgotPassword,
+                        arguments: {
+                          'msisdn': widget.signInParams.phone,
+                        },
                       );
+                      return;
                     }
-                  },
-                  builder: (context, state) {
-                    if (state is OTPLoading) {
-                      return const CircularProgressIndicator();
+                    if (isConsent != null && isConsent) {
+                      Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
+                      return;
+                    } else {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                          Routes.pdvEngagements,
+                          arguments: {
+                            'phone': widget.signInParams.phone,
+                            'refresh_token': state.signInOTPResponseEntity.refreshToken,
+                          },
+                          (route) => false);
                     }
-
-                    return OTPCustomWidget(
-                      controller: otpController,
-                      onCompleted: (value) async {
-                        await Future.delayed(const Duration(seconds: 1));
-                        SignInOTPRequestParams params = SignInOTPRequestParams(
-                          msisdn: widget.signInParams.phone,
-                          otp: int.parse(value),
-                        );
-                        cubit.verifyOTP(params: params);
-                      },
+                  }
+                  if (state is OTPFailed) {
+                    AppToasts.showErrorToast(
+                      message: state.message.tr(context),
+                      context: context,
                     );
-                  },
-                ),
-              ],
-            ),
+                  }
+                },
+                builder: (context, state) {
+                  if (state is OTPLoading) {
+                    return const CircularProgressIndicator();
+                  }
+
+                  return OTPCustomWidget(
+                    controller: otpController,
+                    onCompleted: (value) async {
+                      await Future.delayed(const Duration(seconds: 1));
+                      SignInOTPRequestParams params = SignInOTPRequestParams(
+                        msisdn: widget.signInParams.phone,
+                        otp: int.parse(value),
+                      );
+                      cubit.verifyOTP(params: params);
+                    },
+                  );
+                },
+              ),
+            ],
           ),
         ),
       ),

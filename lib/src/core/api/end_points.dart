@@ -6,7 +6,7 @@ class EndPoints {
   static const String ocrBaseUrl = String.fromEnvironment("OCR_BASE_URL");
 
   // static const String baseUrl = String.fromEnvironment("BASE_URL");
-  static const String baseUrl = "https://ms-pos.mobilis.dz/api1/app";
+  static const String baseUrl = "http://ssa-backend.ddns.net:3000/api1/app";
 
   static bool get isApi1 => baseUrl.contains('api1');
 
