@@ -2,14 +2,12 @@ import 'package:mobilis_smart_pos/src/features/contract/domain/entities/rasd_edi
 
 class RasdEditContractResponseModel extends RasdEditContractResponseEntity {
   const RasdEditContractResponseModel({
-    required super.subscriptionID,
-    required super.contractCode,
+    required super.message,
   });
 
   factory RasdEditContractResponseModel.fromJson({required Map<String, dynamic> json}) {
     return RasdEditContractResponseModel(
-      subscriptionID: json['subscriptionID'],
-      contractCode: json['contractCode'],
+      message: json['message'],
     );
   }
 }

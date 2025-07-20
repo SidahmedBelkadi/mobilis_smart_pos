@@ -1,14 +1,12 @@
 import 'package:equatable/equatable.dart';
 
 class RasdEditContractResponseEntity extends Equatable {
-  final int subscriptionID;
-  final String contractCode;
+  final String message;
 
   const RasdEditContractResponseEntity({
-    required this.subscriptionID,
-    required this.contractCode,
+    required this.message,
   });
 
   @override
-  List<Object?> get props => [subscriptionID, contractCode];
+  List<Object?> get props => [message];
 }

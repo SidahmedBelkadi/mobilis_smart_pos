@@ -17,9 +17,8 @@ class RasdEditRequestParamsEntity {
   final String documentType;
   final String documentNumber;
   final String issueDate;
-  final int? subscriptionTypeId;
   final String? folderFiles;
-  final int? serialNumber;
+  final String? serialNumber;
   final String address;
 
   RasdEditRequestParamsEntity({
@@ -37,7 +36,6 @@ class RasdEditRequestParamsEntity {
     required this.documentType,
     required this.documentNumber,
     required this.issueDate,
-    this.subscriptionTypeId,
     this.folderFiles,
     this.serialNumber,
     required this.address,
@@ -60,7 +58,6 @@ class RasdEditRequestParamsEntity {
         'Document_type': documentType,
         'Document_number': documentNumber,
         'Issue_date': issueDate,
-        'Subscription_type_ID': subscriptionTypeId,
         'Folder_files': folderFiles,
         'PDV_ID': di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials()!.userId,
         'Employee_ID':
@@ -87,7 +84,7 @@ class RasdEditRequestParamsEntity {
     String? issueDate,
     int? subscriptionTypeId,
     String? folderFiles,
-    int? serialNumber,
+    String? serialNumber,
     String? address,
   }) {
     return RasdEditRequestParamsEntity(
@@ -105,7 +102,6 @@ class RasdEditRequestParamsEntity {
       documentType: documentType ?? this.documentType,
       documentNumber: documentNumber ?? this.documentNumber,
       issueDate: issueDate ?? this.issueDate,
-      subscriptionTypeId: subscriptionTypeId ?? this.subscriptionTypeId,
       folderFiles: folderFiles ?? this.folderFiles,
       serialNumber: serialNumber ?? this.serialNumber,
       address: address ?? this.address,

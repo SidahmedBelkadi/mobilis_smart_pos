@@ -1,10 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:json_pretty/json_pretty.dart';
 import 'package:lottie/lottie.dart';
 import 'package:mobilis_smart_pos/src/config/routing/app_routes.dart';
 import 'package:mobilis_smart_pos/src/core/commom/widgets/app_elevated_button_text.dart';
@@ -125,19 +123,7 @@ class _RasdBarCodeScannerState extends State<RasdBarCodeScanner> {
             ElevatedButton(
               child: Text('yes'.tr(context)),
               onPressed: () async {
-                Navigator.of(context).pop();
-                final Map? selectedOffer =
-                    await Navigator.of(context).pushNamed(Routes.offers) as Map?;
-                debugPrint("======== SELECTED OFFER ! $selectedOffer");
-
-                if (selectedOffer != null) {
-                  final params = widget.rasdParams.copyWith(
-                    serialNumber: int.parse(barcode),
-                    subscriptionTypeId: selectedOffer['offerId'],
-                  );
-                  debugPrint(prettyPrintJson(jsonEncode(params.toJson())));
-                  _navigateToSignatureScreen(params);
-                }
+                _navigateToSignatureScreen(context, barcode);
               },
             ),
           ],
@@ -146,9 +132,13 @@ class _RasdBarCodeScannerState extends State<RasdBarCodeScanner> {
     );
   }
 
-  _navigateToSignatureScreen(RasdEditRequestParamsEntity rasdParams) {
+  _navigateToSignatureScreen(BuildContext context, String barCode) {
+    final params = widget.rasdParams.copyWith(
+      serialNumber: barCode,
+    );
+
     Navigator.of(context).pushNamed(Routes.rasdBarSignatureSCreen, arguments: {
-      'rasdParams': rasdParams,
+      'rasdParams': params,
       'recto': widget.rectoImage,
       'verso': widget.versoImage,
     });

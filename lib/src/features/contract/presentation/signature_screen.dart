@@ -50,7 +50,6 @@ class SignatureScreen extends StatefulWidget {
   State<SignatureScreen> createState() => _SignatureScreenState();
 }
 
-bool smsLoading = false;
 String dsaMessage = '';
 
 late GenerateContractParamsEntity generateContractParamsEntity;
@@ -67,7 +66,6 @@ class _SignatureScreenState extends State<SignatureScreen> {
 
   @override
   void initState() {
-    smsLoading = false;
     super.initState();
     ScreenshotService.disableScreenshots();
   }
