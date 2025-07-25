@@ -11,4 +11,5 @@ class StatusCode {
   static const int internalServerError = 500;
   static const int tokenExpired = 498;
   static const int userAccountOnHold = 460;
+  static const int userSessionExpired = 475;
 }

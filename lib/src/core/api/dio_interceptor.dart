@@ -56,6 +56,10 @@ class DioInterceptor extends Interceptor {
       await di.serviceLocator<SmartPosLocalStorage>().clearLoginCredentials();
       navigatorKey.currentState?.pushNamedAndRemoveUntil(Routes.signIn, (route) => false);
       return;
+    } else if (err.response?.statusCode == StatusCode.userSessionExpired) {
+      await di.serviceLocator<SmartPosLocalStorage>().clearLoginCredentials();
+      navigatorKey.currentState?.pushNamedAndRemoveUntil(Routes.signIn, (route) => false);
+      return;
     }
     handler.next(err); // Continue with the error
   }
