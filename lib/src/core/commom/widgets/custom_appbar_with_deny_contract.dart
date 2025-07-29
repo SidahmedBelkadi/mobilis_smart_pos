@@ -12,12 +12,14 @@ class CustomAppbarWithDenyContract extends StatelessWidget implements PreferredS
     this.showProgressIndicator,
     this.currentStep,
     this.allSteps,
+    this.actionTitle = "discard_activation",
   });
 
   final String title;
   final bool? showProgressIndicator;
   final int? currentStep;
   final int? allSteps;
+  final String actionTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +65,7 @@ class CustomAppbarWithDenyContract extends StatelessWidget implements PreferredS
                       Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
                     },
                     value: 'cancel',
-                    child: Text("discard_activation".tr(context)),
+                    child: Text(actionTitle.tr(context)),
                   ),
                 ];
               },

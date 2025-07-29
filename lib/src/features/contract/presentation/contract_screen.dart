@@ -279,13 +279,13 @@ class _ContractScreenState extends State<ContractScreen> {
     );
 
     widget.isMinor
-        ? Navigator.of(context).pushNamed(Routes.parentPreparation, arguments: {
+        ? Navigator.of(context).pushReplacementNamed(Routes.parentPreparation, arguments: {
             'contract': contract,
             'recto': rectoImage,
             'verso': versoImage,
             'isPassport': widget.metaData['document_type'] == 'passport' ? true : false
           })
-        : Navigator.of(context).pushNamed(Routes.barCode, arguments: {
+        : Navigator.of(context).pushReplacementNamed(Routes.barCode, arguments: {
             'contract': contract,
             'recto': rectoImage,
             'verso': versoImage,
@@ -395,6 +395,7 @@ class _ContractScreenState extends State<ContractScreen> {
     return SessionTimeout(
       child: Scaffold(
         appBar: CustomAppbarWithDenyContract(
+          actionTitle: "home",
           title: "contractTitle".tr(context),
           showProgressIndicator: true,
           currentStep: 3,

@@ -65,7 +65,7 @@ class SimScannerScreenState extends State<SimScannerScreen> {
             child: BlocConsumer<ContractCubit, ContractState>(
               listener: (context, state) {
                 if (state is CheckBeforeEditContractSuccess) {
-                  Navigator.of(context).pushNamed(
+                  Navigator.of(context).pushReplacementNamed(
                     Routes.signatureScreen,
                     arguments: {
                       'contract': newContract,
