@@ -372,7 +372,7 @@ class _ParentContractScreenState extends State<ParentContractScreen> {
       parentGender: CivilsInformationsConverterHelper.getToSubmitGenderValue(
         gender: widget.parentExtractedNFCData['gender'],
       ),
-      parentBirthDate: CivilsInformationsConverterHelper.convertToIso8601WithTiret(
+      parentBirthDate: CivilsInformationsConverterHelper.convertToIso8601(
         widget.parentExtractedNFCData['date_of_birth'],
       ),
       parentBirthPlace: birthPlace,

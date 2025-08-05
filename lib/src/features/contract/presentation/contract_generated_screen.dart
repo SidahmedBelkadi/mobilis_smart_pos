@@ -9,7 +9,9 @@ import '../../../core/utils/helpers/app_localization_helper.dart';
 import '../../../core/utils/ressources/app_images.dart';
 
 class ContractGenerated extends StatelessWidget {
-  const ContractGenerated({super.key});
+  const ContractGenerated({super.key, required this.msisdn});
+
+  final String msisdn;
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +31,11 @@ class ContractGenerated extends StatelessWidget {
                       "contract_generated_suc".tr(context),
                       style: Theme.of(context).textTheme.bodyLarge,
                       textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 24.sp),
+                    Text(
+                      "${"msisdn".tr(context)}$msisdn",
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                     SizedBox(height: 80.sp),
                     AppElevatedButtonWithText(

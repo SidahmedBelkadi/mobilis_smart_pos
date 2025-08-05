@@ -130,7 +130,10 @@ class AppRoutes {
         );
 
       case Routes.contractGenerated:
-        return RoutesAnimationManager.slideFromRightTransition(const ContractGenerated());
+        final params = args as Map<String, dynamic>;
+        return RoutesAnimationManager.slideFromRightTransition(ContractGenerated(
+          msisdn: params['msisdn'] as String,
+        ));
 
       case Routes.signIn:
         return RoutesAnimationManager.slideFromRightTransition(

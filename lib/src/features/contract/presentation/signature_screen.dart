@@ -101,8 +101,11 @@ class _SignatureScreenState extends State<SignatureScreen> {
                     isEditContractLoading = false;
                   });
 
-                  Navigator.of(context)
-                      .pushNamedAndRemoveUntil(Routes.contractGenerated, (route) => false);
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                      Routes.contractGenerated, (route) => false,
+                      arguments: {
+                        'msisdn': state.editContractResponseEntity.msisdn,
+                      });
                 }
               },
               builder: (context, state) {
