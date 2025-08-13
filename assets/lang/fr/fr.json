@@ -341,5 +341,6 @@
   "please_enable_sms_permission": "Veuillez activer l'autorisation SMS dans les paramètres pour détecter automatiquement le code.",
   "cancel": "Annuler",
   "password_expired": "Mot de passe expiré",
-  "password_expired_instruction": "Votre mot de passe a expiré. Veuillez le changer pour continuer à utiliser l’application."
+  "password_expired_instruction": "Votre mot de passe a expiré. Veuillez le changer pour continuer à utiliser l’application.",
+  "SIM_ALREADY_USED": "Cette carte SIM est déjà utilisée."
 }

@@ -13,6 +13,8 @@ class CustomAppbarWithDenyContract extends StatelessWidget implements PreferredS
     this.currentStep,
     this.allSteps,
     this.actionTitle = "discard_activation",
+    this.isActionEnabled = true,
+    this.automaticallyImplyLeading = true,
   });
 
   final String title;
@@ -20,6 +22,8 @@ class CustomAppbarWithDenyContract extends StatelessWidget implements PreferredS
   final int? currentStep;
   final int? allSteps;
   final String actionTitle;
+  final bool isActionEnabled;
+  final bool automaticallyImplyLeading;
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +31,7 @@ class CustomAppbarWithDenyContract extends StatelessWidget implements PreferredS
       mainAxisSize: MainAxisSize.min,
       children: [
         AppBar(
+          automaticallyImplyLeading: automaticallyImplyLeading,
           foregroundColor: Colors.black,
           backgroundColor: AppColors.primary,
           centerTitle: true,
@@ -55,22 +60,25 @@ class CustomAppbarWithDenyContract extends StatelessWidget implements PreferredS
                 )
             ],
           ),
-          actions: [
-            PopupMenuButton<String>(
-              onSelected: (value) {},
-              itemBuilder: (context) {
-                return [
-                  PopupMenuItem<String>(
-                    onTap: () {
-                      Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false);
+          actions: !isActionEnabled
+              ? []
+              : [
+                  PopupMenuButton<String>(
+                    onSelected: (value) {},
+                    itemBuilder: (context) {
+                      return [
+                        PopupMenuItem<String>(
+                          onTap: () {
+                            Navigator.of(context)
+                                .pushNamedAndRemoveUntil(Routes.main, (route) => false);
+                          },
+                          value: 'cancel',
+                          child: Text(actionTitle.tr(context)),
+                        ),
+                      ];
                     },
-                    value: 'cancel',
-                    child: Text(actionTitle.tr(context)),
                   ),
-                ];
-              },
-            ),
-          ],
+                ],
         ),
         if (showProgressIndicator != null)
           if ((currentStep! / allSteps!) != 1)

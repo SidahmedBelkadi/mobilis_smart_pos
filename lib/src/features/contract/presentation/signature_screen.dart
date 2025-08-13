@@ -275,7 +275,11 @@ class _SignatureScreenState extends State<SignatureScreen> {
       child: PopScope(
         canPop: false,
         child: Scaffold(
-          appBar: CustomAppbarWithDenyContract(title: "signature".tr(context)),
+          appBar: CustomAppbarWithDenyContract(
+            title: "signature".tr(context),
+            isActionEnabled: false,
+            automaticallyImplyLeading: false,
+          ),
           body: SingleChildScrollView(
             child: Container(
               width: context.width,
