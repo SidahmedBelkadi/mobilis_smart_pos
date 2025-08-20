@@ -22,8 +22,8 @@ class OfferItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 5.sp),
-        padding: EdgeInsets.symmetric(vertical: 10.sp),
+        margin: EdgeInsets.symmetric(vertical: 3.sp),
+        padding: EdgeInsets.symmetric(vertical: 0.sp),
         decoration: BoxDecoration(
           border: Border.all(
             color: AppColors.primary,
@@ -34,7 +34,10 @@ class OfferItem extends StatelessWidget {
           ),
         ),
         child: ListTile(
-          title: Text(title),
+          title: Text(
+            title,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -57,7 +60,7 @@ class OfferItem extends StatelessWidget {
                       ),
                       child: Icon(
                         FontAwesomeIcons.check,
-                        size: 16.sp,
+                        size: 12.sp,
                         color: Colors.white,
                       ),
                     )
