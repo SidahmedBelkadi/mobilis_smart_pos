@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:flutter/foundation.dart'; // <-- for kReleaseMode
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -24,15 +24,21 @@ class _SessionTimeoutState extends State<SessionTimeout> {
   int _remainingTime = 720; // 12 minutes
 
   void _startTimer() {
+    // If we're in dev/debug mode, don't start the timer (infinite session)
+    if (!kReleaseMode) {
+      debugPrint("🔥 Dev mode: Session timeout disabled (infinite session).");
+      return;
+    }
+
     // Cancel any existing timers
     _timer?.cancel();
     _countdownTimer?.cancel();
 
-    // Reset remaining time to 10 minutes
+    // Reset remaining time to 12 minutes
     _remainingTime = 720;
 
     debugPrint(
-        "***************** ======= | TIMER RESTRATED : $_remainingTime ======= | *********************");
+        "***************** ======= | TIMER RESTARTED : $_remainingTime ======= | *********************");
 
     // Start the periodic countdown timer to print remaining time every second
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -43,7 +49,7 @@ class _SessionTimeoutState extends State<SessionTimeout> {
       }
     });
 
-    // Start the main timer to sign out after 10 minutes
+    // Start the main timer to sign out after 12 minutes
     _timer = Timer(
       const Duration(seconds: 720),
       () {
@@ -75,7 +81,10 @@ class _SessionTimeoutState extends State<SessionTimeout> {
       child: BlocConsumer<SignOutCubit, SignOutState>(
         listener: (context, state) {
           if (state is SignOutSuccessful) {
-            Navigator.of(context).pushNamedAndRemoveUntil(Routes.signIn, (route) => false);
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              Routes.signIn,
+              (route) => false,
+            );
           }
         },
         builder: (context, state) {
