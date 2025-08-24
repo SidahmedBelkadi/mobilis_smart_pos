@@ -13,7 +13,6 @@ import 'package:mobilis_smart_pos/src/core/utils/helpers/permissions_helper.dart
 import 'package:mobilis_smart_pos/src/core/utils/helpers/session_timeout.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/trigger_sms_params_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/sms_cubit.dart';
-import '../../../core/commom/widgets/custom_app_bar.dart';
 import '../../sign_in/data/data_sources/smart_pos_local_storage.dart';
 import '../../../services/screenshot_service.dart';
 import 'package:path_provider/path_provider.dart';
@@ -359,6 +358,11 @@ class _SignatureScreenState extends State<SignatureScreen> {
                               children: [
                                 Column(
                                   children: [
+                                    Text(
+                                      "الشــــروط العامــــة للبيـــــع لعروض 2G/3G/4G الدفع المسبق أ.تي.ام موبيليس ",
+                                      style: Theme.of(context).textTheme.bodyLarge,
+                                      textAlign: TextAlign.center,
+                                    ),
                                     const ConditionsOfUse(
                                       desc: AppStrings.arabicAgrement,
                                     ),
