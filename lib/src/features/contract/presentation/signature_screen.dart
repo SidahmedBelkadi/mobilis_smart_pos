@@ -9,14 +9,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_appbar_with_deny_contract.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/permissions_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/session_timeout.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/trigger_sms_params_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/sms_cubit.dart';
 import '../../sign_in/data/data_sources/smart_pos_local_storage.dart';
 import '../../../services/screenshot_service.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:readmore/readmore.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 
@@ -96,7 +94,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
         debugPrint("=================== TIMER FOR SMS STOPPED");
 
         setState(() {
-          smsLoading = false;
+          // smsLoading = false;
           _smsMessage = call.arguments;
           checkSmsSuccess(_smsMessage, context);
         });
@@ -108,16 +106,6 @@ class _SignatureScreenState extends State<SignatureScreen> {
   void dispose() {
     _smsTimer?.cancel();
     super.dispose();
-  }
-
-  Future<bool> _requestSmsPermission() async {
-    PermissionStatus status = await PermissionsUtil.checkPermissionStatus(Permission.sms);
-    if (status.isDenied || status.isRestricted) {
-      return await PermissionsUtil.requestPermission(Permission.sms);
-    } else if (status.isPermanentlyDenied) {
-      return false;
-    }
-    return status.isGranted;
   }
 
   _startSmsTimer() {
@@ -161,45 +149,6 @@ class _SignatureScreenState extends State<SignatureScreen> {
         Navigator.of(context).pop();
       }
     }
-  }
-
-  Future<void> _checkPermissionsAndShowDialog(BuildContext context, ContractCubit cubit) async {
-    final smsStatus = await Permission.sms.request();
-    final phoneStatus = await Permission.phone.request();
-
-    if (smsStatus.isGranted && phoneStatus.isGranted) {
-      // ignore: use_build_context_synchronously
-      _showConfirmationDialog(context, cubit);
-    } else {
-      // ignore: use_build_context_synchronously
-      _showPermissionDeniedDialog(context);
-    }
-  }
-
-  Future<void> _showPermissionDeniedDialog(BuildContext context) {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('camera_permission_title'.tr(context)),
-          content: Text('phone_and_sms_permission_instruction'.tr(context)),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                openAppSettings();
-              },
-              child: Text('open_settings'.tr(context)),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('discard'.tr(context)),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   Future<File> _saveSignature() async {
@@ -421,12 +370,6 @@ class _SignatureScreenState extends State<SignatureScreen> {
                                 ElevatedButton(
                                   child: Text("confrim_sell".tr(context)),
                                   onPressed: () async {
-                                    bool hasPermission = await _requestSmsPermission();
-                                    if (!hasPermission) {
-                                      _showPermissionDeniedDialog(context);
-                                      return;
-                                    }
-
                                     if (!isSignatureValidated) {
                                       AppToasts.showErrorToast(
                                         message: "required_signature".tr(context),
@@ -442,7 +385,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
                                       );
                                       return;
                                     }
-                                    _checkPermissionsAndShowDialog(context, cubit);
+                                    _showConfirmationDialog(context, cubit);
                                   },
                                 ),
                               ],
