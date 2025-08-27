@@ -308,7 +308,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
                                 Column(
                                   children: [
                                     Text(
-                                      "الشــــروط العامــــة للبيـــــع لعروض 2G/3G/4G الدفع المسبق أ.تي.ام موبيليس ",
+                                      "الشــــروط العامــــة للبيـــــع لعروض\n4G / 3G\nالدفع المسبق أ.تي.ام موبيليس",
                                       style: Theme.of(context).textTheme.bodyLarge,
                                       textAlign: TextAlign.center,
                                     ),
