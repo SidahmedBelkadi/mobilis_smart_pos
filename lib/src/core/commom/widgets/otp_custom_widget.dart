@@ -138,7 +138,7 @@ class _OTPCustomWidgetState extends State<OTPCustomWidget> with WidgetsBindingOb
             length: 6,
             obscureText: false,
             autofocus: false,
-            readOnly: true, // User cannot type manually
+            readOnly: false, // User cannot type manually
             validator: (value) {
               if (value == null || value.isEmpty) return '';
               if (value.length != 6) return '';

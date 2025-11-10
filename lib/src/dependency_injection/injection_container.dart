@@ -23,6 +23,8 @@ import 'package:mobilis_smart_pos/src/features/home/domain/use_cases/load_banner
 import 'package:mobilis_smart_pos/src/features/home/presentation/cubit/home_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/invoices/domain/use_cases/retry_activation_use_case.dart';
 import 'package:mobilis_smart_pos/src/features/invoices/presentation/cubit/retry_activation/retry_activation_cubit.dart';
+import 'package:mobilis_smart_pos/src/features/sign_in/domain/use_cases/get_pdv_contract_use_case.dart';
+import 'package:mobilis_smart_pos/src/features/sign_in/domain/use_cases/sign_and_approve_contract_use_case.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -238,12 +240,18 @@ Future<void> initializeAppDependencies() async {
       .registerLazySingleton(() => RasdGenerateContractUseCase(repository: serviceLocator()));
   serviceLocator.registerLazySingleton(() => RasdTrigggerSmsUseCase(repository: serviceLocator()));
   serviceLocator.registerLazySingleton(() => LoadBannersUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(() => GetPdvContractUseCase(repository: serviceLocator()));
+  serviceLocator
+      .registerLazySingleton(() => SignAndApproveContractUseCase(repository: serviceLocator()));
+
   // ================ BLOCS ================ //
 
   serviceLocator.registerFactory(() => SignInCubit(
         signInUseCase: serviceLocator(),
         verifyOtpUseCase: serviceLocator(),
+        getPdvContractUseCase: serviceLocator(),
         approveContractUseCase: serviceLocator(),
+        signAndApproveContractUseCase: serviceLocator(),
         localDataSource: serviceLocator(),
       ));
   // serviceLocator.registerFactory(

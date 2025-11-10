@@ -3,6 +3,7 @@ class AppKeys {
   static const firstLaunch = "A1B2C3D4E5F6";
   static const approveContract = "G7H8I9J0K1L2";
   static const accessToken = "M3N4O5P6Q7R8";
+  static const consent = "M3N3456789R8";
   static const refreshToken = "S9T0U1V2W3X4";
   static const String userId = 'Y5Z6A7B8C9D0';
   static const String employeeId = 'E1F2G3H4I5J6';

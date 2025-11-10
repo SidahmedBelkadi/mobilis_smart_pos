@@ -44,7 +44,7 @@ import '../../features/invoices/presentation/cubit/invoices_cubit.dart';
 import '../../features/invoices/presentation/invoices_screen.dart';
 import '../../features/main/presentation/main_screen.dart';
 import '../../features/on_boarding/presentation/on_boarding_screen.dart';
-import '../../features/on_boarding/presentation/pdv_engagments_screen.dart';
+import '../../features/sign_in/presentation/pdv_engagments_screen.dart';
 import '../../features/profile/presentation/cubit/profile_cubit.dart';
 import '../../features/profile/presentation/pdv_folder_screen.dart';
 import '../../features/profile/presentation/update_pdv_folder.dart';
@@ -109,14 +109,10 @@ class AppRoutes {
           const OnBoardingScreen(),
         );
       case Routes.pdvEngagements:
-        final params = args as Map<String, dynamic>;
         return RoutesAnimationManager.slideFromRightTransition(
           BlocProvider(
             create: (_) => serviceLocator<SignInCubit>(),
-            child: PdvEngagmentsScreen(
-              phone: params['phone'],
-              refreshToken: params['refresh_token'],
-            ),
+            child: PdvEngagmentsScreen(),
           ),
         );
       case Routes.main:

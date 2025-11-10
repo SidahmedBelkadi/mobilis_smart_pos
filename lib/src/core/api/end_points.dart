@@ -7,7 +7,7 @@ class EndPoints {
 
   static const String ocrBaseUrl = String.fromEnvironment("OCR_BASE_URL");
 
-  static String baseUrl = dotenv.env['BASE_URL'] ?? "";
+  static String baseUrl = dotenv.env['BASE_URL_DEV'] ?? "";
   static bool get isApi1 => baseUrl.contains('api1');
 
   // ============== APK ================== //
@@ -31,6 +31,8 @@ class EndPoints {
   static String pdvFolder = "$baseUrl/folder/employee";
   static String retryActivation = "$baseUrl/retry/edit";
   static String getBanners = "$baseUrl/folder/banners";
+  static String getPdvContract = "$baseUrl/file/consent/last-contract";
+  static String signAndApprovePDVContract = "$baseUrl/pdv/consent/sign";
 
   // ================== CLIENT ================= //
   static String checkBeforeEditContract = "$baseUrl/contract/check-before-edit";

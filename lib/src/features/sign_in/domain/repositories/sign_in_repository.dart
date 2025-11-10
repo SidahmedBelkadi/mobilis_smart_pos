@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:dartz/dartz.dart';
 import '../entities/sign_in_approve_contract_params.dart';
 
@@ -13,4 +16,6 @@ abstract class SignInRepository {
     required SignInOTPRequestParams params,
   });
   Future<Either<Failure, String>> approveContract({required SignInApproveContractParams params});
+  Future<Either<Failure, Uint8List>> getPdvContract();
+  Future<Either<Failure, void>> signAndApproveContract({required File signatureFile});
 }

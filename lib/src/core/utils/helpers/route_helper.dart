@@ -14,13 +14,17 @@ class InitialRouteHelper {
 
   String determineInitialRoute() {
     final bool isFirstTime = launchHelper.isFirstTime();
-    final SignInOTPResponseEntity? authResponse =
-        authLocalDataSource.getSavedLoginCredentials();
+    final SignInOTPResponseEntity? authResponse = authLocalDataSource.getSavedLoginCredentials();
+    final isConsent = authLocalDataSource.isUserConsent();
 
     if (isFirstTime) {
       return Routes.onBoarding;
     } else if (authResponse != null && authResponse.accessToken.isNotEmpty) {
-      return Routes.main;
+      if (isConsent) {
+        return Routes.main;
+      } else {
+        return Routes.pdvEngagements;
+      }
     } else {
       return Routes.signIn;
     }

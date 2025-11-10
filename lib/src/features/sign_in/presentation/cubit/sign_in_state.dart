@@ -77,15 +77,12 @@ final class OTPFailed extends SignInState {
 
 final class OTPLoading extends SignInState {}
 
-
 // ----------- APPROVE THE CONTRACT --------------- //
 final class ApproveContractSuccessful extends SignInState {
-  final String message;
-
-  const ApproveContractSuccessful({required this.message});
+  const ApproveContractSuccessful();
 
   @override
-  List<Object> get props => [message];
+  List<Object> get props => [];
 }
 
 final class ApproveContractFailed extends SignInState {

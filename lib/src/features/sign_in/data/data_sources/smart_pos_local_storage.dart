@@ -7,6 +7,10 @@ import '../../../../core/utils/ressources/app_keys.dart';
 import '../../domain/entities/sign_in_otp_response_entity.dart';
 
 abstract class SmartPosLocalStorage {
+  // =========== constent ========== //
+  Future<void> setConsetment({required bool consent});
+  bool isUserConsent();
+
   // =========== Sign in ========== //
 
   Future<void> saveLoginCredentials({required SignInOTPResponseEntity signInResponseEntity});
@@ -243,5 +247,15 @@ class SmartPosLocalStorageImpl implements SmartPosLocalStorage {
 
     final DateTime blockUntil = DateTime.parse(blockUntilString);
     return DateTime.now().isBefore(blockUntil);
+  }
+
+  @override
+  bool isUserConsent() {
+    return sharedPreferences.getBool(AppKeys.consent) ?? true;
+  }
+
+  @override
+  Future<void> setConsetment({required bool consent}) async {
+    await sharedPreferences.setBool(AppKeys.consent, consent);
   }
 }

@@ -114,13 +114,8 @@ class _OTPScreenState extends State<OTPScreen> {
                       }
                       return;
                     } else {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                          Routes.pdvEngagements,
-                          arguments: {
-                            'phone': widget.signInParams.phone,
-                            'refresh_token': state.signInOTPResponseEntity.refreshToken,
-                          },
-                          (route) => false);
+                      Navigator.of(context)
+                          .pushNamedAndRemoveUntil(Routes.pdvEngagements, (route) => false);
                     }
                   }
                   if (state is OTPFailed) {

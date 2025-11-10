@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:dartz/dartz.dart';
 import '../../domain/entities/sign_in_approve_contract_params.dart';
 
@@ -56,6 +59,34 @@ class SignInRepositoryImpl implements SignInRepository {
       try {
         final message = await remoteDataSource.approveContract(params: params);
         return Right(message);
+      } on ServerException catch (e) {
+        return Left(ServerFailure(message: ErrorHandler.getErrorMessage(e)));
+      }
+    } else {
+      return const Left(NoInternetConnectionFailure(message: 'noInternetConnection'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Uint8List>> getPdvContract() async {
+    if (await networkInfo.isConnected) {
+      try {
+        final pdvContract = await remoteDataSource.getPdvContract();
+        return Right(pdvContract);
+      } on ServerException catch (e) {
+        return Left(ServerFailure(message: ErrorHandler.getErrorMessage(e)));
+      }
+    } else {
+      return const Left(NoInternetConnectionFailure(message: 'noInternetConnection'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> signAndApproveContract({required File signatureFile}) async {
+    if (await networkInfo.isConnected) {
+      try {
+        await remoteDataSource.signAndApproveContract(signatureFile: signatureFile);
+        return const Right(unit);
       } on ServerException catch (e) {
         return Left(ServerFailure(message: ErrorHandler.getErrorMessage(e)));
       }

@@ -1,10 +1,14 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:mobilis_smart_pos/src/features/sign_in/domain/use_cases/get_pdv_contract_use_case.dart';
+import 'package:mobilis_smart_pos/src/features/sign_in/domain/use_cases/sign_and_approve_contract_use_case.dart';
 import '../../data/data_sources/smart_pos_local_storage.dart';
-import '../../domain/entities/sign_in_approve_contract_params.dart';
 import '../../domain/entities/sign_in_otp_request_params.dart';
 import '../../domain/entities/sign_in_otp_response_entity.dart';
 import '../../domain/entities/sign_in_request_params.dart';
@@ -19,12 +23,16 @@ class SignInCubit extends Cubit<SignInState> {
   final SignInUseCase signInUseCase;
   final VerifyOtpUseCase verifyOtpUseCase;
   final ApproveContractUseCase approveContractUseCase;
+  final GetPdvContractUseCase getPdvContractUseCase;
+  final SignAndApproveContractUseCase signAndApproveContractUseCase;
   final SmartPosLocalStorage localDataSource;
 
   SignInCubit({
     required this.signInUseCase,
     required this.verifyOtpUseCase,
     required this.approveContractUseCase,
+    required this.getPdvContractUseCase,
+    required this.signAndApproveContractUseCase,
     required this.localDataSource,
   }) : super(SignInInitial());
 
@@ -90,6 +98,10 @@ class SignInCubit extends Cubit<SignInState> {
       (signInOTPResponseEntity) async {
         await localDataSource.clearLoginCredentials();
         await localDataSource.saveLoginCredentials(signInResponseEntity: signInOTPResponseEntity);
+        final bool? isConsent = signInOTPResponseEntity.userIsConsent;
+        if (isConsent != null && !isConsent) {
+          await localDataSource.setConsetment(consent: false);
+        }
         emit(OTPSuccessful(signInOTPResponseEntity: signInOTPResponseEntity));
         // final passwordAge = signInOTPResponseEntity.passwordAge;
 
@@ -116,18 +128,30 @@ class SignInCubit extends Cubit<SignInState> {
     );
   }
 
-  // ---------------- APPROVE THE CONTRACT ------------------ //
-  Future<void> appoveContract({required SignInApproveContractParams params}) async {
+  Future<Uint8List> getPdvContract() async {
+    final failureOrBytes = await getPdvContractUseCase();
+
+    return failureOrBytes.fold(
+      (error) {
+        emit(ApproveContractFailed(message: error.message));
+        return Uint8List(0);
+      },
+      (pdfBytes) => pdfBytes,
+    );
+  }
+
+  Future<void> signAndApproveContract({required File signatureFile}) async {
     emit(ApproveContractLoading());
 
-    final failureOrMessage = await approveContractUseCase(params: params);
+    final failureOrVoid = await signAndApproveContractUseCase(signatureFile: signatureFile);
 
-    failureOrMessage.fold(
+    failureOrVoid.fold(
       (error) {
         emit(ApproveContractFailed(message: error.message));
       },
-      (message) async {
-        emit(ApproveContractSuccessful(message: message));
+      (_) async {
+        await localDataSource.setConsetment(consent: true);
+        emit(ApproveContractSuccessful());
       },
     );
   }
