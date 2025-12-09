@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 
 import '../../../sign_in/data/data_sources/smart_pos_local_storage.dart';
 import '../../domain/entities/contract_request_params_entitiy.dart';
@@ -91,11 +92,13 @@ class ContractCubit extends Cubit<ContractState> {
 
   Future<void> attributeMsisdnAndGenerateContract({
     required GenerateContractParamsEntity params,
+    required String lang,
   }) async {
+    debugPrint("=================== ATTRIBUTE MSISDN AND GENERATE CONTRACT 123");
     emit(GenerateContractLoading());
 
     final failureOrGenerateContractResponseEntity =
-        await generateContractUseCase(generateContractParams: params);
+        await generateContractUseCase(generateContractParams: params, lang: lang);
 
     failureOrGenerateContractResponseEntity.fold((error) {
       emit(GenerateContractFailed(message: error.message));

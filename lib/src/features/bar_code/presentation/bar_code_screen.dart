@@ -76,7 +76,8 @@ class SimScannerScreenState extends State<SimScannerScreen> {
                       'parentRecto': widget.parentRecto,
                       'parentVerso': widget.parentVerso,
                       'justificatif': widget.justificatif,
-                      'parentIsPassport': widget.parentIsPassport
+                      'parentIsPassport': widget.parentIsPassport,
+                      'offerName': selectedOfferName,
                     },
                   );
                 }
@@ -158,6 +159,9 @@ class SimScannerScreenState extends State<SimScannerScreen> {
                     await Navigator.of(context).pushNamed(Routes.offers) as Map?;
 
                 if (selectedOffer != null) {
+                  setState(() {
+                    selectedOfferName = selectedOffer['offerName'] as String?;
+                  });
                   // ignore: use_build_context_synchronously
                   _continueWithBarcode(context, barcode, selectedOffer['offerId']);
                 }

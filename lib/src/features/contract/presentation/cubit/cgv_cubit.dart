@@ -10,15 +10,21 @@ class CgvCubit extends Cubit<CgvState> {
   final GetCgvPerOfferUseCase getCgvPerOfferUseCase;
   CgvCubit({required this.getCgvPerOfferUseCase}) : super(CgvInitial());
 
-  Future<Uint8List> getCGV({required String offerName, required String lang}) async {
+  Future<void> getDynamicCGV({required String offerName, required String lang}) async {
+    emit(LoadCGVLoading());
     final failureOrBytes = await getCgvPerOfferUseCase(offerName: offerName, lang: lang);
 
-    return failureOrBytes.fold(
+    failureOrBytes.fold(
       (error) {
         emit(LoadCGVFailed());
-        return Uint8List(0);
       },
-      (pdfBytes) => pdfBytes,
+      (pdfBytes) {
+        if (pdfBytes.isEmpty) {
+          emit(LoadCGVFailed());
+        } else {
+          emit(LoadCGVSucceded(pdfBytes: pdfBytes));
+        }
+      },
     );
   }
 }

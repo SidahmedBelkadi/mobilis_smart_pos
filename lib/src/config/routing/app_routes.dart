@@ -24,6 +24,7 @@ import '../../features/contract/presentation/choose_card_option_screen.dart';
 import '../../features/contract/presentation/contract_generated_screen.dart';
 import '../../features/contract/presentation/contract_screen.dart';
 import '../../features/contract/presentation/cubit/contract_cubit.dart';
+import '../../features/contract/presentation/cubit/cgv_cubit.dart';
 import '../../features/contract/presentation/mrz/mrz_details.dart';
 import '../../features/contract/presentation/mrz/mrz_preparation_screen.dart';
 import '../../features/contract/presentation/mrz/parent_ocr_details_screen.dart';
@@ -426,6 +427,9 @@ class AppRoutes {
               BlocProvider(
                 create: (context) => serviceLocator<SmsCubit>(),
               ),
+              BlocProvider(
+                create: (context) => serviceLocator<CgvCubit>(),
+              ),
             ],
             child: SignatureScreen(
               contract: params['contract'] as ContractRequestParamsEntitiy,
@@ -437,6 +441,7 @@ class AppRoutes {
               parentVerso: params['parentVerso'],
               justificatif: params['justificatif'],
               parentIsPassport: params['parentIsPassport'],
+              offerName: params['offerName'] as String?,
             ),
           ),
         );

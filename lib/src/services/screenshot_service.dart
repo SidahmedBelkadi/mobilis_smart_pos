@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:screen_protector/screen_protector.dart';
 
@@ -22,10 +23,12 @@ class ScreenshotService {
   }
 
   static Future<void> preventScreenshotOn() async {
+    if (kDebugMode) return;
     await ScreenProtector.preventScreenshotOn();
   }
 
   static Future<void> preventScreenshotOff() async {
+    if (kDebugMode) return;
     await ScreenProtector.preventScreenshotOff();
   }
 }

@@ -8,6 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mobilis_smart_pos/src/config/routing/app_routes.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/dsa_regexp_helper.dart';
+import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/toast_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/ressources/app_colors.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/generate_contract_params_entity.dart';
@@ -157,7 +158,8 @@ class _RetryActivationWidgetState extends State<RetryActivationWidget> {
         dsaMessage: dsaMessage,
         msisdn: phoneNumber);
 
-    await context.read<ContractCubit>().attributeMsisdnAndGenerateContract(params: params);
+    await context.read<ContractCubit>().attributeMsisdnAndGenerateContract(
+        params: params, lang: context.isArabicLocale ? 'AR' : 'FR');
   }
 }
 

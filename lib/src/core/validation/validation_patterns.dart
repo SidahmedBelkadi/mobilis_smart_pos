@@ -5,7 +5,7 @@ class ValidationPatterns {
   static const String strongPasswordPattern =
       r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&])[A-Za-z\d@#$!%*?&]{8,}$';
   static const String emailPattern = r'^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$';
-  static const String addressPattern = r'^.{5,200}$';
+  static const String addressPattern = r'^(?=.*[^\s]).{5,200}$';
   static const String yearsOfExperiencePattern = r'^\d+$';
   static const String ninPattern = r'^\d{18}$';
   static const String documentNumberPattern = r'^\d{9}$';

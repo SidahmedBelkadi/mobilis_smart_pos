@@ -44,7 +44,9 @@ import '../features/contract/domain/repositories/contract_repository.dart';
 import '../features/contract/domain/use_cases/check_before_edit_contract_use_case.dart';
 import '../features/contract/domain/use_cases/edit_contract_use_case.dart';
 import '../features/contract/domain/use_cases/generate_contract_use_case.dart';
+import '../features/contract/domain/use_cases/get_cgv_per_offer_use_case.dart';
 import '../features/contract/presentation/cubit/contract_cubit.dart';
+import '../features/contract/presentation/cubit/cgv_cubit.dart';
 import '../features/forgot_password/data/data_sources/reset_password_remote_data_source.dart';
 import '../features/forgot_password/data/repositories/reset_password_repository_impl.dart';
 import '../features/forgot_password/domain/repositories/reset_password_repository.dart';
@@ -243,6 +245,7 @@ Future<void> initializeAppDependencies() async {
   serviceLocator.registerLazySingleton(() => GetPdvContractUseCase(repository: serviceLocator()));
   serviceLocator
       .registerLazySingleton(() => SignAndApproveContractUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(() => GetCgvPerOfferUseCase(repository: serviceLocator()));
 
   // ================ BLOCS ================ //
 
@@ -310,5 +313,9 @@ Future<void> initializeAppDependencies() async {
 
   serviceLocator.registerFactory(() => HomeCubit(
         useCase: serviceLocator(),
+      ));
+
+  serviceLocator.registerFactory(() => CgvCubit(
+        getCgvPerOfferUseCase: serviceLocator(),
       ));
 }

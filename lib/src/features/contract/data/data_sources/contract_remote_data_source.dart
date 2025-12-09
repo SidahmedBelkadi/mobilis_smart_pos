@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:mobilis_smart_pos/src/features/contract/data/models/rasd_edit_contract_response_model.dart';
 import 'package:mobilis_smart_pos/src/features/contract/data/models/retry_trigger_sms_response_model.dart';
@@ -47,6 +49,7 @@ abstract class ContractRemoteDataSource {
 
   Future<GenerateContractResponseModel> generateContrat({
     required GenerateContractParamsEntity generateContractParams,
+    required String lang,
   });
 
   Future<RasdEditContractResponseModel> rasdEditContract({
@@ -64,6 +67,8 @@ abstract class ContractRemoteDataSource {
     required RasdGenerateContractParamsEntity rasdGenerateContractParams,
     required int subscriptionId,
   });
+
+  Future<Uint8List> getDynamicCGV({required String offerName, required String lang});
 }
 
 class ContractRemoteDataSourceImpl implements ContractRemoteDataSource {
@@ -154,11 +159,13 @@ class ContractRemoteDataSourceImpl implements ContractRemoteDataSource {
   @override
   Future<GenerateContractResponseModel> generateContrat({
     required GenerateContractParamsEntity generateContractParams,
+    required String lang,
   }) async {
     final Map<String, dynamic> body = {
       "msisdn": generateContractParams.msisdn,
       "CC_code": generateContractParams.contractCode,
       "message": generateContractParams.dsaMessage,
+      "lang": lang,
     };
     final clientId = generateContractParams.clientId;
     final invoiceId = generateContractParams.invoiceId;
@@ -253,5 +260,33 @@ class ContractRemoteDataSourceImpl implements ContractRemoteDataSource {
     final response =
         await dioConsumer.post(EndPoints.rasdTriggerSms, body: triggerSmsParams.toJson());
     return jsonDecode(response)['message'];
+  }
+
+  @override
+  Future<Uint8List> getDynamicCGV({required String offerName, required String lang}) async {
+    final response = await dioConsumer.get(
+      "${EndPoints.getDynamicCGV}/$offerName/$lang",
+      responseType: ResponseType.bytes,
+    );
+
+    if (response is List<int>) {
+      debugPrint("PDF header: ${utf8.decode(response.take(10).toList(), allowMalformed: true)}");
+      return Uint8List.fromList(response);
+    }
+
+    if (response is String) {
+      if (!response.startsWith('%PDF')) {
+        try {
+          final decoded = base64Decode(response);
+          debugPrint("PDF decoded from Base64 (length: ${decoded.length})");
+          return decoded;
+        } catch (_) {
+          return Uint8List.fromList(response.codeUnits);
+        }
+      }
+      return Uint8List.fromList(response.codeUnits);
+    }
+
+    throw Exception("Unexpected response type: ${response.runtimeType}");
   }
 }

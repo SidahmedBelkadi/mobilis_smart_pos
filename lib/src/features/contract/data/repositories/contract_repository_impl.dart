@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dartz/dartz.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/rasd_edit_contract_response_entity.dart';
@@ -89,11 +90,12 @@ class ContractRepositoryImpl implements ContractRepository {
   @override
   Future<Either<Failure, GenerateContractResponseEntity>> generateContract({
     required GenerateContractParamsEntity generateContractParams,
+    required String lang,
   }) async {
     if (await networkInfo.isConnected) {
       try {
-        final generateContractResponseModel =
-            await remoteDataSource.generateContrat(generateContractParams: generateContractParams);
+        final generateContractResponseModel = await remoteDataSource.generateContrat(
+            generateContractParams: generateContractParams, lang: lang);
         return Right(generateContractResponseModel);
       } on ServerException catch (e) {
         return Left(ServerFailure(message: ErrorHandler.getErrorMessage(e)));
@@ -195,6 +197,21 @@ class ContractRepositoryImpl implements ContractRepository {
     } else {
       return const Left(
           NoInternetConnectionFailure(message: AppApiResponsesMessages.noInternetConnection));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Uint8List>> getDynamicCGV(
+      {required String offerName, required String lang}) async {
+    if (await networkInfo.isConnected) {
+      try {
+        final cgv = await remoteDataSource.getDynamicCGV(offerName: offerName, lang: lang);
+        return Right(cgv);
+      } on ServerException catch (e) {
+        return Left(ServerFailure(message: ErrorHandler.getErrorMessage(e)));
+      }
+    } else {
+      return const Left(NoInternetConnectionFailure(message: 'noInternetConnection'));
     }
   }
 }

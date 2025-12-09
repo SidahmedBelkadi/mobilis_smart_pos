@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dartz/dartz.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/rasd_edit_contract_response_entity.dart';
@@ -38,6 +39,7 @@ abstract class ContractRepository {
 
   Future<Either<Failure, GenerateContractResponseEntity>> generateContract({
     required GenerateContractParamsEntity generateContractParams,
+    required String lang,
   });
 
   Future<Either<Failure, RetryTriggerSmsResponseEntity>> retryTriggerSms({
@@ -59,4 +61,7 @@ abstract class ContractRepository {
     required RasdGenerateContractParamsEntity rasdGenerateContractParams,
     required int subscriptionId,
   });
+
+  Future<Either<Failure, Uint8List>> getDynamicCGV(
+      {required String offerName, required String lang});
 }

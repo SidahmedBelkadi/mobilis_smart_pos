@@ -12,7 +12,9 @@ class GenerateContractUseCase {
 
   Future<Either<Failure, GenerateContractResponseEntity>> call({
     required GenerateContractParamsEntity generateContractParams,
+    required String lang,
   }) async {
-    return await repository.generateContract(generateContractParams: generateContractParams);
+    return await repository.generateContract(
+        generateContractParams: generateContractParams, lang: lang);
   }
 }

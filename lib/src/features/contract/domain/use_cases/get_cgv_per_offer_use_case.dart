@@ -11,6 +11,6 @@ class GetCgvPerOfferUseCase {
   GetCgvPerOfferUseCase({required this.repository});
 
   Future<Either<Failure, Uint8List>> call({required String offerName, required String lang}) async {
-    return await repository.getCGV(offerName: offerName, lang: lang);
+    return await repository.getDynamicCGV(offerName: offerName, lang: lang);
   }
 }
