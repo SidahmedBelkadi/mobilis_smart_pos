@@ -93,7 +93,7 @@ class _PdvEngagmentsScreenState extends State<PdvEngagmentsScreen> {
                       listener: (context, state) {
                         if (state is ApproveContractSuccessful) {
                           AppToasts.showSuccessToast(
-                            message: "Contrat signé avec succès",
+                            message: "contract_signed_successfully".tr(context),
                             context: context,
                           );
                           Navigator.of(context).pushNamedAndRemoveUntil(

@@ -346,5 +346,6 @@
   "cancel": "إلغاء",
   "password_expired": "انتهت صلاحية كلمة المرور",
   "password_expired_instruction": "لقد انتهت صلاحية كلمة المرور الخاصة بك. يرجى تغيير كلمة المرور لمتابعة استخدام التطبيق.",
-  "SIM_ALREADY_USED": "هذه بطاقة SIM مستخدمة بالفعل."
+  "SIM_ALREADY_USED": "هذه بطاقة SIM مستخدمة بالفعل.",
+  "contract_signed_successfully": "تم توقيع العقد بنجاح"
 }
