@@ -346,5 +346,7 @@
   "cancel": "Annuler",
   "password_expired": "Mot de passe expiré",
   "password_expired_instruction": "Votre mot de passe a expiré. Veuillez le changer pour continuer à utiliser l’application.",
-  "SIM_ALREADY_USED": "Cette carte SIM est déjà utilisée."
+  "SIM_ALREADY_USED": "Cette carte SIM est déjà utilisée.",
+  "contract_signed_successfully": "Contrat signé avec succès",
+  "CGV_indisponibles": "Conditions générales de vente indisponibles"
 }
