@@ -26,7 +26,6 @@ import '../../../core/utils/helpers/media_query_values.dart';
 import '../../../core/utils/helpers/toast_helper.dart';
 import '../../../core/utils/ressources/app_colors.dart';
 import '../../../core/utils/ressources/app_images.dart';
-import '../../../core/utils/ressources/app_strings.dart';
 import '../../../dependency_injection/injection_container.dart' as di;
 import '../domain/entities/contract_request_params_entitiy.dart';
 import '../domain/entities/generate_contract_params_entity.dart';
@@ -480,6 +479,12 @@ class _SignatureScreenState extends State<SignatureScreen> {
                               if (cgvState is LoadCGVSucceded) {
                                 _loadPdf(cgvState.pdfBytes);
                               }
+                              if (cgvState is LoadCGVFailed) {
+                                debugPrint("======== CGV FAILED");
+                                AppToasts.showErrorToast(
+                                    message: "CGV_indisponibles".tr(context), context: context);
+                                return Navigator.of(context).pop();
+                              }
                             },
                             builder: (context, cgvState) {
                               if (cgvState is LoadCGVLoading) {
@@ -499,12 +504,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
                                     ),
                                   );
                                 }
-                                if (_errorLoadingPdf) {
-                                  // If PDF loading failed, show static text as fallback
-                                  return const ConditionsOfUse(
-                                    desc: AppStrings.arabicAgrement,
-                                  );
-                                }
+                                if (_errorLoadingPdf) {}
                                 // Show PDF viewer - use all available space for zooming
                                 final mediaQuery = MediaQuery.of(context);
                                 final appBarHeight = AppBar().preferredSize.height;
@@ -520,10 +520,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
                                   child: PdfViewPinch(controller: pdfControllerPinch!),
                                 );
                               }
-                              // If failed or initial, show static text as fallback
-                              return const ConditionsOfUse(
-                                desc: AppStrings.arabicAgrement,
-                              );
+                              return SizedBox();
                             },
                           );
                   },
