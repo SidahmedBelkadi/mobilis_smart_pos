@@ -347,5 +347,6 @@
   "password_expired": "Password Expired",
   "password_expired_instruction": "Your password has expired. Please change your password to continue using the app.",
   "SIM_ALREADY_USED": "This SIM card is already in use.",
-  "contract_signed_successfully": "Contract signed successfully"
+  "contract_signed_successfully": "Contract signed successfully",
+  "CGV_indisponibles": "General terms and conditions of sale are unavailable"
 }

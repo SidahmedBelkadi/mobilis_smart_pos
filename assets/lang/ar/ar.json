@@ -187,7 +187,7 @@
   "generate_contract": "اتمام العملية",
   "generating": "... يرجى الانتظار",
   "generated_success": "تمت العملية بنجاح",
-  "activation_instruction": "هل ترغب فعلاً في تفعيل بطاقة SIM؟",
+  "activation_instruction": "هل ترغب فعلاً في تفعيل الشريحة؟",
   "firstNameError": "يجب أن يحتوي الاسم الأول على 5 إلى 100 حرف.",
   "lastNameError": "يجب أن يحتوي الاسم الأخير على 5 إلى 100 حرف.",
   "phoneError": "يرجى إدخال رقم هاتف صالح.",
@@ -347,5 +347,6 @@
   "password_expired": "انتهت صلاحية كلمة المرور",
   "password_expired_instruction": "لقد انتهت صلاحية كلمة المرور الخاصة بك. يرجى تغيير كلمة المرور لمتابعة استخدام التطبيق.",
   "SIM_ALREADY_USED": "هذه بطاقة SIM مستخدمة بالفعل.",
-  "contract_signed_successfully": "تم توقيع العقد بنجاح"
+  "contract_signed_successfully": "تم توقيع العقد بنجاح",
+  "CGV_indisponibles": "شروط البيع العامة غير متوفرة"
 }
