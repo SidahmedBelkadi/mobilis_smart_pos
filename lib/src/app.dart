@@ -82,7 +82,7 @@ class LocaleAndThemeBlocBuilder extends StatelessWidget {
 
             return MaterialApp(
               navigatorKey: navigatorKey,
-              debugShowCheckedModeBanner: true,
+              debugShowCheckedModeBanner: false,
               title: 'MOBILIS SMART POS',
               theme: themeState.theme.name == AppThemes.darkTheme.name
                   ? smartDealerThemeDark(localeState.locale)

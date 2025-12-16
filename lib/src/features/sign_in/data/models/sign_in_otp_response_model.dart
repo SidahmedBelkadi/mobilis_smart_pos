@@ -1,4 +1,3 @@
-import '../../domain/entities/password_age_entity.dart';
 import '../../domain/entities/sign_in_otp_response_entity.dart';
 
 class SignInOTPResponseModel extends SignInOTPResponseEntity {
@@ -20,9 +19,7 @@ class SignInOTPResponseModel extends SignInOTPResponseEntity {
       refreshToken: json['refresh_token'] ?? '',
       userIsConsent: json['user_is_consent'],
       firstLogin: json['is_first_login'],
-      passwordAge: json['password_age'] != null
-          ? PasswordAge.fromMap(json['password_age'])
-          : null,
+      passwordAge: json['password_age'],
       userId: json['user_id'],
       employeeId: json['employee_id'],
       msisdn: json['msisdn'],
@@ -36,7 +33,7 @@ class SignInOTPResponseModel extends SignInOTPResponseEntity {
       'refresh_token': refreshToken,
       'user_is_consent': userIsConsent,
       'first_login': firstLogin,
-      'password_age': passwordAge?.toMap(),
+      'password_age': passwordAge,
       'user_id': userId,
       'employee_id': employeeId,
       'msisdn': msisdn,

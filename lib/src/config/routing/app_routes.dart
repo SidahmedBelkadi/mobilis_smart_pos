@@ -125,6 +125,7 @@ class AppRoutes {
               index: params?['index'],
               fromSignin: params?['fromSignin'],
               hasToChangePassowrd: params?['hasToChangePassowrd'],
+              daysLeft: params?['daysLeft'],
             ),
           ),
         );

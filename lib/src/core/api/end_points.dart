@@ -7,7 +7,7 @@ class EndPoints {
 
   static const String ocrBaseUrl = String.fromEnvironment("OCR_BASE_URL");
 
-  static String baseUrl = dotenv.env['BASE_URL_PRE_PROD'] ?? "";
+  static String baseUrl = dotenv.env['BASE_URL_DEV'] ?? "";
   static bool get isApi1 => baseUrl.contains('api1');
 
   // ============== APK ================== //

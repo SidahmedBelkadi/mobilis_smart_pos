@@ -24,11 +24,17 @@ import 'widgets/bottom_nav.dart';
 import 'widgets/drawer.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key, this.index = 0, this.fromSignin, this.hasToChangePassowrd = false});
+  const MainScreen(
+      {super.key,
+      this.index = 0,
+      this.fromSignin,
+      this.hasToChangePassowrd = false,
+      this.daysLeft});
 
   final int? index;
   final bool? fromSignin;
   final bool? hasToChangePassowrd;
+  final int? daysLeft;
 
   @override
   State<MainScreen> createState() => _MyHomePageState();
@@ -60,8 +66,8 @@ class _MyHomePageState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    // Disabled this functionality by client preference
-    // _checkForPassowrdExpiryAlert();
+
+    _checkForPassowrdExpiryAlert();
 
     if (widget.index == null) {
       screenIndex = 0;
@@ -74,14 +80,14 @@ class _MyHomePageState extends State<MainScreen> {
   }
 
   _checkForPassowrdExpiryAlert() async {
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(Duration(seconds: 2));
     if (widget.hasToChangePassowrd == true) {
       QuickAlert.show(
           context: context,
           type: QuickAlertType.info,
-          title: "password_expired".tr(context),
-          text: "password_expired_instruction".tr(context),
-          barrierDismissible: true,
+          title: "password_will_expire_soon".tr(context),
+          text: "password_will_expire_instruction".tr(context),
+          barrierDismissible: false,
           barrierColor: Colors.black.withOpacity(.8),
           backgroundColor: context.isDarkMode ? AppColors.darkerGrey : Colors.white,
           textColor: context.isDarkMode ? Colors.white : Colors.black,

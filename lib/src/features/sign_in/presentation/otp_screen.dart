@@ -91,6 +91,7 @@ class _OTPScreenState extends State<OTPScreen> {
               BlocConsumer<SignInCubit, SignInState>(
                 listener: (context, state) {
                   if (state is OTPSuccessful) {
+                    final entity = state.signInOTPResponseEntity;
                     final bool? isConsent = state.signInOTPResponseEntity.userIsConsent;
                     final passwordAge = state.signInOTPResponseEntity.passwordAge;
                     if (widget.responseParams.isFirstLogin != null &&
@@ -104,10 +105,38 @@ class _OTPScreenState extends State<OTPScreen> {
                       return;
                     }
                     if (isConsent != null && isConsent) {
-                      if (passwordAge != null && passwordAge.months == 6) {
-                        // Handle password expiry Alert
-                        Navigator.of(context).pushNamedAndRemoveUntil(Routes.main, (route) => false,
-                            arguments: {'hasToChangePassowrd': true});
+                      if (passwordAge != null) {
+                        debugPrint("====== PASSWORD AGE : $passwordAge");
+                        debugPrint("====== EXPIRATION DATE : ${entity.passwordExpirationDate}");
+                        debugPrint("====== DAYS LEFT : ${entity.daysUntilExpiration}");
+
+                        if (entity.shouldShow15DaysAlert) {
+                          AppToasts.showWarningToast(
+                            message: "15days_password_expiration".tr(context),
+                            context: context,
+                          );
+                        }
+
+                        // LAST WEEK (NON-DISMISSABLE)
+                        if (entity.isInLastWeekRange) {
+                          Navigator.pushNamedAndRemoveUntil(
+                            context,
+                            Routes.main,
+                            (route) => false,
+                            arguments: {
+                              'hasToChangePassowrd': true,
+                              'daysLeft': entity.daysLeftInLastWeek,
+                            },
+                          );
+                          return;
+                        }
+
+                        // ✅ NORMAL LOGIN
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          Routes.main,
+                          (route) => false,
+                        );
                       } else {
                         Navigator.of(context)
                             .pushNamedAndRemoveUntil(Routes.main, (route) => false);

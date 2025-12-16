@@ -345,8 +345,11 @@
   "please_enable_sms_permission": "Veuillez activer l'autorisation SMS dans les paramètres pour détecter automatiquement le code.",
   "cancel": "Annuler",
   "password_expired": "Mot de passe expiré",
+  "password_will_expire_soon": "Votre mot de passe va bientôt expirer",
+  "password_will_expire_instruction": "Veuillez changer votre mot de passe pour continuer à utiliser l'application.",
   "password_expired_instruction": "Votre mot de passe a expiré. Veuillez le changer pour continuer à utiliser l’application.",
   "SIM_ALREADY_USED": "Cette carte SIM est déjà utilisée.",
   "contract_signed_successfully": "Contrat signé avec succès",
-  "CGV_indisponibles": "Conditions générales de vente indisponibles"
+  "CGV_indisponibles": "Conditions générales de vente indisponibles",
+  "15days_password_expiration": "Votre mot de passe expirera dans 15 jours"
 }
