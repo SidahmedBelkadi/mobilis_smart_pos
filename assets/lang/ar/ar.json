@@ -351,5 +351,8 @@
   "SIM_ALREADY_USED": "هذه بطاقة SIM مستخدمة بالفعل.",
   "contract_signed_successfully": "تم توقيع العقد بنجاح",
   "CGV_indisponibles": "شروط البيع العامة غير متوفرة",
-  "15days_password_expiration": "ستنتهي صلاحية كلمة المرور الخاصة بك خلال 15 يومًا"
+  "15days_password_expiration": "ستنتهي صلاحية كلمة المرور الخاصة بك خلال 15 يومًا",
+  "password_expiry_last_week": "انتبه! كلمة المرور على وشك الانتهاء. قم بتحديثها فورًا.",
+  "CLIENT_BLACKLISTED": "هذا العميل مدرج في القائمة السوداء ولا يمكنه متابعة هذه العملية.",
+  "CLIENT_HAS_REACHED_SIM_LIMIT": "هذا العميل بلغ الحد الأقصى المسموح به"
 }

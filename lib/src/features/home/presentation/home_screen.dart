@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mobilis_smart_pos/src/core/api/end_points.dart';
 import 'package:mobilis_smart_pos/src/features/home/presentation/cubit/home_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/home/presentation/widgets/banners_bloc_builder.dart';
 import 'package:mobilis_smart_pos/src/features/home/presentation/widgets/custom_green_clipper.dart';
@@ -47,14 +49,15 @@ class _MyHomePageState extends State<HomeScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  HomeBannersBlocBuilder(
-                    currentIndex: currentIndex,
-                    onPageChanged: (index) {
-                      setState(() {
-                        currentIndex = index;
-                      });
-                    },
-                  ),
+                  if (EndPoints.baseUrl != dotenv.env['BASE_URL_DEV'])
+                    HomeBannersBlocBuilder(
+                      currentIndex: currentIndex,
+                      onPageChanged: (index) {
+                        setState(() {
+                          currentIndex = index;
+                        });
+                      },
+                    ),
                   SizedBox(height: 24.sp),
                   const HomeIcons(),
                   SizedBox(height: 24.sp),

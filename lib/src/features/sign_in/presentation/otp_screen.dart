@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:mobilis_smart_pos/src/dependency_injection/injection_container.dart' as di;
+import 'package:mobilis_smart_pos/src/features/sign_in/data/data_sources/smart_pos_local_storage.dart';
 import '../domain/entities/sign_in_response.dart';
 
 import '../../../config/routing/app_routes.dart';
@@ -89,7 +91,7 @@ class _OTPScreenState extends State<OTPScreen> {
 
               // --------- OTP Field & Logic
               BlocConsumer<SignInCubit, SignInState>(
-                listener: (context, state) {
+                listener: (context, state) async {
                   if (state is OTPSuccessful) {
                     final entity = state.signInOTPResponseEntity;
                     final bool? isConsent = state.signInOTPResponseEntity.userIsConsent;
@@ -106,19 +108,58 @@ class _OTPScreenState extends State<OTPScreen> {
                     }
                     if (isConsent != null && isConsent) {
                       if (passwordAge != null) {
-                        debugPrint("====== PASSWORD AGE : $passwordAge");
-                        debugPrint("====== EXPIRATION DATE : ${entity.passwordExpirationDate}");
-                        debugPrint("====== DAYS LEFT : ${entity.daysUntilExpiration}");
-
                         if (entity.shouldShow15DaysAlert) {
-                          AppToasts.showWarningToast(
-                            message: "15days_password_expiration".tr(context),
-                            context: context,
-                          );
+                          if (await di
+                              .serviceLocator<SmartPosLocalStorage>()
+                              .shouldShowPasswordNotificationToday()) {
+                            AppToasts.showWarningToast(
+                              message: "15days_password_expiration".tr(context),
+                              context: context,
+                            );
+
+                            // await LocalNotificationService().showNotification(
+                            //   title: "warning".tr(context),
+                            //   body: "15days_password_expiration".tr(context),
+                            // );
+
+                            await di
+                                .serviceLocator<SmartPosLocalStorage>()
+                                .markPasswordNotificationAsShown();
+                          }
+                        }
+
+                        if (entity.isInLastWeekRange) {
+                          if (await di
+                              .serviceLocator<SmartPosLocalStorage>()
+                              .shouldShowPasswordNotificationToday()) {
+                            AppToasts.showWarningToast(
+                              message: "password_expiry_last_week".tr(context),
+                              context: context,
+                            );
+
+                            // await LocalNotificationService().showNotification(
+                            //   title: "warning".tr(context),
+                            //   body: "password_expiry_last_week".tr(context),
+                            // );
+                            await di
+                                .serviceLocator<SmartPosLocalStorage>()
+                                .markPasswordNotificationAsShown();
+
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              Routes.main,
+                              (route) => false,
+                              arguments: {
+                                'hasToChangePassowrdOptional': true,
+                              },
+                            );
+                            return;
+                          }
                         }
 
                         // LAST WEEK (NON-DISMISSABLE)
-                        if (entity.isInLastWeekRange) {
+                        if (entity.isPasswordExpired) {
+                          await di.serviceLocator<SmartPosLocalStorage>().setHasToChangePassword();
                           Navigator.pushNamedAndRemoveUntil(
                             context,
                             Routes.main,
@@ -131,7 +172,7 @@ class _OTPScreenState extends State<OTPScreen> {
                           return;
                         }
 
-                        // ✅ NORMAL LOGIN
+                        // NORMAL LOGIN
                         Navigator.pushNamedAndRemoveUntil(
                           context,
                           Routes.main,

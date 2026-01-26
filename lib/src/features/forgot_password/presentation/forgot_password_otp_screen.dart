@@ -176,7 +176,7 @@ class ForgotPasswordBottomSheet extends StatelessWidget {
             ),
             SizedBox(height: 64.sp),
             BlocConsumer<ForgotPasswordCubit, ForgotPasswordState>(
-              listener: (context, state) {
+              listener: (context, state) async {
                 if (state is ResetPasswordFailure) {
                   AppToasts.showErrorToast(message: state.message.tr(context), context: context);
                   Navigator.of(context).pop();
@@ -187,8 +187,7 @@ class ForgotPasswordBottomSheet extends StatelessWidget {
                     message: "password_updated".tr(context),
                     context: context,
                   );
-                  NotificationService.cancelAll();
-                  di.serviceLocator<SmartPosLocalStorage>().clearScheduledNotificationDate();
+                  await di.serviceLocator<SmartPosLocalStorage>().resetPasswordNotification();
                   Navigator.of(context).pushNamedAndRemoveUntil(Routes.signIn, (route) => false);
                 }
               },

@@ -78,7 +78,7 @@ class _ProfilePasswordUpdateState extends State<ProfilePasswordUpdateScreen> {
           padding: EdgeInsets.symmetric(vertical: 48.sp, horizontal: 24.sp),
           alignment: Alignment.center,
           child: BlocConsumer<ForgotPasswordCubit, ForgotPasswordState>(
-            listener: (context, state) {
+            listener: (context, state) async {
               if (state is ResetPasswordOTPFailure) {
                 AppToasts.showErrorToast(message: state.message.tr(context), context: context);
               }
@@ -93,10 +93,9 @@ class _ProfilePasswordUpdateState extends State<ProfilePasswordUpdateScreen> {
                 AppToasts.showErrorToast(message: state.message.tr(context), context: context);
               }
               if (state is ResetPasswordSuccess) {
+                await di.serviceLocator<SmartPosLocalStorage>().resetPasswordNotification();
+
                 AppToasts.showSuccessToast(message: state.message.tr(context), context: context);
-                /*   AppToasts.showSuccessToast(
-                    message: "passwordChangeSuccess".tr(context),
-                    context: context);*/
                 Navigator.of(context).pushNamedAndRemoveUntil(Routes.signIn, (route) => false);
               }
             },

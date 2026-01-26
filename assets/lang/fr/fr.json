@@ -351,5 +351,8 @@
   "SIM_ALREADY_USED": "Cette carte SIM est déjà utilisée.",
   "contract_signed_successfully": "Contrat signé avec succès",
   "CGV_indisponibles": "Conditions générales de vente indisponibles",
-  "15days_password_expiration": "Votre mot de passe expirera dans 15 jours"
+  "15days_password_expiration": "Votre mot de passe expirera dans 15 jours",
+  "password_expiry_last_week": "Attention ! Votre mot de passe arrive à expiration. Mettez-le à jour maintenant.",
+  "CLIENT_BLACKLISTED": "Ce client est actuellement sur liste noire et ne peut pas poursuivre cette opération.",
+  "CLIENT_HAS_REACHED_SIM_LIMIT": "Ce client a atteint la limite maximale."
 }

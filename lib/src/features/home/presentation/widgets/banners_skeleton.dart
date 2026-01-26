@@ -19,7 +19,7 @@ class BannersSkeleton extends StatelessWidget {
               borderRadius: BorderRadius.circular(16.0.sp),
               child: Container(
                 width: context.width,
-                height: 200.h, // Ensure same height as banners
+                height: 190.h, // Ensure same height as banners
                 color: context.isDarkMode
                     ? AppColors.darkerGrey
                     : AppColors.grey, // Skeleton background color

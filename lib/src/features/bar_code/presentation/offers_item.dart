@@ -7,13 +7,11 @@ class OfferItem extends StatelessWidget {
   const OfferItem({
     super.key,
     required this.title,
-    required this.price,
     this.onTap,
     this.isSelected = false,
   });
 
   final String title;
-  final String price;
   final void Function()? onTap;
   final bool isSelected;
 

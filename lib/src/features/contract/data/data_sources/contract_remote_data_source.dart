@@ -13,6 +13,7 @@ import 'package:mobilis_smart_pos/src/features/contract/domain/entities/rasd_tri
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/retry_trigger_sms_params_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/trigger_sms_params_entity.dart';
 import 'package:mobilis_smart_pos/src/features/sign_in/data/data_sources/smart_pos_local_storage.dart';
+import 'package:mobilis_smart_pos/src/services/pdf_cache_manager.dart';
 
 import '../../../../core/api/dio_consumer.dart';
 import '../../../../core/api/end_points.dart';
@@ -263,30 +264,55 @@ class ContractRemoteDataSourceImpl implements ContractRemoteDataSource {
   }
 
   @override
-  Future<Uint8List> getDynamicCGV({required String offerName, required String lang}) async {
+  Future<Uint8List> getDynamicCGV({
+    required String offerName,
+    required String lang,
+  }) async {
+    // Check cache first
+    final cachedPdf = await PdfCacheManager.getCachedPdf(
+      offerName: offerName,
+      lang: lang,
+    );
+
+    if (cachedPdf != null) {
+      debugPrint('Returning cached PDF for $offerName ($lang)');
+      return cachedPdf;
+    }
+
+    // Fetch from server if not cached
+    debugPrint('Fetching PDF from server for $offerName ($lang)');
     final response = await dioConsumer.get(
       "${EndPoints.getDynamicCGV}/$offerName/$lang",
       responseType: ResponseType.bytes,
     );
 
+    Uint8List pdfBytes;
+
     if (response is List<int>) {
       debugPrint("PDF header: ${utf8.decode(response.take(10).toList(), allowMalformed: true)}");
-      return Uint8List.fromList(response);
-    }
-
-    if (response is String) {
+      pdfBytes = Uint8List.fromList(response);
+    } else if (response is String) {
       if (!response.startsWith('%PDF')) {
         try {
-          final decoded = base64Decode(response);
-          debugPrint("PDF decoded from Base64 (length: ${decoded.length})");
-          return decoded;
+          pdfBytes = base64Decode(response);
+          debugPrint("PDF decoded from Base64 (length: ${pdfBytes.length})");
         } catch (_) {
-          return Uint8List.fromList(response.codeUnits);
+          pdfBytes = Uint8List.fromList(response.codeUnits);
         }
+      } else {
+        pdfBytes = Uint8List.fromList(response.codeUnits);
       }
-      return Uint8List.fromList(response.codeUnits);
+    } else {
+      throw Exception("Unexpected response type: ${response.runtimeType}");
     }
 
-    throw Exception("Unexpected response type: ${response.runtimeType}");
+    // Cache the PDF for future use
+    await PdfCacheManager.cachePdf(
+      offerName: offerName,
+      lang: lang,
+      pdfBytes: pdfBytes,
+    );
+
+    return pdfBytes;
   }
 }

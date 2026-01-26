@@ -7,7 +7,7 @@ class EndPoints {
 
   static const String ocrBaseUrl = String.fromEnvironment("OCR_BASE_URL");
 
-  static String baseUrl = dotenv.env['BASE_URL_DEV'] ?? "";
+  static String baseUrl = dotenv.env['BASE_URL_PRE_PROD'] ?? "";
   static bool get isApi1 => baseUrl.contains('api1');
 
   // ============== APK ================== //
@@ -47,8 +47,6 @@ class EndPoints {
   static String getAllOffers = "$baseUrl/subscription-type/all";
   static String triggerSms = "$baseUrl/contract/triggerSMS";
   static String retryTriggerSms = "$baseUrl/contract/triggerSMS/retry";
-
-  // static const String retriveCGV = "http://172.20.10.5:3002/api2/subscription-type";
 
   // ================== OCR =================== //
   static const String processId = "$ocrBaseUrl/process_id";

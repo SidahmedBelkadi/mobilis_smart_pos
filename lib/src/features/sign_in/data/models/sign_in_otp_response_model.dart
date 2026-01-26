@@ -11,20 +11,21 @@ class SignInOTPResponseModel extends SignInOTPResponseEntity {
     super.employeeId,
     super.msisdn,
     super.pdvCode,
+    super.passwordValidityMonths,
   });
 
   factory SignInOTPResponseModel.fromJson(Map<String, dynamic> json) {
     return SignInOTPResponseModel(
-      accessToken: json['access_token'] ?? '',
-      refreshToken: json['refresh_token'] ?? '',
-      userIsConsent: json['user_is_consent'],
-      firstLogin: json['is_first_login'],
-      passwordAge: json['password_age'],
-      userId: json['user_id'],
-      employeeId: json['employee_id'],
-      msisdn: json['msisdn'],
-      pdvCode: json['pdv_code'],
-    );
+        accessToken: json['access_token'] ?? '',
+        refreshToken: json['refresh_token'] ?? '',
+        userIsConsent: json['user_is_consent'],
+        firstLogin: json['is_first_login'],
+        passwordAge: "2025-08-10T00:00:00Z",
+        userId: json['user_id'],
+        employeeId: json['employee_id'],
+        msisdn: json['msisdn'],
+        pdvCode: json['pdv_code'],
+        passwordValidityMonths: json['password_delay']);
   }
 
   Map<String, dynamic> toJson() {

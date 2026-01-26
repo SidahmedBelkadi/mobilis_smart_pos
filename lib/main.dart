@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/insecure_device_checker.dart';
+import 'package:mobilis_smart_pos/src/services/local_notifications_service.dart';
 import 'package:pretty_bloc_observer/pretty_bloc_observer.dart';
 import 'src/core/utils/helpers/security_helper.dart';
 
@@ -26,9 +27,11 @@ void main() async {
 
   FlutterNativeSplash.remove();
 
-  if (kDebugMode) {
-    Bloc.observer = PrettyBlocObserver();
-  }
+  await LocalNotificationService().init();
+
+  // if (kDebugMode) {
+  //   Bloc.observer = PrettyBlocObserver();
+  // }
 
   if (isNotSafeDevice) {
     runApp(const InsecureDevice());

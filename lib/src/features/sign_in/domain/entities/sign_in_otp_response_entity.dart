@@ -11,21 +11,20 @@ class SignInOTPResponseEntity extends Equatable {
   final bool? firstLogin;
   final String? passwordAge;
   final String? businessName;
+  final String? passwordValidityMonths;
 
-  static const int passwordValidityMonths = 6;
-
-  const SignInOTPResponseEntity({
-    required this.accessToken,
-    required this.refreshToken,
-    this.userIsConsent,
-    this.firstLogin,
-    this.userId,
-    this.employeeId,
-    this.msisdn,
-    this.pdvCode,
-    this.passwordAge,
-    this.businessName,
-  });
+  const SignInOTPResponseEntity(
+      {required this.accessToken,
+      required this.refreshToken,
+      this.userIsConsent,
+      this.firstLogin,
+      this.userId,
+      this.employeeId,
+      this.msisdn,
+      this.pdvCode,
+      this.passwordAge,
+      this.businessName,
+      this.passwordValidityMonths = "6"});
 
   @override
   List<Object?> get props => [
@@ -38,20 +37,21 @@ class SignInOTPResponseEntity extends Equatable {
         pdvCode,
         passwordAge,
         businessName,
+        passwordValidityMonths,
       ];
 
   factory SignInOTPResponseEntity.fromMap(Map<String, dynamic> map) {
     return SignInOTPResponseEntity(
-      accessToken: map['accessToken'] ?? '',
-      refreshToken: map['refreshToken'] ?? '',
-      userIsConsent: map['userIsConsent'],
-      firstLogin: map['first_login'],
-      userId: map['userId'],
-      employeeId: map['employee'],
-      msisdn: map['msisdn'],
-      pdvCode: map['pdvCode'],
-      passwordAge: map['password_age'],
-    );
+        accessToken: map['accessToken'] ?? '',
+        refreshToken: map['refreshToken'] ?? '',
+        userIsConsent: map['userIsConsent'],
+        firstLogin: map['first_login'],
+        userId: map['userId'],
+        employeeId: map['employee'],
+        msisdn: map['msisdn'],
+        pdvCode: map['pdvCode'],
+        passwordAge: map['password_age'],
+        passwordValidityMonths: map['password_delay']);
   }
 
   // ---------------- Password Expiration Logic ----------------
@@ -69,7 +69,7 @@ class SignInOTPResponseEntity extends Equatable {
 
     return DateTime(
       last.year,
-      last.month + passwordValidityMonths,
+      last.month + int.parse(passwordValidityMonths ?? "6"),
       last.day,
     );
   }
@@ -79,7 +79,12 @@ class SignInOTPResponseEntity extends Equatable {
     final expiry = passwordExpirationDate;
     if (expiry == null) return null;
 
-    return expiry.difference(DateTime.now()).inDays;
+    final now = DateTime.now();
+
+    final today = DateTime(now.year, now.month, now.day);
+    final expiryDateOnly = DateTime(expiry.year, expiry.month, expiry.day);
+
+    return expiryDateOnly.difference(today).inDays;
   }
 
   // ---------------- Alerts Logic ----------------
@@ -95,6 +100,7 @@ class SignInOTPResponseEntity extends Equatable {
   bool get isPasswordExpired {
     final days = daysUntilExpiration;
     if (days == null) return false;
+
     return days <= 0;
   }
 

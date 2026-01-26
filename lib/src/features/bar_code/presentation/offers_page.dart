@@ -59,26 +59,25 @@ class _OffersPageState extends State<OffersPage> {
               }
               if (state is GetAllOffersSuccess) {
                 final offers = state.offers;
-                return Padding(
-                  padding: EdgeInsets.all(16.0.sp),
-                  child: Column(
-                    children: [
-                      Text(
-                        "offers".tr(context),
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      SizedBox(height: 24.sp),
-                      Expanded(
-                        child: ListView.builder(
+                return SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.sp),
+                    child: Column(
+                      children: [
+                        Text(
+                          "offers".tr(context),
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        SizedBox(height: 24.sp),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
                           itemCount: offers.length,
                           itemBuilder: (_, index) {
-                            final OfferEntity offer = offers[index];
+                            final offer = offers[index];
                             return OfferItem(
                               title: offer.name,
-                              price: context.isArabicLocale
-                                  ? offer.formattedPriceAr
-                                  : offer.formattedPrice,
                               onTap: () {
                                 setState(() {
                                   selectedOfferName = offer.name;
@@ -90,8 +89,8 @@ class _OffersPageState extends State<OffersPage> {
                             );
                           },
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               }

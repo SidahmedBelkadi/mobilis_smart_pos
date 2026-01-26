@@ -29,11 +29,13 @@ class MainScreen extends StatefulWidget {
       this.index = 0,
       this.fromSignin,
       this.hasToChangePassowrd = false,
+      this.hasToChangePassowrdOptional = false,
       this.daysLeft});
 
   final int? index;
   final bool? fromSignin;
   final bool? hasToChangePassowrd;
+  final bool? hasToChangePassowrdOptional;
   final int? daysLeft;
 
   @override
@@ -81,13 +83,15 @@ class _MyHomePageState extends State<MainScreen> {
 
   _checkForPassowrdExpiryAlert() async {
     await Future.delayed(Duration(seconds: 2));
-    if (widget.hasToChangePassowrd == true) {
+    if (widget.hasToChangePassowrd == true ||
+        di.serviceLocator<SmartPosLocalStorage>().hasToChangePassword() ||
+        widget.hasToChangePassowrdOptional == true) {
       QuickAlert.show(
           context: context,
-          type: QuickAlertType.info,
+          type: QuickAlertType.warning,
           title: "password_will_expire_soon".tr(context),
           text: "password_will_expire_instruction".tr(context),
-          barrierDismissible: false,
+          barrierDismissible: widget.hasToChangePassowrdOptional ?? false,
           barrierColor: Colors.black.withOpacity(.8),
           backgroundColor: context.isDarkMode ? AppColors.darkerGrey : Colors.white,
           textColor: context.isDarkMode ? Colors.white : Colors.black,

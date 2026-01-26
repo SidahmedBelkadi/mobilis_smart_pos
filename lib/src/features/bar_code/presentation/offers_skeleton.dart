@@ -25,7 +25,6 @@ class OffersSkeleton extends StatelessWidget {
                 itemCount: 7,
                 itemBuilder: (context, index) => OfferItem(
                   title: "Offer Name",
-                  price: '2000 DA',
                   onTap: () {},
                 ),
               ),

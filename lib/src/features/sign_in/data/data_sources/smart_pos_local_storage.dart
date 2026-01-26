@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:mobilis_smart_pos/src/services/pdf_cache_manager.dart';
 import '../../../../core/utils/enums/themes_enum.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -59,6 +60,14 @@ abstract class SmartPosLocalStorage {
   void unBlockRetryActivationTemporarly();
 
   bool isRetryBlocked();
+
+  // ========== Passsword Expiry ========= //
+
+  Future<bool> shouldShowPasswordNotificationToday();
+  Future<void> markPasswordNotificationAsShown();
+  Future<void> resetPasswordNotification();
+  Future<void> setHasToChangePassword();
+  bool hasToChangePassword();
 }
 
 class SmartPosLocalStorageImpl implements SmartPosLocalStorage {
@@ -75,6 +84,10 @@ class SmartPosLocalStorageImpl implements SmartPosLocalStorage {
     await sharedPreferences.remove(AppKeys.msisdn);
     await sharedPreferences.remove(AppKeys.pdvCode);
     await sharedPreferences.remove(AppKeys.businessName);
+
+    // Clear PDF cache on logout
+    await PdfCacheManager.clearCache();
+    debugPrint('User logged out - all data cleared including PDF cache');
   }
 
   @override
@@ -257,5 +270,44 @@ class SmartPosLocalStorageImpl implements SmartPosLocalStorage {
   @override
   Future<void> setConsetment({required bool consent}) async {
     await sharedPreferences.setBool(AppKeys.consent, consent);
+  }
+
+  // Key to store last shown date
+  static const _lastPasswordNotificationKey = 'last_password_notification_date';
+  // Key to store a flag to check if he has to change his password
+  static const _hasToChangePassword = 'has_to_change_password';
+
+// Returns true if notification has not been shown today, otherwise false
+  @override
+  Future<bool> shouldShowPasswordNotificationToday() async {
+    final todayStr = DateTime.now().toIso8601String().substring(0, 10); // YYYY-MM-DD
+    final lastShownDate = sharedPreferences.getString(_lastPasswordNotificationKey);
+
+    // If already shown today, do not show again
+    return lastShownDate != todayStr;
+  }
+
+// Marks that a password notification has been shown today
+  @override
+  Future<void> markPasswordNotificationAsShown() async {
+    final todayStr = DateTime.now().toIso8601String().substring(0, 10); // YYYY-MM-DD
+    await sharedPreferences.setString(_lastPasswordNotificationKey, todayStr);
+  }
+
+// Resets the daily notification (e.g., after password change)
+  @override
+  Future<void> resetPasswordNotification() async {
+    debugPrint("======= NOTIFICATION RESET");
+    await sharedPreferences.remove(_lastPasswordNotificationKey);
+  }
+
+  @override
+  bool hasToChangePassword() {
+    return sharedPreferences.getBool(_hasToChangePassword) ?? false;
+  }
+
+  @override
+  Future<void> setHasToChangePassword() async {
+    await sharedPreferences.setBool(_hasToChangePassword, true);
   }
 }
