@@ -89,8 +89,12 @@ class _MyHomePageState extends State<MainScreen> {
       QuickAlert.show(
           context: context,
           type: QuickAlertType.warning,
-          title: "password_will_expire_soon".tr(context),
-          text: "password_will_expire_instruction".tr(context),
+          title: widget.hasToChangePassowrdOptional == true
+              ? "password_will_expire_soon".tr(context)
+              : "password_expired".tr(context),
+          text: widget.hasToChangePassowrdOptional == true
+              ? "password_will_expire_instruction".tr(context)
+              : "password_expired_instruction".tr(context),
           barrierDismissible: widget.hasToChangePassowrdOptional ?? false,
           barrierColor: Colors.black.withOpacity(.8),
           backgroundColor: context.isDarkMode ? AppColors.darkerGrey : Colors.white,

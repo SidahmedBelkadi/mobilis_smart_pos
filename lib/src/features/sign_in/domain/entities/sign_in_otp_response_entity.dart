@@ -9,22 +9,23 @@ class SignInOTPResponseEntity extends Equatable {
   final String? pdvCode;
   final bool? userIsConsent;
   final bool? firstLogin;
-  final String? passwordAge;
+  final String? passwordAge; // ISO string (UTC)
   final String? businessName;
   final String? passwordValidityMonths;
 
-  const SignInOTPResponseEntity(
-      {required this.accessToken,
-      required this.refreshToken,
-      this.userIsConsent,
-      this.firstLogin,
-      this.userId,
-      this.employeeId,
-      this.msisdn,
-      this.pdvCode,
-      this.passwordAge,
-      this.businessName,
-      this.passwordValidityMonths = "6"});
+  const SignInOTPResponseEntity({
+    required this.accessToken,
+    required this.refreshToken,
+    this.userIsConsent,
+    this.firstLogin,
+    this.userId,
+    this.employeeId,
+    this.msisdn,
+    this.pdvCode,
+    this.passwordAge,
+    this.businessName,
+    this.passwordValidityMonths = "6",
+  });
 
   @override
   List<Object?> get props => [
@@ -33,6 +34,7 @@ class SignInOTPResponseEntity extends Equatable {
         userIsConsent,
         firstLogin,
         userId,
+        employeeId,
         msisdn,
         pdvCode,
         passwordAge,
@@ -42,66 +44,85 @@ class SignInOTPResponseEntity extends Equatable {
 
   factory SignInOTPResponseEntity.fromMap(Map<String, dynamic> map) {
     return SignInOTPResponseEntity(
-        accessToken: map['accessToken'] ?? '',
-        refreshToken: map['refreshToken'] ?? '',
-        userIsConsent: map['userIsConsent'],
-        firstLogin: map['first_login'],
-        userId: map['userId'],
-        employeeId: map['employee'],
-        msisdn: map['msisdn'],
-        pdvCode: map['pdvCode'],
-        passwordAge: map['password_age'],
-        passwordValidityMonths: map['password_delay']);
+      accessToken: map['accessToken'] ?? '',
+      refreshToken: map['refreshToken'] ?? '',
+      userIsConsent: map['userIsConsent'],
+      firstLogin: map['first_login'],
+      userId: map['userId'],
+      employeeId: map['employee'],
+      msisdn: map['msisdn'],
+      pdvCode: map['pdvCode'],
+      passwordAge: map['password_age'],
+      passwordValidityMonths: map['password_delay'],
+      businessName: map['businessName'],
+    );
   }
 
-  // ---------------- Password Expiration Logic ----------------
+  // ---------------------------------------------------------------------------
+  // Date Helpers
+  // ---------------------------------------------------------------------------
 
-  /// Last password change date (UTC-safe)
+  /// Safely adds months to a date (handles month overflow & day clamping)
+  DateTime _addMonths(DateTime date, int months) {
+    final newMonth = date.month + months;
+    final year = date.year + ((newMonth - 1) ~/ 12);
+    final month = ((newMonth - 1) % 12) + 1;
+
+    final lastDayOfTargetMonth = DateTime.utc(year, month + 1, 0).day;
+
+    final day = date.day > lastDayOfTargetMonth ? lastDayOfTargetMonth : date.day;
+
+    return DateTime.utc(year, month, day);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Password Expiration Logic
+  // ---------------------------------------------------------------------------
+
+  /// Last password change date (UTC)
   DateTime? get lastPasswordChange {
     if (passwordAge == null) return null;
-    return DateTime.parse(passwordAge!);
+    return DateTime.parse(passwordAge!).toUtc();
   }
 
-  /// Password expiration date
+  /// Password expiration date (UTC, safe)
   DateTime? get passwordExpirationDate {
     final last = lastPasswordChange;
     if (last == null) return null;
 
-    return DateTime(
-      last.year,
-      last.month + int.parse(passwordValidityMonths ?? "6"),
-      last.day,
-    );
+    final months = int.tryParse(passwordValidityMonths ?? '6') ?? 6;
+    return _addMonths(last, months);
   }
 
-  /// Days remaining until expiration
+  /// Days remaining until expiration (date-only, UTC-safe)
   int? get daysUntilExpiration {
     final expiry = passwordExpirationDate;
     if (expiry == null) return null;
 
-    final now = DateTime.now();
+    final now = DateTime.now().toUtc();
 
-    final today = DateTime(now.year, now.month, now.day);
-    final expiryDateOnly = DateTime(expiry.year, expiry.month, expiry.day);
+    final today = DateTime.utc(now.year, now.month, now.day);
+    final expiryDateOnly = DateTime.utc(expiry.year, expiry.month, expiry.day);
 
     return expiryDateOnly.difference(today).inDays;
   }
 
-  // ---------------- Alerts Logic ----------------
+  // ---------------------------------------------------------------------------
+  // Alerts Logic
+  // ---------------------------------------------------------------------------
 
-  /// Exactly 15 days before expiration (dismissable Toast)
+  /// Exactly 15 days before expiration (dismissible toast)
   bool get shouldShow15DaysAlert {
     final days = daysUntilExpiration;
     if (days == null) return false;
     return days == 15;
   }
 
-  ///  Password expired
+  /// Password expired (AFTER expiration day)
   bool get isPasswordExpired {
     final days = daysUntilExpiration;
     if (days == null) return false;
-
-    return days <= 0;
+    return days < 0;
   }
 
   /// Inside last week window (7 → 1 days)
@@ -116,7 +137,9 @@ class SignInOTPResponseEntity extends Equatable {
     return isInLastWeek || isPasswordExpired;
   }
 
-  // ---------------- Last Week Range Logic ----------------
+  // ---------------------------------------------------------------------------
+  // Last Week Range Logic
+  // ---------------------------------------------------------------------------
 
   /// Start date of last week (7 days before expiration)
   DateTime? get lastWeekStartDate {
@@ -132,17 +155,17 @@ class SignInOTPResponseEntity extends Equatable {
     final expiry = passwordExpirationDate;
     if (start == null || expiry == null) return false;
 
-    final today = DateTime.now();
+    final today = DateTime.now().toUtc();
 
     /// Inclusive start, exclusive expiry
     return !today.isBefore(start) && today.isBefore(expiry);
   }
 
-  /// Days left until expiration (correct & stable)
+  /// Days left until expiration (stable, UTC)
   int? get daysLeftInLastWeek {
     final expiry = passwordExpirationDate;
     if (expiry == null) return null;
 
-    return expiry.difference(DateTime.now()).inDays;
+    return expiry.difference(DateTime.now().toUtc()).inDays;
   }
 }

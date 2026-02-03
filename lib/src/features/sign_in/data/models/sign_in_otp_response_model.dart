@@ -20,7 +20,7 @@ class SignInOTPResponseModel extends SignInOTPResponseEntity {
         refreshToken: json['refresh_token'] ?? '',
         userIsConsent: json['user_is_consent'],
         firstLogin: json['is_first_login'],
-        passwordAge: "2025-08-10T00:00:00Z",
+        passwordAge: json['password_age'],
         userId: json['user_id'],
         employeeId: json['employee_id'],
         msisdn: json['msisdn'],
