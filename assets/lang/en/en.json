@@ -257,6 +257,7 @@
   "CONSETEMENT_ACQUIRED": "Thank you. Your consent to the contract has been successfully recorded.",
   "FIRST_LOGIN": "Welcome! As this is your first login, please change your password to continue.",
   "USER_HAS_TO_CHANGE_DEFAULT_PASSWORD": "You must change the default password to continue",
+  "USER_HAS_TO_CHANGE_PASSWORD": "You have to change your password",
   "PERMISSIONS_REQUIRED": "Permissions are required for the app to work. Please grant them to continue.",
   "PASSWORD_UPDATED": "Your password has been successfully updated.",
   "ACCOUNT_ON_HOLD": "Your account is currently suspended.",

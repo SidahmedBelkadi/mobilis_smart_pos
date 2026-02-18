@@ -257,6 +257,7 @@
   "CONSETEMENT_ACQUIRED": "Merci. Votre consentement au contrat a été enregistré avec succès.",
   "FIRST_LOGIN": "Bienvenue ! Comme c'est votre première connexion, veuillez changer votre mot de passe pour continuer.",
   "USER_HAS_TO_CHANGE_DEFAULT_PASSWORD": "Vous devez changer le mot de passe par défaut pour continuer.",
+  "USER_HAS_TO_CHANGE_PASSWORD": "Vous devez changer votre mot de passe pour continuer.",
   "PERMISSIONS_REQUIRED": "Des autorisations sont nécessaires pour que l'application fonctionne. Veuillez les accorder pour continuer.",
   "PASSWORD_UPDATED": "Votre mot de passe a été mis à jour avec succès.",
   "ACCOUNT_ON_HOLD": "Votre compte est momentanément suspendu , veuillez contacter votre commercial",

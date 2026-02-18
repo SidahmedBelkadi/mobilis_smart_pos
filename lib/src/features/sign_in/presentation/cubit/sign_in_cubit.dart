@@ -6,8 +6,11 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:mobilis_smart_pos/src/app.dart';
+import 'package:mobilis_smart_pos/src/config/routing/app_routes.dart';
 import 'package:mobilis_smart_pos/src/features/sign_in/domain/use_cases/get_pdv_contract_use_case.dart';
 import 'package:mobilis_smart_pos/src/features/sign_in/domain/use_cases/sign_and_approve_contract_use_case.dart';
+import 'package:path/path.dart';
 import '../../data/data_sources/smart_pos_local_storage.dart';
 import '../../domain/entities/sign_in_otp_request_params.dart';
 import '../../domain/entities/sign_in_otp_response_entity.dart';
@@ -94,6 +97,10 @@ class SignInCubit extends Cubit<SignInState> {
     failureOrSignInOTPResponseEntity.fold(
       (error) {
         emit(OTPFailed(message: error.message));
+        if (error.message.contains('ACCOUNT_ON_HOLD')) {
+          navigatorKey.currentState?.pushNamedAndRemoveUntil(Routes.signIn, (route) => false);
+          return;
+        }
       },
       (signInOTPResponseEntity) async {
         await localDataSource.clearLoginCredentials();

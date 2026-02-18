@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -29,9 +28,9 @@ void main() async {
   //   Bloc.observer = PrettyBlocObserver();
   // }
 
-  if (isNotSafeDevice) {
-    runApp(const InsecureDevice());
-  } else {
-    runApp(const SmartPos());
-  }
+  // if (isNotSafeDevice) {
+  //   runApp(const InsecureDevice());
+  // } else {
+  runApp(const SmartPos());
+  // }
 }

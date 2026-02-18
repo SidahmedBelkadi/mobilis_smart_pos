@@ -220,6 +220,15 @@ class _SignInScreenState extends State<SignInScreen> {
                                       arguments: {"msisdn": cubit.phoneController.text});
                                 },
                               );
+                            } else if (state.message.contains('REDIRECT_TO_CHANGE_PASSWORD')) {
+                              AppToasts.showInfoToast(
+                                message: "USER_HAS_TO_CHANGE_PASSWORD".tr(context),
+                                context: context,
+                                onAutoCompleteCompleted: (p0) {
+                                  Navigator.of(context).pushNamed(Routes.forgotPassword,
+                                      arguments: {"msisdn": cubit.phoneController.text});
+                                },
+                              );
                             } else {
                               AppToasts.showErrorToast(
                                 message: state.message.tr(context),
