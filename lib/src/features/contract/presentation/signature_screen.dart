@@ -15,6 +15,7 @@ import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/sms_c
 import '../../sign_in/data/data_sources/smart_pos_local_storage.dart';
 import '../../../services/screenshot_service.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pdfx/pdfx.dart';
 import 'package:readmore/readmore.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 
@@ -24,7 +25,6 @@ import '../../../core/utils/helpers/media_query_values.dart';
 import '../../../core/utils/helpers/toast_helper.dart';
 import '../../../core/utils/ressources/app_colors.dart';
 import '../../../core/utils/ressources/app_images.dart';
-import '../../../core/utils/ressources/app_strings.dart';
 import '../../../dependency_injection/injection_container.dart' as di;
 import '../domain/entities/contract_request_params_entitiy.dart';
 import '../domain/entities/generate_contract_params_entity.dart';
@@ -80,12 +80,29 @@ class _SignatureScreenState extends State<SignatureScreen> {
 
   String currentDateAr = DateFormat('dd-MM-yyyy').format(DateTime.now());
   Timer? _smsTimer;
+  bool _isContractGenerationTriggered = false;
+
+  late PdfController _pdfController;
+  bool _isPdfLoaded = false;
 
   @override
   void initState() {
     smsLoading = false;
     super.initState();
     ScreenshotService.disableScreenshots();
+
+    _pdfController = PdfController(
+      document: PdfDocument.openAsset('assets/pdf/cgv_5g_static.pdf'),
+    );
+    _pdfController.loadingState.addListener(() {
+      if (_pdfController.loadingState.value == PdfLoadingState.success) {
+        if (mounted) {
+          setState(() {
+            _isPdfLoaded = true;
+          });
+        }
+      }
+    });
 
     platform.setMethodCallHandler((call) async {
       if (call.method == "receivedSms") {
@@ -105,6 +122,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
   @override
   void dispose() {
     _smsTimer?.cancel();
+    _pdfController.dispose();
     super.dispose();
   }
 
@@ -117,13 +135,26 @@ class _SignatureScreenState extends State<SignatureScreen> {
 
   void checkSmsSuccess(String message, BuildContext context) {
     debugPrint("==================== MESSAGE : $message");
+
+    // Ignore "Activation en cours" messages completely
+    final RegExp regExp2 = RegExp(r'Activation en cours');
+    if (regExp2.hasMatch(message)) {
+      debugPrint("==================== Ignoring 'Activation en cours' message");
+      return;
+    }
+
+    // Prevent duplicate calls
+    if (_isContractGenerationTriggered) {
+      debugPrint(
+          "==================== Contract generation already triggered, ignoring duplicate message");
+      return;
+    }
+
     setState(() {
       generateContractParamsEntity.dsaMessage = message;
     });
 
     final RegExp regExp = RegExp(r'La carte SIM (\d+) est activee, avec le numero (2136\d{8})');
-    final RegExp regExp2 = RegExp(r'Activation en cours');
-
     final match = regExp.firstMatch(message);
     final cubit = context.read<ContractCubit>();
 
@@ -136,18 +167,14 @@ class _SignatureScreenState extends State<SignatureScreen> {
 
       if (phoneNumber != null && dsaICCID == iccid) {
         generateContractParamsEntity.msisdn = phoneNumber;
+        _isContractGenerationTriggered = true;
         cubit.attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
       }
     } else {
       debugPrint("===================== Message: $message");
-      if (!regExp2.hasMatch(message)) {
-        generateContractParamsEntity.msisdn = "FAILED";
-        cubit.attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
-      } else if (regExp2.hasMatch(message)) {
-      } else {
-        AppToasts.showErrorToast(message: message, context: context);
-        Navigator.of(context).pop();
-      }
+      generateContractParamsEntity.msisdn = "FAILED";
+      _isContractGenerationTriggered = true;
+      cubit.attributeMsisdnAndGenerateContract(params: generateContractParamsEntity);
     }
   }
 
@@ -190,12 +217,8 @@ class _SignatureScreenState extends State<SignatureScreen> {
               ),
               onPressed: () async {
                 Navigator.of(context).pop();
-                final file = await _saveSignature();
-                setState(() {
-                  signatureFile = file;
-                });
 
-                // Make the API call first
+                // signatureFile is already set by _showSignatureModal
                 cubit.editContract(
                     contract: widget.contract,
                     recto: widget.recto,
@@ -211,6 +234,152 @@ class _SignatureScreenState extends State<SignatureScreen> {
               },
             ),
           ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showSignatureModal(BuildContext context) {
+    // Create a new signature pad key for the modal
+    final GlobalKey<SfSignaturePadState> modalSignaturePadKey = GlobalKey();
+    bool modalSignatureValidated = false;
+    bool modalConditionChecked = false;
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Dialog(
+              child: Container(
+                padding: EdgeInsets.all(24.sp),
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.9,
+                  maxWidth: MediaQuery.of(context).size.width * 0.9,
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "signature".tr(context),
+                        style: Theme.of(context).textTheme.headlineSmall,
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 24.sp),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(width: 1, color: AppColors.secondary),
+                        ),
+                        height: 200.h,
+                        width: double.infinity,
+                        child: SfSignaturePad(
+                          key: modalSignaturePadKey,
+                          minimumStrokeWidth: 5,
+                          maximumStrokeWidth: 6,
+                          strokeColor: Colors.black,
+                          backgroundColor: Colors.white,
+                          onDrawStart: () {
+                            setModalState(() {
+                              modalSignatureValidated = true;
+                            });
+                            return false;
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 12.sp),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: () {
+                            setModalState(() {
+                              modalSignatureValidated = false;
+                            });
+                            modalSignaturePadKey.currentState!.clear();
+                          },
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.clear),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16.sp),
+                      CheckboxListTile(
+                        title: Text(
+                          "signature_approve".tr(context),
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                        value: modalConditionChecked,
+                        onChanged: (value) {
+                          setModalState(() {
+                            modalConditionChecked = value ?? false;
+                          });
+                        },
+                      ),
+                      SizedBox(height: 24.sp),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(dialogContext).pop();
+                            },
+                            child: Text("discard".tr(context)),
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              if (!modalSignatureValidated) {
+                                AppToasts.showErrorToast(
+                                  message: "required_signature".tr(context),
+                                  context: dialogContext,
+                                );
+                                return;
+                              }
+
+                              if (!modalConditionChecked) {
+                                AppToasts.showErrorToast(
+                                  message: "signature_approve".tr(context),
+                                  context: dialogContext,
+                                );
+                                return;
+                              }
+
+                              // Save the signature
+                              final ui.Image image =
+                                  await modalSignaturePadKey.currentState!.toImage();
+                              final ByteData? byteData =
+                                  await image.toByteData(format: ui.ImageByteFormat.png);
+                              final Uint8List imageData = byteData!.buffer.asUint8List();
+                              final tempDir = await getTemporaryDirectory();
+                              final file = await File('${tempDir.path}/signature.png').create();
+                              await file.writeAsBytes(imageData);
+
+                              setState(() {
+                                signatureFile = file;
+                                signatureImagePath = file.path;
+                                isSignatureValidated = true;
+                                _isConditionOfSignatureChecked = true;
+                              });
+
+                              Navigator.of(dialogContext).pop();
+                            },
+                            child: Text("confirm".tr(context)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
         );
       },
     );
@@ -305,89 +474,68 @@ class _SignatureScreenState extends State<SignatureScreen> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Column(
-                                  children: [
-                                    Text(
-                                      "الشــــروط العامــــة للبيـــــع لعروض\n4G / 3G\nالدفع المسبق أ.تي.ام موبيليس",
-                                      style: Theme.of(context).textTheme.bodyLarge,
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    const ConditionsOfUse(
-                                      desc: AppStrings.arabicAgrement,
-                                    ),
-                                    SizedBox(height: 12.sp),
-                                    Text(
-                                      "الجزائر، في $currentDateAr\nأنا، الممضي أسفله، أؤكد أنني قرأت و وافقت على كامل شروط البيع العامة",
-                                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                          color: AppColors.primary, fontWeight: FontWeight.bold),
-                                    ),
-                                    SizedBox(height: 32.h),
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        border: Border.all(width: 1, color: AppColors.secondary),
+                                // PDF viewer
+                                SizedBox(
+                                  height: 550.h,
+                                  width: context.width,
+                                  child: PdfView(
+                                    controller: _pdfController,
+                                    scrollDirection: Axis.vertical,
+                                    physics: const BouncingScrollPhysics(),
+                                    builders: PdfViewBuilders<DefaultBuilderOptions>(
+                                      options: const DefaultBuilderOptions(),
+                                      documentLoaderBuilder: (_) => const Center(
+                                        child: CircularProgressIndicator(),
                                       ),
-                                      height: 200.h,
-                                      width: 300.w,
-                                      child: SfSignaturePad(
-                                        key: _signaturePadKey,
-                                        minimumStrokeWidth: 5,
-                                        maximumStrokeWidth: 6,
-                                        strokeColor: Colors.black,
-                                        backgroundColor: Colors.white,
-                                        onDrawStart: () {
-                                          setState(() {
-                                            isSignatureValidated = true;
-                                          });
-                                          return false;
-                                        },
+                                      pageLoaderBuilder: (_) => const Center(
+                                        child: CircularProgressIndicator(),
                                       ),
                                     ),
-                                    EraseSignatureButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          isSignatureValidated = false;
-                                        });
-                                        _signaturePadKey.currentState!.clear();
-                                      },
-                                    ),
-                                    SizedBox(height: 24.sp),
-                                    CheckboxListTile(
-                                      title: Text(
-                                        "أوافق على إدراج توقيعي في العقد الخاص بي و كذلك في وثيقة الشروط العامة للبيع",
-                                        style: Theme.of(context).textTheme.bodySmall,
-                                      ),
-                                      value: _isConditionOfSignatureChecked,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _isConditionOfSignatureChecked = true;
-                                        });
-                                      },
-                                    ),
-                                    // SizedBox(height: 24.sp),
-                                  ],
+                                  ),
                                 ),
-                                SizedBox(height: 64.h),
-                                ElevatedButton(
-                                  child: Text("confrim_sell".tr(context)),
-                                  onPressed: () async {
-                                    if (!isSignatureValidated) {
-                                      AppToasts.showErrorToast(
-                                        message: "required_signature".tr(context),
-                                        context: context,
-                                      );
-                                      return;
-                                    }
 
-                                    if (!_isConditionOfSignatureChecked) {
-                                      AppToasts.showErrorToast(
-                                        message: "signature_approve".tr(context),
-                                        context: context,
-                                      );
-                                      return;
-                                    }
-                                    _showConfirmationDialog(context, cubit);
-                                  },
-                                ),
+                                SizedBox(height: 64.h),
+
+                                if (_isPdfLoaded)
+                                  isSignatureValidated && _isConditionOfSignatureChecked
+                                      ? ElevatedButton(
+                                          child: Text("activate_sim".tr(context)),
+                                          onPressed: () async {
+                                            cubit.editContract(
+                                                contract: widget.contract,
+                                                recto: widget.recto,
+                                                verso: widget.verso,
+                                                signature: signatureFile,
+                                                isPassport: widget.isPassport,
+                                                parentRecto: widget.parentRecto,
+                                                parentVerso: widget.parentVerso,
+                                                justifiatif: widget.justificatif,
+                                                parentIsPassport: widget.parentIsPassport);
+                                            ScreenshotService.enableScreenshots();
+                                            debugPrint("============ REQUESTED ============");
+                                          },
+                                        )
+                                      : ElevatedButton(
+                                          child: Text("confrim_sell".tr(context)),
+                                          onPressed: () async {
+                                            // if (!isSignatureValidated) {
+                                            //   AppToasts.showErrorToast(
+                                            //     message: "required_signature".tr(context),
+                                            //     context: context,
+                                            //   );
+                                            //   return;
+                                            // }
+
+                                            // if (!_isConditionOfSignatureChecked) {
+                                            //   AppToasts.showErrorToast(
+                                            //     message: "signature_approve".tr(context),
+                                            //     context: context,
+                                            //   );
+                                            //   return;
+                                            //}
+                                            _showSignatureModal(context);
+                                          },
+                                        ),
                               ],
                             );
                     },
