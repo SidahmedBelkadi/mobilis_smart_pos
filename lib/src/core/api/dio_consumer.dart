@@ -97,7 +97,7 @@ class DioConsumer extends ApiConsumer {
 
       final response = await client.post(
         path,
-        data: formDataIsEnabled ? body : jsonEncode(body),
+        data: formDataIsEnabled ? body : (body == null ? null : jsonEncode(body)),
         options: finalOptions,
         queryParameters: queryParameters,
       );
@@ -144,7 +144,7 @@ class DioConsumer extends ApiConsumer {
 
       final response = await client.patch(
         path,
-        data: formDataIsEnabled ? body : jsonEncode(body),
+        data: formDataIsEnabled ? body : (body == null ? null : jsonEncode(body)),
         options: finalOptions,
         queryParameters: queryParameters,
       );
@@ -211,7 +211,7 @@ class DioConsumer extends ApiConsumer {
 
       final response = await client.put(
         path,
-        data: formDataIsEnabled ? body : jsonEncode(body),
+        data: formDataIsEnabled ? body : (body == null ? null : jsonEncode(body)),
         options: finalOptions,
         queryParameters: queryParameters,
       );

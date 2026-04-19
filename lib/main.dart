@@ -28,9 +28,9 @@ void main() async {
   //   Bloc.observer = PrettyBlocObserver();
   // }
 
-  // if (isNotSafeDevice) {
-  //   runApp(const InsecureDevice());
-  // } else {
-  runApp(const SmartPos());
-  // }
+  if (isNotSafeDevice) {
+    runApp(const InsecureDevice());
+  } else {
+    runApp(const SmartPos());
+  }
 }

@@ -23,6 +23,13 @@ import 'package:mobilis_smart_pos/src/features/home/domain/use_cases/load_banner
 import 'package:mobilis_smart_pos/src/features/home/presentation/cubit/home_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/invoices/domain/use_cases/retry_activation_use_case.dart';
 import 'package:mobilis_smart_pos/src/features/invoices/presentation/cubit/retry_activation/retry_activation_cubit.dart';
+import 'package:mobilis_smart_pos/src/features/notifications/data/data_sources/notification_remote_data_source.dart';
+import 'package:mobilis_smart_pos/src/features/notifications/data/repositories/notification_repository_impl.dart';
+import 'package:mobilis_smart_pos/src/features/notifications/domain/repositories/notification_repository.dart';
+import 'package:mobilis_smart_pos/src/features/notifications/domain/use_cases/get_notifications_use_case.dart';
+import 'package:mobilis_smart_pos/src/features/notifications/domain/use_cases/get_unread_count_use_case.dart';
+import 'package:mobilis_smart_pos/src/features/notifications/domain/use_cases/mark_as_read_use_case.dart';
+import 'package:mobilis_smart_pos/src/features/notifications/presentation/cubit/notification_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/sign_in/domain/use_cases/get_pdv_contract_use_case.dart';
 import 'package:mobilis_smart_pos/src/features/sign_in/domain/use_cases/sign_and_approve_contract_use_case.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
@@ -152,10 +159,19 @@ Future<void> initializeAppDependencies() async {
       () => OffersRemoteDataSourceImpl(dio: serviceLocator()));
   serviceLocator.registerLazySingleton<HomeRemoteDataSource>(
       () => HomeRemoteDataSourceImpl(dioConsumer: serviceLocator()));
+  serviceLocator.registerLazySingleton<NotificationRemoteDataSource>(
+      () => NotificationRemoteDataSourceImpl(dioConsumer: serviceLocator()));
+
   // ================ REPOSITORIES ================ //
 
   serviceLocator.registerLazySingleton<SignInRepository>(
     () => SignInRepositoryImpl(
+      networkInfo: serviceLocator(),
+      remoteDataSource: serviceLocator(),
+    ),
+  );
+  serviceLocator.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(
       networkInfo: serviceLocator(),
       remoteDataSource: serviceLocator(),
     ),
@@ -242,6 +258,10 @@ Future<void> initializeAppDependencies() async {
       .registerLazySingleton(() => RasdGenerateContractUseCase(repository: serviceLocator()));
   serviceLocator.registerLazySingleton(() => RasdTrigggerSmsUseCase(repository: serviceLocator()));
   serviceLocator.registerLazySingleton(() => LoadBannersUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(
+      () => GetUnreadNotificationsCountUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(() => GetNotificationsUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(() => MarkAsReadUseCase(repository: serviceLocator()));
   serviceLocator.registerLazySingleton(() => GetPdvContractUseCase(repository: serviceLocator()));
   serviceLocator
       .registerLazySingleton(() => SignAndApproveContractUseCase(repository: serviceLocator()));
@@ -313,6 +333,13 @@ Future<void> initializeAppDependencies() async {
 
   serviceLocator.registerFactory(() => HomeCubit(
         useCase: serviceLocator(),
+        getUnreadNotificationsCountUseCase: serviceLocator(),
+      ));
+
+  serviceLocator.registerFactory(() => NotificationCubit(
+        getNotificationsUseCase: serviceLocator(),
+        markAsReadUseCase: serviceLocator(),
+        getUnreadNotificationsCountUseCase: serviceLocator(),
       ));
 
   serviceLocator.registerFactory(() => CgvCubit(

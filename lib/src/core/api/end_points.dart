@@ -52,6 +52,11 @@ class EndPoints {
   static const String processId = "$ocrBaseUrl/process_id";
   static const String processPassport = "$ocrBaseUrl/process_passport";
 
-// ================== app Version check =================== //
+  // ================== app Version check =================== //
   static String appVersion = "$baseUrl/mobile_version/last";
+
+  // ================== NOTIFICATIONS =================== //
+  static String notificationsUnread = "$baseUrl/notifications/unread";
+  static String notificationsList = "$baseUrl/notifications";
+  static String notificationsMarkAsRead(int id) => "$baseUrl/notifications/$id/read";
 }

@@ -55,6 +55,9 @@ import '../../features/sign_in/presentation/cubit/sign_in_cubit.dart';
 import '../../features/sign_in/presentation/otp_screen.dart';
 import '../../features/sign_in/presentation/sign_in_screen.dart';
 
+import '../../features/notifications/presentation/cubit/notification_cubit.dart';
+import '../../features/notifications/presentation/screens/notification_screen.dart';
+
 class Routes {
   Routes._();
 
@@ -98,6 +101,7 @@ class Routes {
   static const String changePassword = "/profile_change_password";
   static const String rasdBarCodeScanner = "/rasd_bar_code_scanner";
   static const String rasdBarSignatureSCreen = "/rasd_signature";
+  static const String notifications = "/notifications";
 }
 
 class AppRoutes {
@@ -119,8 +123,15 @@ class AppRoutes {
       case Routes.main:
         final params = args as Map<String, dynamic>?;
         return RoutesAnimationManager.slideFromRightTransition(
-          BlocProvider(
-            create: (context) => serviceLocator<HomeCubit>(),
+          MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => serviceLocator<HomeCubit>(),
+              ),
+              BlocProvider(
+                create: (context) => serviceLocator<NotificationCubit>(),
+              ),
+            ],
             child: MainScreen(
               index: params?['index'],
               fromSignin: params?['fromSignin'],
@@ -478,6 +489,13 @@ class AppRoutes {
               recto: params['recto'],
               verso: params['verso'],
             ),
+          ),
+        );
+      case Routes.notifications:
+        return RoutesAnimationManager.slideFromRightTransition(
+          BlocProvider.value(
+            value: args as NotificationCubit,
+            child: const NotificationScreen(),
           ),
         );
     }

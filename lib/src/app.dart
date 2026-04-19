@@ -15,6 +15,8 @@ import 'features/sign_in/data/data_sources/smart_pos_local_storage.dart';
 import 'features/sign_out/domain/use_cases/sign_out_use_case.dart';
 import 'features/sign_out/presentation/cubit/sign_out_cubit.dart';
 
+import 'features/notifications/presentation/cubit/notification_cubit.dart';
+
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class SmartPos extends StatelessWidget {
