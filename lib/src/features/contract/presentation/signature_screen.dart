@@ -198,7 +198,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
     }
   }
 
-  Future<void> _showSignatureModal(BuildContext context) {
+  Future<void> _showSignatureModal(BuildContext context, ContractCubit cubit) {
     // Create a new signature pad key for the modal
     final GlobalKey<SfSignaturePadState> modalSignaturePadKey = GlobalKey();
     bool modalSignatureValidated = false;
@@ -327,6 +327,20 @@ class _SignatureScreenState extends State<SignatureScreen> {
                                 _isConditionOfSignatureChecked = true;
                               });
 
+                              // Trigger activation directly
+                              cubit.editContract(
+                                  contract: widget.contract,
+                                  recto: widget.recto,
+                                  verso: widget.verso,
+                                  signature: file,
+                                  isPassport: widget.isPassport,
+                                  parentRecto: widget.parentRecto,
+                                  parentVerso: widget.parentVerso,
+                                  justifiatif: widget.justificatif,
+                                  parentIsPassport: widget.parentIsPassport);
+                              ScreenshotService.enableScreenshots();
+                              debugPrint("============ REQUESTED ============");
+
                               Navigator.of(dialogContext).pop();
                             },
                             child: Text("confirm".tr(context)),
@@ -344,52 +358,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
     );
   }
 
-  Future<void> _showConfirmationDialog(BuildContext context, ContractCubit cubit) {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            "activation_instruction".tr(context),
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text("discard".tr(context)),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text(
-                'accept'.tr(context),
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              onPressed: () async {
-                Navigator.of(context).pop();
-                // Make the API call first
-                cubit.editContract(
-                    contract: widget.contract,
-                    recto: widget.recto,
-                    verso: widget.verso,
-                    signature: signatureFile,
-                    isPassport: widget.isPassport,
-                    parentRecto: widget.parentRecto,
-                    parentVerso: widget.parentVerso,
-                    justifiatif: widget.justificatif,
-                    parentIsPassport: widget.parentIsPassport);
-                ScreenshotService.enableScreenshots();
-                debugPrint("============ REQUESTED ============");
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -575,37 +544,12 @@ class _SignatureScreenState extends State<SignatureScreen> {
                               ),
                               child: Text("signature".tr(context)),
                               onPressed: () {
-                                _showSignatureModal(context);
+                                _showSignatureModal(context, cubit);
                               },
                             ),
                           )
                         else
-                          Expanded(
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: Size(double.infinity, 56.h),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text("activate_sim".tr(context)),
-                                  SizedBox(width: 8.sp),
-                                  PulsingIcon(),
-                                ],
-                              ),
-                              onPressed: () async {
-                                if (!_isConditionOfSignatureChecked) {
-                                  AppToasts.showErrorToast(
-                                    message: "signature_approve".tr(context),
-                                    context: context,
-                                  );
-                                  return;
-                                }
-                                _showConfirmationDialog(context, cubit);
-                              },
-                            ),
-                          ),
+                          const SizedBox.shrink(),
                       ],
                     );
                   },
