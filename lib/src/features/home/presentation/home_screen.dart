@@ -42,7 +42,7 @@ class _MyHomePageState extends State<HomeScreen> {
     return BlocListener<HomeCubit, HomeState>(
       listenWhen: (previous, current) => previous.unreadCount == 0 && current.unreadCount > 0,
       listener: (context, state) {
-        _showNotificationPopup(context, state.unreadCount);
+        //_showNotificationPopup(context, state.unreadCount);
       },
       child: Scaffold(
         drawer: const HomeDrawer(),

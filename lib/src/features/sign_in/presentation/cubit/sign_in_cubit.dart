@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mobilis_smart_pos/src/app.dart';
@@ -40,8 +41,11 @@ class SignInCubit extends Cubit<SignInState> {
   }) : super(SignInInitial());
 
   // ----------- VARIABLES ------------------ //
-  TextEditingController passwordController = TextEditingController();
-  TextEditingController phoneController = TextEditingController();
+  TextEditingController passwordController =
+      kDebugMode ? TextEditingController(text: "Hello@20") : TextEditingController();
+  TextEditingController phoneController =
+      kDebugMode ? TextEditingController(text: "6 60 62 30 11") : TextEditingController();
+
   bool isObsecure = true;
   bool isDisabled = false;
   late SignInRequestParams params;

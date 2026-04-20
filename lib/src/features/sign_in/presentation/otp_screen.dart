@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,6 +9,7 @@ import 'package:mobilis_smart_pos/src/features/sign_in/data/data_sources/smart_p
 import '../domain/entities/sign_in_response.dart';
 
 import '../../../config/routing/app_routes.dart';
+import '../../../core/utils/helpers/localization_utils.dart';
 import '../../../core/commom/widgets/otp_custom_widget.dart';
 import '../../../core/utils/helpers/app_localization_helper.dart';
 import '../../../core/utils/helpers/media_query_values.dart';
@@ -108,12 +110,18 @@ class _OTPScreenState extends State<OTPScreen> {
                     }
                     if (isConsent != null && isConsent) {
                       if (passwordAge != null) {
+                        debugPrint("******************** PasswordAge: $passwordAge");
                         if (entity.shouldShow15DaysAlert) {
-                          if (await di
-                              .serviceLocator<SmartPosLocalStorage>()
-                              .shouldShowPasswordNotificationToday()) {
+                          debugPrint("******************** shouldShow15DaysAlert");
+                          if (kDebugMode ||
+                              await di
+                                  .serviceLocator<SmartPosLocalStorage>()
+                                  .shouldShowPasswordNotificationToday()) {
+                            debugPrint("******************** shouldShowPasswordNotificationToday");
                             AppToasts.showWarningToast(
-                              message: "15days_password_expiration".tr(context),
+                              message: "15days_password_expiration"
+                                  .tr(context)
+                                  .replaceFirst('{duration}', LocalizationUtils.getLocalizedDuration(context, 15)),
                               context: context,
                             );
 
@@ -129,11 +137,16 @@ class _OTPScreenState extends State<OTPScreen> {
                         }
 
                         if (entity.isInLastWeekRange) {
-                          if (await di
-                              .serviceLocator<SmartPosLocalStorage>()
-                              .shouldShowPasswordNotificationToday()) {
+                          debugPrint("******************** isInLastWeekRange");
+                          if (kDebugMode ||
+                              await di
+                                  .serviceLocator<SmartPosLocalStorage>()
+                                  .shouldShowPasswordNotificationToday()) {
+                            debugPrint("******************** shouldShowPasswordNotificationToday");
                             AppToasts.showWarningToast(
-                              message: "password_expiry_last_week".tr(context),
+                              message: "password_expiry_last_week"
+                                  .tr(context)
+                                  .replaceFirst('{duration}', LocalizationUtils.getLocalizedDuration(context, entity.daysLeftInLastWeek ?? 0)),
                               context: context,
                             );
 
@@ -151,6 +164,7 @@ class _OTPScreenState extends State<OTPScreen> {
                               (route) => false,
                               arguments: {
                                 'hasToChangePassowrdOptional': true,
+                                'daysLeft': entity.daysLeftInLastWeek,
                               },
                             );
                             return;

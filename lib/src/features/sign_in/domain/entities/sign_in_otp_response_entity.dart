@@ -163,9 +163,6 @@ class SignInOTPResponseEntity extends Equatable {
 
   /// Days left until expiration (stable, UTC)
   int? get daysLeftInLastWeek {
-    final expiry = passwordExpirationDate;
-    if (expiry == null) return null;
-
-    return expiry.difference(DateTime.now().toUtc()).inDays;
+    return daysUntilExpiration;
   }
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,6 +13,7 @@ import '../../../core/utils/helpers/app_localization_helper.dart';
 import '../../../core/utils/helpers/media_query_values.dart';
 import '../../../core/utils/ressources/app_colors.dart';
 import '../../../core/utils/ressources/app_images.dart';
+import '../../../core/utils/helpers/localization_utils.dart';
 import '../../../dependency_injection/injection_container.dart' as di;
 import '../../../services/upgrader_service.dart';
 import '../../contract/presentation/choose_card_option_screen.dart';
@@ -93,9 +95,11 @@ class _MyHomePageState extends State<MainScreen> {
               ? "password_will_expire_soon".tr(context)
               : "password_expired".tr(context),
           text: widget.hasToChangePassowrdOptional == true
-              ? "password_will_expire_instruction".tr(context)
+              ? "password_will_expire_instruction"
+                  .tr(context)
+                  .replaceFirst('{duration}', LocalizationUtils.getLocalizedDuration(context, widget.daysLeft ?? 0))
               : "password_expired_instruction".tr(context),
-          barrierDismissible: widget.hasToChangePassowrdOptional ?? false,
+          barrierDismissible: kDebugMode ? true : widget.hasToChangePassowrdOptional ?? false,
           barrierColor: Colors.black.withOpacity(.8),
           backgroundColor: context.isDarkMode ? AppColors.darkerGrey : Colors.white,
           textColor: context.isDarkMode ? Colors.white : Colors.black,
