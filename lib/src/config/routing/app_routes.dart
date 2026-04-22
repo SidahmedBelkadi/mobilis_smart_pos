@@ -473,7 +473,7 @@ class AppRoutes {
         );
       case Routes.rasdBarSignatureSCreen:
         final params = args as Map<String, dynamic>;
-        return RoutesAnimationManager.slideFromBottomTransition(
+        return RoutesAnimationManager.slideFromRightTransition(
           args: args,
           MultiBlocProvider(
             providers: [
@@ -483,11 +483,15 @@ class AppRoutes {
               BlocProvider(
                 create: (context) => serviceLocator<RasdContractCubit>(),
               ),
+              BlocProvider(
+                create: (context) => serviceLocator<CgvCubit>(),
+              ),
             ],
             child: RasdSignatureScreen(
               rasdParams: params['rasdParams'],
               recto: params['recto'],
               verso: params['verso'],
+              offerName: params['offerName'] as String?,
             ),
           ),
         );

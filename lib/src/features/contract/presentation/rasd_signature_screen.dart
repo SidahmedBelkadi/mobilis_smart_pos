@@ -1,37 +1,34 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
-import 'package:json_pretty/json_pretty.dart';
 import 'package:lottie/lottie.dart';
 import 'package:mobilis_smart_pos/src/config/routing/app_routes.dart';
 import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_app_bar.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
-import 'package:mobilis_smart_pos/src/core/utils/helpers/permissions_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/session_timeout.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/toast_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/ressources/app_colors.dart';
 import 'package:mobilis_smart_pos/src/core/utils/ressources/app_images.dart';
-import 'package:mobilis_smart_pos/src/core/utils/ressources/app_strings.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/rasd_generate_contract_params_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/rasd_request_params_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/rasd_trigger_sms_params_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/rasd/rasd_contract_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/rasd/rasd_sms_cubit.dart';
-import 'package:mobilis_smart_pos/src/features/contract/presentation/signature_screen.dart';
+import 'package:pdfx/pdfx.dart';
 import 'package:mobilis_smart_pos/src/features/sign_in/data/data_sources/smart_pos_local_storage.dart';
 import 'package:mobilis_smart_pos/src/services/screenshot_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import '../../../dependency_injection/injection_container.dart' as di;
+import 'cubit/cgv_cubit.dart';
 
 class RasdSignatureScreen extends StatefulWidget {
   const RasdSignatureScreen({
@@ -39,18 +36,22 @@ class RasdSignatureScreen extends StatefulWidget {
     required this.rasdParams,
     required this.recto,
     required this.verso,
+    this.offerName,
   });
 
   final RasdEditRequestParamsEntity rasdParams;
   final File? recto;
   final File? verso;
+  final String? offerName;
 
   @override
   State<RasdSignatureScreen> createState() => _RasdSignatureScreenState();
 }
 
+bool smsLoading = false;
+String dsaMessage = '';
+
 class _RasdSignatureScreenState extends State<RasdSignatureScreen> {
-  bool _isConditionOfSignatureChecked = false;
   static const platform = MethodChannel('sms/sms_receiver');
 
   String _smsMessage = "No message received yet.";
@@ -62,44 +63,68 @@ class _RasdSignatureScreenState extends State<RasdSignatureScreen> {
 
   late File signatureFile;
 
-  String currentDateAr = DateFormat('dd-MM-yyyy').format(DateTime.now());
-  final GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey();
-
   Timer? _smsTimer;
+  bool _isContractGenerationTriggered = false;
 
   late RasdGenerateContractParamsEntity generateContractParamsEntity;
   final String msisdnApn =
       di.serviceLocator<SmartPosLocalStorage>().getSavedLoginCredentials()!.msisdn!;
 
   int? subscriptiondId;
+  PdfControllerPinch? pdfControllerPinch;
+  bool _errorLoadingPdf = false;
+
+  Future<void> _loadPdf(Uint8List pdfBytes) async {
+    try {
+      if (pdfBytes.isEmpty) throw Exception("Empty PDF data");
+
+      final document = await PdfDocument.openData(pdfBytes);
+      if (mounted) {
+        setState(() {
+          pdfControllerPinch = PdfControllerPinch(document: Future.value(document));
+          _errorLoadingPdf = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _errorLoadingPdf = true;
+        });
+      }
+    }
+  }
 
   @override
   void initState() {
     ScreenshotService.preventScreenshotOn();
     smsLoading = false;
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final offerName = widget.offerName ?? 'SAMA';
+        context
+            .read<CgvCubit>()
+            .getDynamicCGV(offerName: offerName, lang: context.isArabicLocale ? 'AR' : 'FR');
+      }
+    });
+
     platform.setMethodCallHandler((call) async {
       if (call.method == "receivedSms") {
         _smsTimer?.cancel();
         debugPrint("=================== TIMER FOR SMS STOPPED");
 
         setState(() {
-          smsLoading = false;
           _smsMessage = call.arguments;
           checkSmsSuccess(_smsMessage, context);
         });
       }
     });
-    super.initState();
-
-    debugPrint(
-        "============= RASD CONTRACT SIGNATURE : \n ${prettyPrintJson(jsonEncode(widget.rasdParams.toJson()))}");
-
-    debugPrint("ID CARD RECTO IMAGE SIGNATURE : ${widget.recto?.path}");
-    debugPrint("ID CARD VERSO IMAGE SIGNATURE : ${widget.verso?.path}");
   }
 
   @override
   void dispose() {
+    _smsTimer?.cancel();
     ScreenshotService.preventScreenshotOff();
     super.dispose();
   }
@@ -111,8 +136,7 @@ class _RasdSignatureScreenState extends State<RasdSignatureScreen> {
     return SessionTimeout(
       child: Scaffold(
         appBar: CustomAppBar(title: "signature".tr(context)),
-        body: SingleChildScrollView(
-          child: BlocConsumer<RasdSmsCubit, RasdSmsState>(
+        body: BlocConsumer<RasdSmsCubit, RasdSmsState>(
             listener: (context, state) {
               if (state is RasdTriggerSmsFailed) {
                 setState(() {
@@ -138,11 +162,6 @@ class _RasdSignatureScreenState extends State<RasdSignatureScreen> {
                     Navigator.of(context).pushNamedAndRemoveUntil(
                         Routes.main, arguments: {'index': 1}, (route) => false);
                   }
-                  if (state is RasdGenerateContractSuccess) {
-                    Navigator.of(context)
-                        .pushNamedAndRemoveUntil(Routes.contractGenerated, (route) => false);
-                  }
-
                   if (state is RasdGenerateContractSuccess) {
                     Navigator.of(context)
                         .pushNamedAndRemoveUntil(Routes.contractGenerated, (route) => false);
@@ -174,164 +193,79 @@ class _RasdSignatureScreenState extends State<RasdSignatureScreen> {
                 },
                 builder: (context, state) {
                   if (state is RasdEditContractLoading) {
-                    return SizedBox(
-                      height: context.height - 100.h,
-                      child: Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SizedBox(
-                              height: 32.sp,
-                              width: 32.sp,
-                              child: const CircularProgressIndicator(),
-                            ),
-                            SizedBox(height: 16.sp),
-                            Text(
-                              "generating".tr(context),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
+                    return const ProcessingContractLoading();
                   }
 
                   if (state is RasdGenerateContractLoading) {
-                    return SizedBox(
-                      height: context.height,
-                      child: Center(
-                        child: SizedBox(
-                          height: 32.sp,
-                          width: 32.sp,
-                          child: const CircularProgressIndicator(),
-                        ),
-                      ),
-                    );
+                    return const ProcessingContractLoading();
                   }
                   return smsLoading
-                      ? SizedBox(
-                          height: context.height - 200.h,
-                          width: context.width,
-                          child: Center(
-                            child: Column(
-                              children: [
-                                Text(
-                                  "please_wait".tr(context),
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                                SizedBox(height: 12.sp),
-                                LottieBuilder.asset(
-                                  AppImages.smsAnim1,
-                                  height: 350.sp,
-                                  width: 350.sp,
-                                )
-                              ],
-                            ),
-                          ),
-                        )
-                      : Container(
-                          width: context.width,
-                          padding: EdgeInsets.all(32.sp),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Column(
-                                children: [
-                                  const ConditionsOfUse(
-                                    desc: AppStrings.arabicAgrement,
-                                  ),
-                                  SizedBox(height: 12.sp),
-                                  Text(
-                                    "الجزائر، في $currentDateAr\nأنا، الممضي أسفله، أؤكد أنني قرأت و وافقت على كامل شروط البيع العامة",
-                                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                        color: AppColors.primary, fontWeight: FontWeight.bold),
-                                  ),
-                                  SizedBox(height: 32.h),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(width: 1, color: AppColors.secondary),
-                                    ),
-                                    height: 200.h,
-                                    width: 300.w,
-                                    child: SfSignaturePad(
-                                      key: _signaturePadKey,
-                                      minimumStrokeWidth: 5,
-                                      maximumStrokeWidth: 6,
-                                      strokeColor: Colors.black,
-                                      backgroundColor: Colors.white,
-                                      onDrawStart: () {
-                                        setState(() {
-                                          isSignatureValidated = true;
-                                        });
-                                        return false;
-                                      },
-                                    ),
-                                  ),
-                                  EraseSignatureButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        isSignatureValidated = false;
-                                      });
-                                      _signaturePadKey.currentState!.clear();
-                                    },
-                                  ),
-                                  SizedBox(height: 24.sp),
-                                  CheckboxListTile(
-                                    title: Text(
-                                      "أوافق على إدراج توقيعي في العقد الخاص بي و كذلك في وثيقة الشروط العامة للبيع",
-                                      style: Theme.of(context).textTheme.bodySmall,
-                                    ),
-                                    value: _isConditionOfSignatureChecked,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _isConditionOfSignatureChecked = true;
-                                      });
-                                    },
-                                  ),
-                                  // SizedBox(height: 24.sp),
-                                ],
-                              ),
-                              SizedBox(height: 64.h),
-                              ElevatedButton(
-                                child: Text("confrim_sell".tr(context)),
-                                onPressed: () async {
-                                  bool hasPermission = await _requestSmsPermission();
-                                  if (!hasPermission) {
-                                    // ignore: use_build_context_synchronously
-                                    _showPermissionDeniedDialog(context);
-                                    return;
-                                  }
-
-                                  if (!isSignatureValidated) {
-                                    AppToasts.showErrorToast(
-                                      // ignore: use_build_context_synchronously
-                                      message: "required_signature".tr(context),
-                                      // ignore: use_build_context_synchronously
-                                      context: context,
-                                    );
-                                    return;
-                                  }
-
-                                  if (!_isConditionOfSignatureChecked) {
-                                    AppToasts.showErrorToast(
-                                      // ignore: use_build_context_synchronously
-                                      message: "signature_approve".tr(context),
-                                      // ignore: use_build_context_synchronously
-                                      context: context,
-                                    );
-                                    return;
-                                  }
-                                  _checkPermissionsAndShowDialog(context, cubit);
-                                },
-                              ),
-                            ],
-                          ),
+                      ? const SendingActivationSMS()
+                      : BlocConsumer<CgvCubit, CgvState>(
+                          listener: (context, cgvState) {
+                            if (cgvState is LoadCGVSucceded) {
+                              _loadPdf(cgvState.pdfBytes);
+                            }
+                            if (cgvState is LoadCGVFailed) {
+                              AppToasts.showErrorToast(
+                                  message: "CGV_indisponibles".tr(context), context: context);
+                              Navigator.of(context).pop();
+                            }
+                          },
+                          builder: (context, cgvState) {
+                            if (cgvState is LoadCGVLoading) {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+                            if (cgvState is LoadCGVSucceded) {
+                              if (pdfControllerPinch == null && !_errorLoadingPdf) {
+                                return const Center(child: CircularProgressIndicator());
+                              }
+                              final mediaQuery = MediaQuery.of(context);
+                              final appBarHeight = AppBar().preferredSize.height;
+                              final bottomNavHeight = 56.h;
+                              final availableHeight = mediaQuery.size.height -
+                                  mediaQuery.padding.top -
+                                  appBarHeight -
+                                  bottomNavHeight;
+                              return SizedBox(
+                                height: availableHeight,
+                                width: mediaQuery.size.width,
+                                child: PdfViewPinch(controller: pdfControllerPinch!),
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          },
                         );
                 },
+              );
+            },
+          ),
+        bottomNavigationBar: Container(
+          height: 56.h,
+          width: double.infinity,
+          padding: EdgeInsets.only(left: 16.sp, right: 16.sp, bottom: 8.sp, top: 8.sp),
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 4,
+                offset: const Offset(0, -2),
+              ),
+            ],
+          ),
+          child: BlocBuilder<CgvCubit, CgvState>(
+            builder: (context, cgvState) {
+              final isPdfDisplayed =
+                  cgvState is LoadCGVSucceded && pdfControllerPinch != null && !_errorLoadingPdf;
+
+              if (!isPdfDisplayed || smsLoading) {
+                return const SizedBox.shrink();
+              }
+
+              return ElevatedButton(
+                onPressed: () => _showSignatureModal(context, cubit),
+                child: Text("signature".tr(context)),
               );
             },
           ),
@@ -349,12 +283,21 @@ class _RasdSignatureScreenState extends State<RasdSignatureScreen> {
 
   void checkSmsSuccess(String message, BuildContext context) {
     debugPrint("==================== MESSAGE : $message");
+
+    final RegExp regExp2 = RegExp(r'Activation en cours');
+    if (regExp2.hasMatch(message)) {
+      return;
+    }
+
+    if (_isContractGenerationTriggered) {
+      return;
+    }
+
     setState(() {
       generateContractParamsEntity.dsaMessage = message;
     });
 
     final RegExp regExp = RegExp(r'La carte SIM (\d+) est activee, avec le numero (2136\d{8})');
-    final RegExp regExp2 = RegExp(r'Activation en cours');
     final match = regExp.firstMatch(message);
     final cubit = context.read<RasdContractCubit>();
 
@@ -365,105 +308,36 @@ class _RasdSignatureScreenState extends State<RasdSignatureScreen> {
       debugPrint("=================== COMPOSED ICCID : $iccid ");
       if (phoneNumber != null && iccid == dsaICCID) {
         generateContractParamsEntity.msisdn = phoneNumber;
-
+        _isContractGenerationTriggered = true;
         cubit.rasdGenerateContract(
             params: generateContractParamsEntity, subscriptionId: subscriptiondId!);
       }
     } else {
       debugPrint("===================== Message: $message");
-      if (!regExp2.hasMatch(message)) {
-        generateContractParamsEntity.msisdn = "FAILED";
-
-        cubit.rasdGenerateContract(
-            params: generateContractParamsEntity, subscriptionId: subscriptiondId!);
-      } else if (regExp2.hasMatch(message)) {
-      } else {
-        AppToasts.showErrorToast(message: message, context: context);
-        Navigator.of(context).pop();
-      }
+      generateContractParamsEntity.msisdn = "FAILED";
+      _isContractGenerationTriggered = true;
+      cubit.rasdGenerateContract(params: generateContractParamsEntity, subscriptionId: subscriptiondId!);
     }
   }
 
-  Future<void> _checkPermissionsAndShowDialog(BuildContext context, RasdContractCubit cubit) async {
+  Future<bool> _checkPermissionsAndActivate(
+      BuildContext context, RasdContractCubit cubit, File signature) async {
     final smsStatus = await Permission.sms.request();
-    final phoneStatus = await Permission.phone.request();
 
-    if (smsStatus.isGranted && phoneStatus.isGranted) {
-      // ignore: use_build_context_synchronously
-      _showConfirmationDialog(context, cubit);
+    if (smsStatus.isGranted) {
+      cubit.rasdEditContract(
+        params: widget.rasdParams,
+        recto: widget.recto,
+        verso: widget.verso,
+        signature: signature,
+      );
+      debugPrint("============ REQUESTED ============");
+      return true;
     } else {
-      // ignore: use_build_context_synchronously
-      _showPermissionDeniedDialog(context);
-    }
-  }
-
-  Future<void> _showConfirmationDialog(BuildContext context, RasdContractCubit cubit) {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            "activation_instruction".tr(context),
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text("discard".tr(context)),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text(
-                'accept'.tr(context),
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              onPressed: () async {
-                Navigator.of(context).pop();
-                final file = await _saveSignature();
-                setState(() {
-                  signatureFile = file;
-                });
-
-                cubit.rasdEditContract(
-                  params: widget.rasdParams,
-                  recto: widget.recto,
-                  verso: widget.verso,
-                  signature: signatureFile,
-                );
-                debugPrint("============ REQUESTED ============");
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<File> _saveSignature() async {
-    final ui.Image image = await _signaturePadKey.currentState!.toImage();
-    final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    final Uint8List imageData = byteData!.buffer.asUint8List();
-    final tempDir = await getTemporaryDirectory();
-    final file = await File('${tempDir.path}/signature.png').create();
-    await file.writeAsBytes(imageData);
-    setState(() {
-      signatureImagePath = file.path;
-    });
-    return file;
-  }
-
-  Future<bool> _requestSmsPermission() async {
-    PermissionStatus status = await PermissionsUtil.checkPermissionStatus(Permission.sms);
-    if (status.isDenied || status.isRestricted) {
-      return await PermissionsUtil.requestPermission(Permission.sms);
-    } else if (status.isPermanentlyDenied) {
+      if (!mounted) return false;
+      await _showPermissionDeniedDialog(context);
       return false;
     }
-    return status.isGranted;
   }
 
   Future<void> _showPermissionDeniedDialog(BuildContext context) {
@@ -489,6 +363,219 @@ class _RasdSignatureScreenState extends State<RasdSignatureScreen> {
           ],
         );
       },
+    );
+  }
+
+  Future<void> _showSignatureModal(BuildContext context, RasdContractCubit cubit) {
+    final GlobalKey<SfSignaturePadState> modalSignaturePadKey = GlobalKey();
+    bool modalSignatureValidated = false;
+    bool modalConditionChecked = false;
+    bool isSubmitting = false;
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Dialog(
+              child: Container(
+                padding: EdgeInsets.all(24.sp),
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.9,
+                  maxWidth: MediaQuery.of(context).size.width * 0.9,
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "signature".tr(context),
+                        style: Theme.of(context).textTheme.headlineSmall,
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 24.sp),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(width: 1, color: AppColors.secondary),
+                        ),
+                        height: 200.h,
+                        width: double.infinity,
+                        child: SfSignaturePad(
+                          key: modalSignaturePadKey,
+                          minimumStrokeWidth: 5,
+                          maximumStrokeWidth: 6,
+                          strokeColor: Colors.black,
+                          backgroundColor: Colors.white,
+                          onDrawStart: () {
+                            setModalState(() {
+                              modalSignatureValidated = true;
+                            });
+                            return false;
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 12.sp),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: () {
+                            setModalState(() {
+                              modalSignatureValidated = false;
+                            });
+                            modalSignaturePadKey.currentState!.clear();
+                          },
+                          child: const Icon(Icons.clear),
+                        ),
+                      ),
+                      SizedBox(height: 16.sp),
+                      CheckboxListTile(
+                        title: Text(
+                          "signature_approve".tr(context),
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                        value: modalConditionChecked,
+                        onChanged: (value) {
+                          setModalState(() {
+                            modalConditionChecked = value ?? false;
+                          });
+                        },
+                      ),
+                      SizedBox(height: 24.sp),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(dialogContext).pop();
+                            },
+                            child: Text("discard".tr(context)),
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              if (isSubmitting) return;
+                              if (!modalSignatureValidated) {
+                                AppToasts.showErrorToast(
+                                  message: "required_signature".tr(context),
+                                  context: dialogContext,
+                                );
+                                return;
+                              }
+
+                              if (!modalConditionChecked) {
+                                AppToasts.showErrorToast(
+                                  message: "signature_approve".tr(context),
+                                  context: dialogContext,
+                                );
+                                return;
+                              }
+
+                              final ui.Image image = await modalSignaturePadKey.currentState!.toImage();
+                              final ByteData? byteData =
+                                  await image.toByteData(format: ui.ImageByteFormat.png);
+                              final Uint8List imageData = byteData!.buffer.asUint8List();
+                              final tempDir = await getTemporaryDirectory();
+                              final file = await File('${tempDir.path}/signature.png').create();
+                              await file.writeAsBytes(imageData);
+
+                              setModalState(() {
+                                isSubmitting = true;
+                              });
+                              setState(() {
+                                signatureFile = file;
+                                signatureImagePath = file.path;
+                                isSignatureValidated = true;
+                              });
+
+                              final didTriggerActivation =
+                                  await _checkPermissionsAndActivate(context, cubit, file);
+                              if (didTriggerActivation && mounted) {
+                                Navigator.of(dialogContext).pop();
+                              }
+                              if (mounted) {
+                                setModalState(() {
+                                  isSubmitting = false;
+                                });
+                              }
+                            },
+                            child: isSubmitting
+                                ? SizedBox(
+                                    height: 16.sp,
+                                    width: 16.sp,
+                                    child: const CircularProgressIndicator(strokeWidth: 2),
+                                  )
+                                : Text("confirm".tr(context)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class SendingActivationSMS extends StatelessWidget {
+  const SendingActivationSMS({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: context.height,
+      width: context.width,
+      child: Center(
+        child: Column(
+          children: [
+            Text(
+              "please_wait".tr(context),
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            SizedBox(height: 12.sp),
+            LottieBuilder.asset(
+              AppImages.smsAnim1,
+              height: 350.sp,
+              width: 350.sp,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ProcessingContractLoading extends StatelessWidget {
+  const ProcessingContractLoading({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: 32.sp,
+            width: 32.sp,
+            child: const CircularProgressIndicator(),
+          ),
+          SizedBox(height: 16.sp),
+          Text(
+            "generating".tr(context),
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
     );
   }
 }

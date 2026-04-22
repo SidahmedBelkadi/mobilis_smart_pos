@@ -136,7 +136,10 @@ class _RasdBarCodeScannerState extends State<RasdBarCodeScanner> {
                     subscriptionTypeId: selectedOffer['offerId'],
                   );
                   debugPrint(prettyPrintJson(jsonEncode(params.toJson())));
-                  _navigateToSignatureScreen(params);
+                  _navigateToSignatureScreen(
+                    params,
+                    selectedOffer['offerName'] as String?,
+                  );
                 }
               },
             ),
@@ -146,11 +149,15 @@ class _RasdBarCodeScannerState extends State<RasdBarCodeScanner> {
     );
   }
 
-  _navigateToSignatureScreen(RasdEditRequestParamsEntity rasdParams) {
+  _navigateToSignatureScreen(
+    RasdEditRequestParamsEntity rasdParams,
+    String? offerName,
+  ) {
     Navigator.of(context).pushNamed(Routes.rasdBarSignatureSCreen, arguments: {
       'rasdParams': rasdParams,
       'recto': widget.rectoImage,
       'verso': widget.versoImage,
+      'offerName': offerName,
     });
   }
 }
