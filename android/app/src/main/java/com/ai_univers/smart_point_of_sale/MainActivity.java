@@ -35,6 +35,10 @@ import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.net.Socket;
+import android.provider.Settings;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -360,9 +364,11 @@ public class MainActivity extends FlutterActivity {
         boolean isEmulator = isRunningOnEmulator();
         boolean isDebugger = isDebuggerAttached();
         boolean isRooted = isDeviceRooted();
+        boolean isFrida = isFridaRunning();
+        boolean isHooked = isHookingDetected();
+        boolean isUsbDebug = isUsbDebuggingEnabled();
 
-
-        return isEmulator || isDebugger || isRooted;
+        return isEmulator || isDebugger || isRooted || isFrida || isHooked || isUsbDebug;
     }
 
     private boolean isRunningOnEmulator() {
@@ -430,7 +436,75 @@ public class MainActivity extends FlutterActivity {
             return true;
         }
 
+        // Check for Magisk
+        if (isPackageInstalled("com.topjohnwu.magisk")) {
+            return true;
+        }
+
         return false;
+    }
+
+    private boolean isFridaRunning() {
+        try {
+            // Check for Frida's default port
+            Socket socket = new Socket("localhost", 27042);
+            socket.close();
+            return true;
+        } catch (Exception e) {
+            // Port not open
+        }
+
+        // Check for Frida files in common locations
+        String[] fridaFiles = {
+                "frida-server",
+                "re.frida.server",
+                "frida-agent"
+        };
+        for (String file : fridaFiles) {
+            if (new File("/data/local/tmp/" + file).exists()) return true;
+        }
+
+        // Check for frida-agent in maps
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("/proc/self/maps"));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.toLowerCase().contains("frida-agent") || line.toLowerCase().contains("frida-server")) {
+                    reader.close();
+                    return true;
+                }
+            }
+            reader.close();
+        } catch (Exception e) {
+            // Ignore
+        }
+
+        return false;
+    }
+
+    private boolean isHookingDetected() {
+        try {
+            throw new Exception("SecurityCheck");
+        } catch (Exception e) {
+            int zygoteInitCount = 0;
+            for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+                if (stackTraceElement.getClassName().equals("com.android.internal.os.ZygoteInit")) {
+                    zygoteInitCount++;
+                    if (zygoteInitCount == 2) {
+                        return true;
+                    }
+                }
+                if (stackTraceElement.getClassName().equals("com.saurik.substrate.MSHookMethod") ||
+                        stackTraceElement.getClassName().equals("de.robv.android.xposed.XposedBridge")) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean isUsbDebuggingEnabled() {
+        return Settings.Global.getInt(getContentResolver(), Settings.Global.ADB_ENABLED, 0) != 0;
     }
 
     // Helper method to check if a command can be executed
