@@ -7,6 +7,8 @@ import 'package:mobilis_smart_pos/src/core/commom/widgets/custom_app_bar.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/app_localization_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart';
 import 'package:mobilis_smart_pos/src/core/utils/ressources/app_colors.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../features/home/presentation/cubit/home_cubit.dart';
 import '../../data/models/notification_model.dart';
 import '../cubit/notification_cubit.dart';
@@ -452,12 +454,23 @@ class _NotificationTile extends StatelessWidget {
                         color: Colors.grey.withOpacity(0.05),
                         borderRadius: BorderRadius.circular(16.sp),
                       ),
-                      child: Text(
-                        description,
+                      child: Linkify(
+                        text: description,
+                        onOpen: (link) async {
+                          final uri = Uri.parse(link.url);
+                          if (await canLaunchUrl(uri)) {
+                            await launchUrl(uri, mode: LaunchMode.externalApplication);
+                          }
+                        },
                         style: TextStyle(
                           fontSize: 16.sp,
                           height: 1.6,
                           color: context.isDarkMode ? Colors.white70 : Colors.black87,
+                        ),
+                        linkStyle: TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
                         ),
                       ),
                     ),
