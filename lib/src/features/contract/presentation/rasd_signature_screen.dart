@@ -136,7 +136,8 @@ class _RasdSignatureScreenState extends State<RasdSignatureScreen> {
     return SessionTimeout(
       child: Scaffold(
         appBar: CustomAppBar(title: "signature".tr(context)),
-        body: BlocConsumer<RasdSmsCubit, RasdSmsState>(
+        body: SafeArea(
+          child: BlocConsumer<RasdSmsCubit, RasdSmsState>(
             listener: (context, state) {
               if (state is RasdTriggerSmsFailed) {
                 setState(() {
@@ -176,8 +177,7 @@ class _RasdSignatureScreenState extends State<RasdSignatureScreen> {
                         dsaMessage: dsaMessage,
                       );
                     });
-                    debugPrint(
-                        "================ STATE IS SUCCESS ==============================  ");
+                    debugPrint("================ STATE IS SUCCESS ==============================  ");
                     final rasdTriggerSmsParamsEntity = RasdTriggerSmsParamsEntity(
                       subscritpionId: response.subscriptionID,
                       msisdnAPN: msisdnApn,
@@ -240,34 +240,37 @@ class _RasdSignatureScreenState extends State<RasdSignatureScreen> {
               );
             },
           ),
-        bottomNavigationBar: Container(
-          height: 56.h,
-          width: double.infinity,
-          padding: EdgeInsets.only(left: 16.sp, right: 16.sp, bottom: 8.sp, top: 8.sp),
-          decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 4,
-                offset: const Offset(0, -2),
-              ),
-            ],
-          ),
-          child: BlocBuilder<CgvCubit, CgvState>(
-            builder: (context, cgvState) {
-              final isPdfDisplayed =
-                  cgvState is LoadCGVSucceded && pdfControllerPinch != null && !_errorLoadingPdf;
-
-              if (!isPdfDisplayed || smsLoading) {
-                return const SizedBox.shrink();
-              }
-
-              return ElevatedButton(
-                onPressed: () => _showSignatureModal(context, cubit),
-                child: Text("signature".tr(context)),
-              );
-            },
+        ),
+        bottomNavigationBar: SafeArea(
+          child: Container(
+            height: 56.h,
+            width: double.infinity,
+            padding: EdgeInsets.only(left: 16.sp, right: 16.sp, bottom: 8.sp, top: 8.sp),
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
+            child: BlocBuilder<CgvCubit, CgvState>(
+              builder: (context, cgvState) {
+                final isPdfDisplayed =
+                    cgvState is LoadCGVSucceded && pdfControllerPinch != null && !_errorLoadingPdf;
+  
+                if (!isPdfDisplayed || smsLoading) {
+                  return const SizedBox.shrink();
+                }
+  
+                return ElevatedButton(
+                  onPressed: () => _showSignatureModal(context, cubit),
+                  child: Text("signature".tr(context)),
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -316,7 +319,8 @@ class _RasdSignatureScreenState extends State<RasdSignatureScreen> {
       debugPrint("===================== Message: $message");
       generateContractParamsEntity.msisdn = "FAILED";
       _isContractGenerationTriggered = true;
-      cubit.rasdGenerateContract(params: generateContractParamsEntity, subscriptionId: subscriptiondId!);
+      cubit.rasdGenerateContract(
+          params: generateContractParamsEntity, subscriptionId: subscriptiondId!);
     }
   }
 
@@ -474,7 +478,8 @@ class _RasdSignatureScreenState extends State<RasdSignatureScreen> {
                                 return;
                               }
 
-                              final ui.Image image = await modalSignaturePadKey.currentState!.toImage();
+                              final ui.Image image =
+                                  await modalSignaturePadKey.currentState!.toImage();
                               final ByteData? byteData =
                                   await image.toByteData(format: ui.ImageByteFormat.png);
                               final Uint8List imageData = byteData!.buffer.asUint8List();

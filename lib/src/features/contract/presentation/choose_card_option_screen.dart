@@ -64,133 +64,140 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: context.isDarkMode ? AppColors.darkGrey : Colors.white,
-        actions: [
-          Container(
-            padding: EdgeInsets.all(12.sp),
-            width: context.width,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Text(
-                  "nationality_with_point".tr(context),
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-                SizedBox(width: 30.sp),
-                DropdownButton<String>(
-                  value: nationalitiesValues.contains(nationality) ? nationality : null,
-                  items: [
-                    // Existing nationalities
-                    ...nationalitiesValues.map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(
-                          value == 'DZ' ? 'dz_client'.tr(context) : 'rasd_client'.tr(context),
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      );
-                    }).toList(),
-                    // Add the "Coming Soon" option
-                    DropdownMenuItem<String>(
-                      value: null, // Set value to null to make it unselectable
-                      enabled: false, // Disable the option
-                      child: Text(
-                        'coming_soon'.tr(context),
-                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                              color: Colors.grey, // Grey out the text to indicate it's disabled
+    return SafeArea(
+      child: Column(
+        children: [
+          AppBar(
+            backgroundColor: context.isDarkMode ? AppColors.darkGrey : Colors.white,
+            actions: [
+              Container(
+                padding: EdgeInsets.all(12.sp),
+                width: context.width,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Text(
+                      "nationality_with_point".tr(context),
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    SizedBox(width: 30.sp),
+                    DropdownButton<String>(
+                      value: nationalitiesValues.contains(nationality) ? nationality : null,
+                      items: [
+                        // Existing nationalities
+                        ...nationalitiesValues.map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value == 'DZ' ? 'dz_client'.tr(context) : 'rasd_client'.tr(context),
+                              style: Theme.of(context).textTheme.bodyLarge,
                             ),
-                      ),
+                          );
+                        }).toList(),
+                        // Add the "Coming Soon" option
+                        DropdownMenuItem<String>(
+                          value: null, // Set value to null to make it unselectable
+                          enabled: false, // Disable the option
+                          child: Text(
+                            'coming_soon'.tr(context),
+                            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                                  color: Colors.grey, // Grey out the text to indicate it's disabled
+                                ),
+                          ),
+                        ),
+                      ],
+                      onChanged: (String? newValue) {
+                        if (newValue != null) {
+                          setState(() {
+                            nationality = newValue;
+                          });
+                        }
+                      },
                     ),
                   ],
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      setState(() {
-                        nationality = newValue;
-                      });
-                    }
-                  },
                 ),
-              ],
-            ),
-          )
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          height: context.height - 80.sp,
-          width: context.width,
-          padding: EdgeInsets.all(20.sp),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "chooseCard".tr(context),
-                style: Theme.of(context).textTheme.bodyLarge!.copyWith(color: AppColors.primary),
-                textAlign: TextAlign.center,
-              ),
-              Lottie.asset(AppImages.chooseScanAnimation, height: 320.h, width: 320.w),
-              SizedBox(height: 32.h),
-              nationality == 'RASD'
-                  ? Column(
-                      children: [
-                        AppElevatedButtonWithText(
-                          text: "identityCard".tr(context),
-                          onPressed: () async {
-                            bool hasPermission = await _requestCameraPermission();
-                            if (hasPermission) {
-                              // ignore: use_build_context_synchronously
-                              Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) {
-                                  return const RasdOcrScreen();
-                                },
-                              ));
-                            } else {
-                              // ignore: use_build_context_synchronously
-                              await _showPermissionDeniedDialog(context);
-                            }
-                          },
-                        ),
-                      ],
-                    )
-                  : Column(
-                      children: [
-                        AppElevatedButtonWithText(
-                          text: "identityCard".tr(context),
-                          onPressed: () async {
-                            bool hasPermission = await _requestCameraPermission();
-                            if (hasPermission) {
-                              setState(() {
-                                docType = "id_card";
-                              });
-                              await startOCR(docType: "id_card");
-                            } else {
-                              await _showPermissionDeniedDialog(context);
-                            }
-                          },
-                        ),
-                        SizedBox(height: 16.h),
-                        AppElevatedButtonWithText(
-                          text: "passport".tr(context),
-                          onPressed: () async {
-                            bool hasPermission = await _requestCameraPermission();
-                            if (hasPermission) {
-                              setState(() {
-                                docType = "passport";
-                              });
-                              await startOCR(docType: "passport");
-                            } else {
-                              await _showPermissionDeniedDialog(context);
-                            }
-                          },
-                        ),
-                      ],
-                    )
+              )
             ],
           ),
-        ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Container(
+                height: context.height - 80.sp,
+                width: context.width,
+                padding: EdgeInsets.all(20.sp),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "chooseCard".tr(context),
+                      style:
+                          Theme.of(context).textTheme.bodyLarge!.copyWith(color: AppColors.primary),
+                      textAlign: TextAlign.center,
+                    ),
+                    Lottie.asset(AppImages.chooseScanAnimation, height: 320.h, width: 320.w),
+                    SizedBox(height: 32.h),
+                    nationality == 'RASD'
+                        ? Column(
+                            children: [
+                              AppElevatedButtonWithText(
+                                text: "identityCard".tr(context),
+                                onPressed: () async {
+                                  bool hasPermission = await _requestCameraPermission();
+                                  if (hasPermission) {
+                                    // ignore: use_build_context_synchronously
+                                    Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) {
+                                        return const RasdOcrScreen();
+                                      },
+                                    ));
+                                  } else {
+                                    // ignore: use_build_context_synchronously
+                                    await _showPermissionDeniedDialog(context);
+                                  }
+                                },
+                              ),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              AppElevatedButtonWithText(
+                                text: "identityCard".tr(context),
+                                onPressed: () async {
+                                  bool hasPermission = await _requestCameraPermission();
+                                  if (hasPermission) {
+                                    setState(() {
+                                      docType = "id_card";
+                                    });
+                                    await startOCR(docType: "id_card");
+                                  } else {
+                                    await _showPermissionDeniedDialog(context);
+                                  }
+                                },
+                              ),
+                              SizedBox(height: 16.h),
+                              AppElevatedButtonWithText(
+                                text: "passport".tr(context),
+                                onPressed: () async {
+                                  bool hasPermission = await _requestCameraPermission();
+                                  if (hasPermission) {
+                                    setState(() {
+                                      docType = "passport";
+                                    });
+                                    await startOCR(docType: "passport");
+                                  } else {
+                                    await _showPermissionDeniedDialog(context);
+                                  }
+                                },
+                              ),
+                            ],
+                          )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

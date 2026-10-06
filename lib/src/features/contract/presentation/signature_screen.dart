@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -358,8 +357,6 @@ class _SignatureScreenState extends State<SignatureScreen> {
     );
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<ContractCubit>();
@@ -372,8 +369,9 @@ class _SignatureScreenState extends State<SignatureScreen> {
             isActionEnabled: false,
             automaticallyImplyLeading: false,
           ),
-          body: Container(
-            width: context.width,
+          body: SafeArea(
+            child: Container(
+              width: context.width,
             padding: EdgeInsets.zero,
             child: BlocConsumer<SmsCubit, SmsState>(
               listener: (context, state) {
@@ -497,64 +495,67 @@ class _SignatureScreenState extends State<SignatureScreen> {
               },
             ),
           ),
-          bottomNavigationBar: Container(
-            height: 56.h,
-            width: double.infinity,
-            padding: EdgeInsets.only(
-              left: 16.sp,
-              right: 16.sp,
-              bottom: 8.sp,
-              top: 8.sp,
-            ),
-            decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 4,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-            ),
-            child: BlocBuilder<CgvCubit, CgvState>(
-              builder: (context, cgvState) {
-                // Only show button if PDF is successfully loaded and displayed
-                final isPdfDisplayed =
-                    cgvState is LoadCGVSucceded && pdfControllerPinch != null && !_errorLoadingPdf;
-
-                if (!isPdfDisplayed) {
-                  return const SizedBox.shrink();
-                }
-
-                return BlocBuilder<ContractCubit, ContractState>(
-                  builder: (context, state) {
-                    if (state is EditContractLoading || state is GenerateContractLoading) {
-                      return const SizedBox.shrink();
-                    }
-                    if (smsLoading) {
-                      return const SizedBox.shrink();
-                    }
-                    return Row(
-                      children: [
-                        if (!isSignatureValidated)
-                          Expanded(
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: Size(double.infinity, 56.h),
+        ),
+          bottomNavigationBar: SafeArea(
+            child: Container(
+              height: 56.h,
+              width: double.infinity,
+              padding: EdgeInsets.only(
+                left: 16.sp,
+                right: 16.sp,
+                bottom: 8.sp,
+                top: 8.sp,
+              ),
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: BlocBuilder<CgvCubit, CgvState>(
+                builder: (context, cgvState) {
+                  // Only show button if PDF is successfully loaded and displayed
+                  final isPdfDisplayed =
+                      cgvState is LoadCGVSucceded && pdfControllerPinch != null && !_errorLoadingPdf;
+  
+                  if (!isPdfDisplayed) {
+                    return const SizedBox.shrink();
+                  }
+  
+                  return BlocBuilder<ContractCubit, ContractState>(
+                    builder: (context, state) {
+                      if (state is EditContractLoading || state is GenerateContractLoading) {
+                        return const SizedBox.shrink();
+                      }
+                      if (smsLoading) {
+                        return const SizedBox.shrink();
+                      }
+                      return Row(
+                        children: [
+                          if (!isSignatureValidated)
+                            Expanded(
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize: Size(double.infinity, 56.h),
+                                ),
+                                child: Text("signature".tr(context)),
+                                onPressed: () {
+                                  _showSignatureModal(context, cubit);
+                                },
                               ),
-                              child: Text("signature".tr(context)),
-                              onPressed: () {
-                                _showSignatureModal(context, cubit);
-                              },
-                            ),
-                          )
-                        else
-                          const SizedBox.shrink(),
-                      ],
-                    );
-                  },
-                );
-              },
+                            )
+                          else
+                            const SizedBox.shrink(),
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           ),
         ),

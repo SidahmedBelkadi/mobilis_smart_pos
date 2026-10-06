@@ -15,11 +15,13 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(
-        title: "profile_info".tr(context),
-      ),
-      body: const ProfilePersonalInformations(),
+    return Column(
+      children: [
+        CustomAppBar(
+          title: "profile_info".tr(context),
+        ),
+        const Expanded(child: ProfilePersonalInformations()),
+      ],
     );
   }
 }

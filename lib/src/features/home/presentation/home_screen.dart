@@ -44,36 +44,33 @@ class _MyHomePageState extends State<HomeScreen> {
       listener: (context, state) {
         //_showNotificationPopup(context, state.unreadCount);
       },
-      child: Scaffold(
-        drawer: const HomeDrawer(),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              const CustomGreenClipper(),
-              Container(
-                height: context.height - 180,
-                padding: EdgeInsets.fromLTRB(24.sp, 0, 24.sp, 24.sp),
-                width: context.width,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    if (EndPoints.baseUrl != dotenv.env['BASE_URL_DEV'])
-                      HomeBannersBlocBuilder(
-                        currentIndex: currentIndex,
-                        onPageChanged: (index) {
-                          setState(() {
-                            currentIndex = index;
-                          });
-                        },
-                      ),
-                    SizedBox(height: 24.sp),
-                    const HomeIcons(),
-                    SizedBox(height: 24.sp),
-                  ],
-                ),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            const CustomGreenClipper(),
+            Container(
+              height: context.height - 180,
+              padding: EdgeInsets.fromLTRB(24.sp, 0, 24.sp, 24.sp),
+              width: context.width,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  if (EndPoints.baseUrl != dotenv.env['BASE_URL_DEV'])
+                    HomeBannersBlocBuilder(
+                      currentIndex: currentIndex,
+                      onPageChanged: (index) {
+                        setState(() {
+                          currentIndex = index;
+                        });
+                      },
+                    ),
+                  SizedBox(height: 24.sp),
+                  const HomeIcons(),
+                  SizedBox(height: 24.sp),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -356,7 +356,7 @@
   "password_expiry_last_week": "Warning! Your password is about to expire. Update it now.",
   "day_singular": "1 day",
   "day_plural": "{n} days",
-  "CLIENT_BLACKLISTED": "This client is currently blacklisted and cannot proceed with this operation.",
+ "CLIENT_BLACKLISTED": "You cannot proceed with this operation.",
   "CLIENT_HAS_REACHED_SIM_LIMIT": "This client has reached the maximum limit",
   "new_notifications": "New Notifications",
   "you_have_unread_notifications": "You have {count} unread notifications.",

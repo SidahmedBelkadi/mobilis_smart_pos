@@ -358,7 +358,7 @@
   "CGV_indisponibles": "شروط البيع العامة غير متوفرة",
   "15days_password_expiration": "ستنتهي صلاحية كلمة المرور الخاصة بك خلال {duration}",
   "password_expiry_last_week": "انتبه! كلمة المرور على وشك الانتهاء. قم بتحديثها فورًا.",
-  "CLIENT_BLACKLISTED": "هذا العميل مدرج في القائمة السوداء ولا يمكنه متابعة هذه العملية.",
+  "CLIENT_BLACKLISTED": "لا يمكنكم متابعة هذه العملية.",
   "CLIENT_HAS_REACHED_SIM_LIMIT": "هذا العميل بلغ الحد الأقصى المسموح به",
   "new_notifications": "إشعارات جديدة",
   "you_have_unread_notifications": "لديك {count} إشعارات غير مقروءة.",

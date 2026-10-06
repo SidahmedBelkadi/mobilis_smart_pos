@@ -19,3 +19,8 @@ macos/Flutter/ephemeral/
 *.iml
 *.apk
 *.aab
+
+# Docs (local only)
+docs/
+*.md
+!README.md

@@ -356,7 +356,7 @@
   "CGV_indisponibles": "Conditions générales de vente indisponibles",
   "15days_password_expiration": "Votre mot de passe expirera dans {duration}",
   "password_expiry_last_week": "Attention ! Votre mot de passe arrive à expiration. Mettez-le à jour maintenant.",
-  "CLIENT_BLACKLISTED": "Ce client est actuellement sur liste noire et ne peut pas poursuivre cette opération.",
+"CLIENT_BLACKLISTED": "Vous ne pouvez pas poursuivre cette opération.",
   "CLIENT_HAS_REACHED_SIM_LIMIT": "Ce client a atteint la limite maximale.",
   "new_notifications": "Nouvelles Notifications",
   "you_have_unread_notifications": "Vous avez {count} notifications non lues.",

@@ -95,9 +95,8 @@ class _MyHomePageState extends State<MainScreen> {
               ? "password_will_expire_soon".tr(context)
               : "password_expired".tr(context),
           text: widget.hasToChangePassowrdOptional == true
-              ? "password_will_expire_instruction"
-                  .tr(context)
-                  .replaceFirst('{duration}', LocalizationUtils.getLocalizedDuration(context, widget.daysLeft ?? 0))
+              ? "password_will_expire_instruction".tr(context).replaceFirst('{duration}',
+                  LocalizationUtils.getLocalizedDuration(context, widget.daysLeft ?? 0))
               : "password_expired_instruction".tr(context),
           barrierDismissible: kDebugMode ? true : widget.hasToChangePassowrdOptional ?? false,
           barrierColor: Colors.black.withOpacity(.8),
@@ -165,13 +164,15 @@ class _MyHomePageState extends State<MainScreen> {
       child: PopScope(
         canPop: false,
         child: Scaffold(
-          drawer: const HomeDrawer(),
-          bottomNavigationBar: CustomAppBottomNavBar(
-            currentIndex: screenIndex,
-            onTap: (index) => setState(
-              () {
-                screenIndex = index;
-              },
+          drawer: screenIndex == 1 ? null : const HomeDrawer(),
+          bottomNavigationBar: SafeArea(
+            child: CustomAppBottomNavBar(
+              currentIndex: screenIndex,
+              onTap: (index) => setState(
+                () {
+                  screenIndex = index;
+                },
+              ),
             ),
           ),
           body: screens[screenIndex],

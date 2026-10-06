@@ -40,12 +40,14 @@ class _SignInScreenState extends State<SignInScreen> {
     return PopScope(
       canPop: false,
       child: Scaffold(
-        bottomNavigationBar: Padding(
-          padding: EdgeInsets.all(16.sp),
-          child: Image.asset(
-            AppImages.mobilisWithYou,
-            height: 50.sp,
-            width: 50.sp,
+        bottomNavigationBar: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.all(16.sp),
+            child: Image.asset(
+              AppImages.mobilisWithYou,
+              height: 50.sp,
+              width: 50.sp,
+            ),
           ),
         ),
         appBar: AppBar(
@@ -97,167 +99,169 @@ class _SignInScreenState extends State<SignInScreen> {
             },
           ),
         ),
-        body: SingleChildScrollView(
-          child: SizedBox(
-            height: context.height,
-            width: context.width,
-            child: Padding(
-              padding: EdgeInsets.all(20.sp),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  // MOBILIS LOGO IMAGE
-                  Image.asset(
-                    context.isDarkMode ? AppImages.msPosLogoVBlack : AppImages.msPosLogoV,
-                    height: 200.h,
-                    width: 200.w,
-                  ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: SizedBox(
+              height: context.height,
+              width: context.width,
+              child: Padding(
+                padding: EdgeInsets.all(20.sp),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    // MOBILIS LOGO IMAGE
+                    Image.asset(
+                      context.isDarkMode ? AppImages.msPosLogoVBlack : AppImages.msPosLogoV,
+                      height: 200.h,
+                      width: 200.w,
+                    ),
 
-                  SizedBox(height: 24.sp),
+                    SizedBox(height: 24.sp),
 
-                  Text(
-                    "signInTitle".tr(context),
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: AppColors.primary,
-                        ),
-                  ),
+                    Text(
+                      "signInTitle".tr(context),
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color: AppColors.primary,
+                          ),
+                    ),
 
-                  SizedBox(height: 32.sp),
+                    SizedBox(height: 32.sp),
 
-                  // --- FROM + BUTTON
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // --- SIGNIN FORM
+                    // --- FROM + BUTTON
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // --- SIGNIN FORM
 
-                      Form(
-                        key: formKey,
-                        child: Column(
-                          children: [
-                            // ---- MSISDN FIELD
+                        Form(
+                          key: formKey,
+                          child: Column(
+                            children: [
+                              // ---- MSISDN FIELD
 
-                            Directionality(
-                              textDirection: TextDirection.ltr,
-                              child: AppTextFormField(
-                                label: "msisdnLabel".tr(context),
-                                prefixText: "(+213 🇩🇿)  ",
-                                validationType: InputType.PHONE,
-                                keyboardType: TextInputType.phone,
-                                suffixIcon: Icons.phone_android,
-                                textEditingController: cubit.phoneController,
-                              ),
-                            ),
-
-                            SizedBox(height: 16.h),
-
-                            // ---- PASSWORD FIELD
-                            BlocBuilder<SignInCubit, SignInState>(
-                              builder: (context, state) {
-                                return AppTextFormField(
-                                  label: "password".tr(context),
-                                  suffixIcon: cubit.isObsecure
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                  isObsecure: cubit.isObsecure,
-                                  onSuffixTap: () => cubit.onObsecureClicked(),
-                                  textEditingController: cubit.passwordController,
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      Align(
-                        alignment:
-                            context.isArabicLocale ? Alignment.centerLeft : Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () => Navigator.of(context)
-                              .pushNamed(Routes.forgotPassword, arguments: {"msisdn": null}),
-                          child: Text(
-                            "forgotPassword".tr(context),
-                            style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.bold,
+                              Directionality(
+                                textDirection: TextDirection.ltr,
+                                child: AppTextFormField(
+                                  label: "msisdnLabel".tr(context),
+                                  prefixText: "(+213 🇩🇿)  ",
+                                  validationType: InputType.PHONE,
+                                  keyboardType: TextInputType.phone,
+                                  suffixIcon: Icons.phone_android,
+                                  textEditingController: cubit.phoneController,
                                 ),
+                              ),
+
+                              SizedBox(height: 16.h),
+
+                              // ---- PASSWORD FIELD
+                              BlocBuilder<SignInCubit, SignInState>(
+                                builder: (context, state) {
+                                  return AppTextFormField(
+                                    label: "password".tr(context),
+                                    suffixIcon: cubit.isObsecure
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off_outlined,
+                                    isObsecure: cubit.isObsecure,
+                                    onSuffixTap: () => cubit.onObsecureClicked(),
+                                    textEditingController: cubit.passwordController,
+                                  );
+                                },
+                              ),
+                            ],
                           ),
                         ),
-                      ),
 
-                      SizedBox(height: 24.h),
+                        Align(
+                          alignment:
+                              context.isArabicLocale ? Alignment.centerLeft : Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () => Navigator.of(context)
+                                .pushNamed(Routes.forgotPassword, arguments: {"msisdn": null}),
+                            child: Text(
+                              "forgotPassword".tr(context),
+                              style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ),
+                        ),
 
-                      // --- SIGNIN BUTTON
-                      BlocConsumer<SignInCubit, SignInState>(
-                        listener: (context, state) {
-                          if (state is SignInSuccessful) {
-                            final isFirstLogin = state.signInResponseEntity.isFirstLogin;
-                            if (isFirstLogin != null && isFirstLogin == true) {
-                              AppToasts.showInfoToast(
-                                message: "USER_HAS_TO_CHANGE_DEFAULT_PASSWORD".tr(context),
-                                context: context,
-                                onAutoCompleteCompleted: (p0) {
-                                  Navigator.of(context).pushNamed(Routes.forgotPassword,
-                                      arguments: {"msisdn": cubit.phoneController.text});
-                                },
-                              );
-                            } else {
-                              AppToasts.showSuccessToast(
-                                message: "code_has_been_sent".tr(context),
-                                context: context,
-                              );
-                              Navigator.of(context).pushNamed(Routes.otp, arguments: {
-                                'params': cubit.params,
-                                'responseParams': state.signInResponseEntity
-                              });
+                        SizedBox(height: 24.h),
+
+                        // --- SIGNIN BUTTON
+                        BlocConsumer<SignInCubit, SignInState>(
+                          listener: (context, state) {
+                            if (state is SignInSuccessful) {
+                              final isFirstLogin = state.signInResponseEntity.isFirstLogin;
+                              if (isFirstLogin != null && isFirstLogin == true) {
+                                AppToasts.showInfoToast(
+                                  message: "USER_HAS_TO_CHANGE_DEFAULT_PASSWORD".tr(context),
+                                  context: context,
+                                  onAutoCompleteCompleted: (p0) {
+                                    Navigator.of(context).pushNamed(Routes.forgotPassword,
+                                        arguments: {"msisdn": cubit.phoneController.text});
+                                  },
+                                );
+                              } else {
+                                AppToasts.showSuccessToast(
+                                  message: "code_has_been_sent".tr(context),
+                                  context: context,
+                                );
+                                Navigator.of(context).pushNamed(Routes.otp, arguments: {
+                                  'params': cubit.params,
+                                  'responseParams': state.signInResponseEntity
+                                });
+                              }
+                            } else if (state is SignInFailed) {
+                              if (state.message == "USER_HAS_TO_CHANGE_DEFAULT_PASSWORD") {
+                                AppToasts.showInfoToast(
+                                  message: "USER_HAS_TO_CHANGE_DEFAULT_PASSWORD".tr(context),
+                                  context: context,
+                                  onAutoCompleteCompleted: (p0) {
+                                    Navigator.of(context).pushNamed(Routes.forgotPassword,
+                                        arguments: {"msisdn": cubit.phoneController.text});
+                                  },
+                                );
+                              } else if (state.message.contains('REDIRECT_TO_CHANGE_PASSWORD')) {
+                                AppToasts.showInfoToast(
+                                  message: "USER_HAS_TO_CHANGE_PASSWORD".tr(context),
+                                  context: context,
+                                  onAutoCompleteCompleted: (p0) {
+                                    Navigator.of(context).pushNamed(Routes.forgotPassword,
+                                        arguments: {"msisdn": cubit.phoneController.text});
+                                  },
+                                );
+                              } else {
+                                AppToasts.showErrorToast(
+                                  message: state.message.tr(context),
+                                  context: context,
+                                );
+                              }
                             }
-                          } else if (state is SignInFailed) {
-                            if (state.message == "USER_HAS_TO_CHANGE_DEFAULT_PASSWORD") {
-                              AppToasts.showInfoToast(
-                                message: "USER_HAS_TO_CHANGE_DEFAULT_PASSWORD".tr(context),
-                                context: context,
-                                onAutoCompleteCompleted: (p0) {
-                                  Navigator.of(context).pushNamed(Routes.forgotPassword,
-                                      arguments: {"msisdn": cubit.phoneController.text});
-                                },
-                              );
-                            } else if (state.message.contains('REDIRECT_TO_CHANGE_PASSWORD')) {
-                              AppToasts.showInfoToast(
-                                message: "USER_HAS_TO_CHANGE_PASSWORD".tr(context),
-                                context: context,
-                                onAutoCompleteCompleted: (p0) {
-                                  Navigator.of(context).pushNamed(Routes.forgotPassword,
-                                      arguments: {"msisdn": cubit.phoneController.text});
-                                },
-                              );
-                            } else {
-                              AppToasts.showErrorToast(
-                                message: state.message.tr(context),
-                                context: context,
-                              );
+                          },
+                          builder: (context, state) {
+                            if (state is SignInLoading) {
+                              return const LoadingButton();
                             }
-                          }
-                        },
-                        builder: (context, state) {
-                          if (state is SignInLoading) {
-                            return const LoadingButton();
-                          }
 
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Button(
-                                cubit: cubit,
-                                formKey: formKey,
-                              ),
-                              SizedBox(height: 8.h),
-                              const VersionWidget(),
-                            ],
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Button(
+                                  cubit: cubit,
+                                  formKey: formKey,
+                                ),
+                                SizedBox(height: 8.h),
+                                const VersionWidget(),
+                              ],
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
