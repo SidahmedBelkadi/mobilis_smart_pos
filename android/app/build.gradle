@@ -80,6 +80,8 @@ android {
 tasks.withType(KotlinCompile).all {
     kotlinOptions {
         freeCompilerArgs += ["-Xskip-metadata-version-check"]
+        // Same bytecode target as compileOptions above (Java 1.8)
+        jvmTarget = "1.8"
     }
 }
 

@@ -13,6 +13,7 @@ import 'package:mobilis_smart_pos/src/features/home/presentation/cubit/home_cubi
 import 'package:mobilis_smart_pos/src/features/invoices/presentation/cubit/retry_activation/retry_activation_cubit.dart';
 
 import '../../core/animation/routes_animation_manager.dart';
+import '../../core/security/device_security_config.dart';
 import '../../dependency_injection/injection_container.dart';
 import '../../features/OCR/presentation/cubit/ocr_cubit.dart';
 import '../../features/OCR/presentation/id_ocr_screen.dart';
@@ -35,6 +36,7 @@ import '../../features/contract/presentation/ocr/parent_mrz_ocr.dart';
 import '../../features/contract/presentation/parent_contract_screen.dart';
 import '../../features/contract/presentation/parent_preparation_screen.dart';
 import '../../features/contract/presentation/signature_screen.dart';
+import '../../features/device_security/presentation/device_security_diagnostic_screen.dart';
 import '../../features/e-payment/presentation/e-payment_screen.dart';
 import '../../features/e-rselli/presentation/e-rselli_screen.dart';
 import '../../features/forgot_password/presentation/cubit/forgot_password_cubit.dart';
@@ -102,6 +104,7 @@ class Routes {
   static const String rasdBarCodeScanner = "/rasd_bar_code_scanner";
   static const String rasdBarSignatureSCreen = "/rasd_signature";
   static const String notifications = "/notifications";
+  static const String deviceSecurityDiagnostic = "/device_security_diagnostic";
 }
 
 class AppRoutes {
@@ -501,6 +504,11 @@ class AppRoutes {
             value: args as NotificationCubit,
             child: const NotificationScreen(),
           ),
+        );
+      case Routes.deviceSecurityDiagnostic:
+        if (!DeviceSecurityConfig.diagnosticEnabled) return null;
+        return RoutesAnimationManager.slideFromRightTransition(
+          const DeviceSecurityDiagnosticScreen(),
         );
     }
     return null;

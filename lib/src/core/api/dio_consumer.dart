@@ -5,9 +5,11 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter/material.dart';
+import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 import '../../dependency_injection/injection_container.dart' as di;
 import '../error/exception.dart';
+import '../security/device_signature_interceptor.dart';
 import 'api_consumer.dart';
 import 'dio_interceptor.dart';
 import 'end_points.dart';
@@ -38,7 +40,15 @@ class DioConsumer extends ApiConsumer {
       ..connectTimeout = const Duration(seconds: 60)
       ..followRedirects = false;
 
+    // The debug logger is registered first in the DI; move it last so it
+    // prints the request as actually sent (token and X-* signature headers).
+    final loggers = client.interceptors.whereType<PrettyDioLogger>().toList();
+    client.interceptors.removeWhere((interceptor) => interceptor is PrettyDioLogger);
+
     client.interceptors.add(di.serviceLocator<DioInterceptor>());
+    // After DioInterceptor so the signed request already carries its final headers.
+    client.interceptors.add(di.serviceLocator<DeviceSignatureInterceptor>());
+    client.interceptors.addAll(loggers);
   }
 
   @override

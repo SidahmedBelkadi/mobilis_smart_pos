@@ -4,6 +4,8 @@ import 'package:mobilis_smart_pos/src/core/api/end_points.dart';
 import '../../utils/helpers/media_query_values.dart';
 import 'package:package_info_plus/package_info_plus.dart'; // Import package_info_plus
 
+import '../../../config/routing/app_routes.dart';
+import '../../security/device_security_config.dart';
 import '../../utils/ressources/app_colors.dart';
 
 class VersionWidget extends StatefulWidget {
@@ -32,6 +34,16 @@ class VersionWidgetState extends State<VersionWidget> {
 
   @override
   Widget build(BuildContext context) {
+    // Long press opens the device security diagnostic (internal builds only).
+    return GestureDetector(
+      onLongPress: DeviceSecurityConfig.diagnosticEnabled
+          ? () => Navigator.of(context).pushNamed(Routes.deviceSecurityDiagnostic)
+          : null,
+      child: _buildBadge(context),
+    );
+  }
+
+  Widget _buildBadge(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: context.isDarkMode ? AppColors.primary : AppColors.secondaryLight,

@@ -27,6 +27,7 @@ import androidx.core.content.ContextCompat;
 import com.ai_univers.smart_point_of_sale.Reader.NFCResultCallback;
 import com.ai_univers.smart_point_of_sale.Reader.vision.BarcodeScannerActivity;
 import com.ai_univers.smart_point_of_sale.Reader.vision.ScanActivity;
+import com.ai_univers.smart_point_of_sale.security.DeviceSecurityPlugin;
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanner;
 import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions;
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanning;
@@ -146,6 +147,9 @@ public class MainActivity extends FlutterActivity {
                         }
                 );
 
+
+        // Device key (Android Keystore) used to sign API requests
+        new DeviceSecurityPlugin(getApplicationContext(), getFlutterEngine().getDartExecutor().getBinaryMessenger()).register();
 
         // Set up Otp method channel
         MethodChannel otpMethodChannel = new MethodChannel(getFlutterEngine().getDartExecutor().getBinaryMessenger(), OTP_CHANNEL);

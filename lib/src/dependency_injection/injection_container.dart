@@ -37,6 +37,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/api/dio_interceptor.dart';
 import '../core/networking/network_info.dart';
+import '../core/security/device_enrollment_api.dart';
+import '../core/security/device_key_store.dart';
+import '../core/security/device_security_config.dart';
+import '../core/security/device_security_service.dart';
+import '../core/security/device_signature_interceptor.dart';
 import '../core/utils/helpers/launch_helper.dart';
 import '../core/utils/helpers/route_helper.dart';
 import '../features/OCR/data/data_sources/ocr_data_source.dart';
@@ -120,6 +125,22 @@ Future<void> initializeAppDependencies() async {
   // serviceLocator.registerLazySingleton<DioConsumer>(() => DioConsumer(client: dio));
 
   serviceLocator.registerLazySingleton(() => UpgraderService(dio: serviceLocator()));
+
+  // =============== DEVICE SECURITY ============= //
+  serviceLocator.registerLazySingleton<DeviceKeyStore>(() => MethodChannelDeviceKeyStore());
+  serviceLocator.registerLazySingleton<DeviceEnrollmentApi>(
+    () => DeviceSecurityConfig.useMockBackend
+        ? MockDeviceEnrollmentApi()
+        : RemoteDeviceEnrollmentApi(dio: dio),
+  );
+  serviceLocator.registerLazySingleton(() => DeviceSecurityService(
+        keyStore: serviceLocator(),
+        api: serviceLocator(),
+        storage: serviceLocator(),
+      ));
+  serviceLocator.registerLazySingleton(
+    () => DeviceSignatureInterceptor(client: dio, security: serviceLocator()),
+  );
 
   // =============== CORE ====================== //
   serviceLocator
