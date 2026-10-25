@@ -7,11 +7,16 @@ import android.nfc.tech.IsoDep;
 import android.util.Log;
 
 import com.ai_univers.smart_point_of_sale.Reader.ActiveAuthentication;
+import com.ai_univers.smart_point_of_sale.Reader.BacFailedException;
+import com.ai_univers.smart_point_of_sale.Reader.DzNfcReaderImpl;
 import com.ai_univers.smart_point_of_sale.Reader.NfcDiagnostics;
+import com.ai_univers.smart_point_of_sale.Reader.NfcProgressListener;
 import com.ai_univers.smart_point_of_sale.utils.ImageUtil;
 import com.google.android.datatransport.runtime.logging.Logging;
 
+import net.sf.scuba.smartcards.CardFileInputStream;
 import net.sf.scuba.smartcards.CardService;
+import net.sf.scuba.smartcards.CardServiceException;
 
 import org.jmrtd.BACKey;
 import org.jmrtd.PassportService;
@@ -37,6 +42,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -51,6 +57,11 @@ public class DzNfcModel {
     private final boolean extractFacialImage;
     private final boolean extractSignature;
 
+    private static final int ISO_DEP_TIMEOUT_MS = 5000;
+
+    /** Files fully read during a previous attempt on the same document (see readFile). */
+    private final Map<Short, byte[]> fileCache = new HashMap<>();
+
     public DzNfcModel(Context context, String documentType, String documentNumber, String dateOfBirth, String dateOfExpiry, boolean extractFacialImage, boolean extractSignature) {
         this.context = context;
         this.documentType = documentType;
@@ -61,7 +72,10 @@ public class DzNfcModel {
         this.extractSignature = extractSignature;
     }
 
-    public JSONObject readNfcData(IsoDep isoDep) throws Exception {
+    public JSONObject readNfcData(IsoDep isoDep, NfcProgressListener progressListener) throws Exception {
+        Progress progress = new Progress(progressListener);
+        progress.report(2, NfcProgressListener.STEP_AUTH);
+
         NfcDiagnostics diagnostics = new NfcDiagnostics(context, documentType);
         diagnostics.logTag(isoDep);
 
@@ -75,36 +89,52 @@ public class DzNfcModel {
         BACKey bacKey = new BACKey(this.documentNumber, dateOfBirth, this.dateOfExpiry);
 
         passportService.open();
+        // Active Authentication makes the chip compute an RSA signature: give it time
+        try {
+            isoDep.setTimeout(ISO_DEP_TIMEOUT_MS);
+        } catch (Exception ignored) {
+        }
 
         // Debug builds only: probes EF.CardAccess and tries PACE before falling back to BAC
         boolean paceUsed = diagnostics.probeCardAccessAndPace(passportService, bacKey);
 
         passportService.sendSelectApplet(paceUsed);
         if (!paceUsed) {
-            passportService.doBAC(bacKey);
+            try {
+                passportService.doBAC(bacKey);
+            } catch (CardServiceException e) {
+                // The card answered but refused the keys: the MRZ does not match this document
+                if (!DzNfcReaderImpl.isTagLost(e, isoDep)) {
+                    throw new BacFailedException(e);
+                }
+                throw e;
+            }
         }
         diagnostics.logAccessControl(paceUsed);
+        progress.report(10, NfcProgressListener.STEP_READ);
 
 
         JSONObject certificateJson = new JSONObject();
 
         // Keep the raw bytes: EF.SOD hashes must be computed on them, not on a re-encoding
-        byte[] dg1Bytes = readBytes(passportService.getInputStream(PassportService.EF_DG1));
+        byte[] dg1Bytes = readFile(passportService, PassportService.EF_DG1, progress, 10, 20);
         DG1File dg1File = new DG1File(new ByteArrayInputStream(dg1Bytes));
         MRZInfo mrzInfo = dg1File.getMRZInfo();
 
-        // Keep the raw bytes: EF.SOD hashes must be computed on them, not on a re-encoding
-        byte[] dg11Bytes = readBytes(passportService.getInputStream(PassportService.EF_DG11));
+        byte[] dg11Bytes = readFile(passportService, PassportService.EF_DG11, progress, 20, 45);
         DG11File dg11File = new DG11File(new ByteArrayInputStream(dg11Bytes));
 
-        // Keep the raw bytes: EF.SOD hashes must be computed on them, not on a re-encoding
-        byte[] dg12Bytes = readBytes(passportService.getInputStream(PassportService.EF_DG12));
+        byte[] dg12Bytes = readFile(passportService, PassportService.EF_DG12, progress, 45, 60);
         DG12File dg12File = new DG12File(new ByteArrayInputStream(dg12Bytes));
 
-        SODFile sod = new SODFile(passportService.getInputStream(PassportService.EF_SOD));
+        SODFile sod = new SODFile(new ByteArrayInputStream(readFile(passportService, PassportService.EF_SOD, progress, 60, 78)));
 
-        // Rejects cloned and emulated chips: the chip must sign a fresh random challenge
-        ActiveAuthentication.verify(passportService, sod);
+        // Rejects cloned and emulated chips: the chip on the phone right now must sign
+        // a fresh random challenge (never skipped, even when the files come from the cache)
+        byte[] dg15Bytes = readFile(passportService, PassportService.EF_DG15, progress, 78, 85);
+        progress.report(85, NfcProgressListener.STEP_VERIFY);
+        ActiveAuthentication.verify(passportService, sod, dg15Bytes);
+        progress.report(95, NfcProgressListener.STEP_VERIFY);
 
         byte[] facialImageBytes = null;
         byte[] signatureImageBytes = null;
@@ -219,8 +249,54 @@ public class DzNfcModel {
         // Add the signer certificate details
         resultJson.put("certificate", certificateJson);
 
-
+        progress.report(100, NfcProgressListener.STEP_VERIFY);
         return resultJson;
+    }
+
+    /**
+     * Reads a whole elementary file, reporting progress between [from] and [to].
+     *
+     * Complete files are kept for the next attempt, so after a lost connection only
+     * the missing part is read again. This is safe: BAC with the same MRZ already
+     * proves it is the same document, and Active Authentication is always redone live.
+     */
+    private byte[] readFile(PassportService service, short fid, Progress progress, int from, int to) throws Exception {
+        byte[] cached = fileCache.get(fid);
+        if (cached != null) {
+            progress.report(to, NfcProgressListener.STEP_READ);
+            return cached;
+        }
+
+        CardFileInputStream in = service.getInputStream(fid);
+        int length = Math.max(in.getLength(), 1);
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream(length);
+        byte[] data = new byte[1024];
+        int nRead;
+        while ((nRead = in.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
+            progress.report(from + (to - from) * Math.min(buffer.size(), length) / length, NfcProgressListener.STEP_READ);
+        }
+        byte[] bytes = buffer.toByteArray();
+        fileCache.put(fid, bytes);
+        return bytes;
+    }
+
+    /** Forwards progress only when it moves forward, to keep the UI updates light. */
+    private static final class Progress {
+        private final NfcProgressListener listener;
+        private int last = -1;
+        private String lastStep;
+
+        Progress(NfcProgressListener listener) {
+            this.listener = listener;
+        }
+
+        void report(int percent, String step) {
+            if (listener == null || (percent <= last && step.equals(lastStep))) return;
+            last = Math.max(last, percent);
+            lastStep = step;
+            listener.onProgress(last, step);
+        }
     }
 
     private String bytesToHex(byte[] bytes) {

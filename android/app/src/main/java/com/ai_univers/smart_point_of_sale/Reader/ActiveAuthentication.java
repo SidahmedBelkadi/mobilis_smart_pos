@@ -20,8 +20,6 @@ import org.jmrtd.PassportService;
 import org.jmrtd.lds.SODFile;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.security.KeyFactory;
 import java.security.MessageDigest;
 import java.security.PublicKey;
@@ -51,13 +49,12 @@ public final class ActiveAuthentication {
      * @throws DocumentVerificationException the chip is not genuine (reject the document)
      * @throws CardServiceException          communication error (the user may scan again)
      */
-    public static void verify(PassportService service, SODFile sod) throws Exception {
+    public static void verify(PassportService service, SODFile sod, byte[] dg15) throws Exception {
         // 1. DG15 must be protected by EF.SOD, otherwise a fake chip supplies its own key
         byte[] expectedHash = sod.getDataGroupHashes().get(15);
         if (expectedHash == null) {
             throw fail("DG15 not listed in EF.SOD (document without Active Authentication)");
         }
-        byte[] dg15 = readAll(service.getInputStream(PassportService.EF_DG15));
         byte[] actualHash = MessageDigest.getInstance(sod.getDigestAlgorithm()).digest(dg15);
         if (!MessageDigest.isEqual(expectedHash, actualHash)) {
             throw fail("DG15 hash does not match EF.SOD");
@@ -135,15 +132,5 @@ public final class ActiveAuthentication {
     private static DocumentVerificationException fail(String reason) {
         Log.w(TAG, "Document rejected: " + reason);
         return new DocumentVerificationException(reason);
-    }
-
-    private static byte[] readAll(InputStream in) throws Exception {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int read;
-        while ((read = in.read(buffer)) != -1) {
-            out.write(buffer, 0, read);
-        }
-        return out.toByteArray();
     }
 }

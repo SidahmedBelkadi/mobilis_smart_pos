@@ -28,8 +28,16 @@ class NFCService {
       });
       return Map<String, dynamic>.from(json.decode(result));
     } on PlatformException catch (e) {
-      debugPrint("=================== Error starting NFC scan: ${e.message} ${e.details}");
-      return {'error': 'Failed to start NFC scan: ${e.message}'};
+      debugPrint("=================== Error starting NFC scan: ${e.code} ${e.message}");
+      // code: BAC_FAILED, DOCUMENT_NOT_AUTHENTIC, NFC_READ_ERROR or CANCELLED
+      return {'error': 'Failed to start NFC scan: ${e.message}', 'code': e.code};
     }
+  }
+
+  /// Ends the pending [readNfc] session (its result becomes CANCELLED).
+  static Future<void> cancel() async {
+    try {
+      await platform.invokeMethod('cancelNfc');
+    } on PlatformException catch (_) {}
   }
 }

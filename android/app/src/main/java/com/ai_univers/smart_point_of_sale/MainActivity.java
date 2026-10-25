@@ -56,9 +56,12 @@ public class MainActivity extends FlutterActivity {
     private static final String SMS_CHANNEL = "sms/sms_receiver";
     private static final String OTP_CHANNEL = "otp_receiver";
     private NfcAdapter nfcAdapter;
-    private boolean isNfcReadCompleted = false;
+    private static final int MAX_NFC_READ_ERRORS = 3;
+    /** Pending "readNfc" call, null when no NFC session is open. */
+    private volatile MethodChannel.Result nfcSessionResult;
+    private volatile boolean nfcReading = false;
+    private int nfcReadErrors = 0;
 
-    private boolean resultSent = false;
     private static final int OCR_REQUEST_CODE = 1001;
     private static final int BARCODE_REQUEST_CODE = 2002;
     private static final int MLKIT_SCANNER_REQUEST_CODE = 5555;
@@ -103,12 +106,12 @@ public class MainActivity extends FlutterActivity {
                                     // Initialize Kameleon SDK with the received parameters
                                     Kameleon.initialize(MainActivity.this, documentType, documentNumber, dateOfBirth, dateOfExpiry, extractFacialImage, extractSignature);
 
-                                    // Reset flags
-                                    resultSent = false;
-                                    isNfcReadCompleted = false;
-
                                     // Start the NFC read process
                                     startNfcReading(result);
+                                } else if (call.method.equals("cancelNfc")) {
+                                    stopNfcReading();
+                                    finishNfcSession(null, "CANCELLED", "NFC reading cancelled");
+                                    result.success(null);
                                 } else if (call.method.equals("securityCheck")) {
                                     boolean securityStatus = checkSecurity();
                                     result.success(securityStatus);
@@ -314,54 +317,108 @@ public class MainActivity extends FlutterActivity {
 
 
 
+    /**
+     * One NFC session per "readNfc" call: the Flutter result stays pending until the
+     * document is read, definitively refused or the session is cancelled. When the
+     * card is moved away, the session keeps waiting for it: no need to rescan the MRZ.
+     */
     private void startNfcReading(MethodChannel.Result result) {
-        NfcAdapter.ReaderCallback readerCallback = new NfcAdapter.ReaderCallback() {
+        // A previous session still waiting (screen reopened): close it first
+        finishNfcSession(null, "CANCELLED", "Replaced by a new NFC session");
+        nfcSessionResult = result;
+        nfcReadErrors = 0;
+        nfcReading = false;
+        enableNfcReaderMode();
+    }
+
+    private void enableNfcReaderMode() {
+        if (nfcAdapter == null || nfcSessionResult == null) return;
+        nfcAdapter.enableReaderMode(this, this::onNfcTagDiscovered,
+                NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK | NfcAdapter.FLAG_READER_NFC_A | NfcAdapter.FLAG_READER_NFC_B, null);
+    }
+
+    private void stopNfcReading() {
+        if (nfcAdapter != null) {
+            nfcAdapter.disableReaderMode(this);
+        }
+    }
+
+    /** Runs on the NFC thread: the whole chip read happens here. */
+    private void onNfcTagDiscovered(Tag tag) {
+        if (nfcSessionResult == null || nfcReading) return;
+        IsoDep isoDep = IsoDep.get(tag);
+        if (isoDep == null) return;
+
+        nfcReading = true;
+        sendNfcEvent("reading_started", null);
+        Kameleon.readNFC(isoDep, (percent, step) -> {
+            HashMap<String, Object> progress = new HashMap<>();
+            progress.put("progress", percent);
+            progress.put("step", step);
+            sendNfcEvent("reading_progress", progress);
+        }, new NFCResultCallback() {
             @Override
-            public void onTagDiscovered(Tag tag) {
+            public void onSuccess(JSONObject json) {
+                stopNfcReading();
+                finishNfcSession(json.toString(), null, null);
+            }
 
-                if (isNfcReadCompleted || resultSent) {
-                    return;  // Prevent further NFC reads if reading is already completed
+            @Override
+            public void onError(String code, String errorMessage, boolean retryable) {
+                Log.w("MainActivity", "NFC read failed: " + code + " " + errorMessage);
+                if (NFCResultCallback.READ_ERROR.equals(code) && ++nfcReadErrors >= MAX_NFC_READ_ERRORS) {
+                    // The card stays on the phone but keeps failing: stop asking to present it again
+                    retryable = false;
+                    code = NFCResultCallback.NFC_READ_ERROR;
                 }
-
-                IsoDep isoDep = IsoDep.get(tag);
-                if (isoDep != null) {
-                    try {
-                        // Notify Flutter that NFC reading has started
-                        runOnUiThread(() -> new MethodChannel(getFlutterEngine().getDartExecutor().getBinaryMessenger(), CHANNEL)
-                                .invokeMethod("reading_started", null));
-
-                        // Read the NFC data using the Kameleon SDK
-                        Kameleon.readNFC(isoDep, new NFCResultCallback() {
-                            @Override
-                            public void onSuccess(JSONObject json) {
-                                runOnUiThread(() -> result.success(json.toString()));
-                                resultSent = true;
-                                isNfcReadCompleted = true;
-                            }
-
-                            @Override
-                            public void onError(String errorMessage) {
-                                runOnUiThread(() -> result.error("NFC_READ_ERROR", errorMessage, null));
-                                resultSent = true;
-                            }
-                        });
-                    } catch (Exception e) {
-                        Log.e("MainActivity", "Error reading NFC tag : " + e, e);
-                        runOnUiThread(() -> result.error("NFC_READ_ERROR", "Failed to read NFC tag" + e, null));
-                    }
+                if (retryable) {
+                    nfcReading = false;
+                    HashMap<String, Object> event = new HashMap<>();
+                    event.put("reason", code);
+                    sendNfcEvent("reading_interrupted", event);
+                } else {
+                    stopNfcReading();
+                    finishNfcSession(null, code, errorMessage);
                 }
             }
-        };
+        });
+    }
 
-        nfcAdapter.enableReaderMode(this, readerCallback, NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK | NfcAdapter.FLAG_READER_NFC_A | NfcAdapter.FLAG_READER_NFC_B, null);
+    private void sendNfcEvent(String method, Object arguments) {
+        runOnUiThread(() -> {
+            if (getFlutterEngine() != null) {
+                new MethodChannel(getFlutterEngine().getDartExecutor().getBinaryMessenger(), CHANNEL)
+                        .invokeMethod(method, arguments);
+            }
+        });
+    }
+
+    /** Replies once to the pending "readNfc" call: [json] on success, otherwise the error [code]. */
+    private void finishNfcSession(String json, String code, String message) {
+        MethodChannel.Result result = nfcSessionResult;
+        nfcSessionResult = null;
+        nfcReading = false;
+        if (result == null) return;
+        runOnUiThread(() -> {
+            if (json != null) {
+                result.success(json);
+            } else {
+                result.error(code, message, null);
+            }
+        });
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (nfcAdapter != null) {
-            nfcAdapter.disableReaderMode(this);
-        }
+        stopNfcReading();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Reader mode is dropped in onPause: resume a session that is still waiting for the card
+        enableNfcReaderMode();
     }
 
     private boolean checkSecurity() {

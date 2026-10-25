@@ -384,5 +384,14 @@
   "device_not_supported_message": "This phone cannot prove that it runs the official Smart POS app (hardware attestation unavailable). Please use another recent Android phone with Google services.",
   "device_not_genuine_title": "App or device not compliant",
   "device_not_genuine_message": "This is not the official version of the app, or the phone has been modified (rooted or unverified system). Please install the official Smart POS app on an unmodified phone.",
-  "device_check_retry_failed": "The check failed again."
+  "device_check_retry_failed": "The check failed again.",
+  "nfc_step_auth": "Connecting to the chip…",
+  "nfc_step_read": "Reading the document…",
+  "nfc_step_verify": "Verifying the document…",
+  "nfc_connection_lost_title": "Connection with the document lost",
+  "nfc_connection_lost_message": "Place the document against the phone again and keep it still. Reading will resume automatically, no need to scan the document again.",
+  "nfc_read_failed_title": "Reading failed",
+  "nfc_bac_failed_message": "The chip could not be opened. Make sure this is the same document that was scanned, then try again.",
+  "nfc_read_failed_message": "The document chip could not be read. Try again, keeping the document still against the phone.",
+  "nfc_rescan_document": "Scan the document again"
 }

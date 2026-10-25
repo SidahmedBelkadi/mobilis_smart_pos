@@ -17,7 +17,7 @@ public class DzNfcViewModel {
 
     public String readNfcTag(IsoDep isoDep) {
         try {
-            String result = String.valueOf(nfcModel.readNfcData(isoDep));
+            String result = String.valueOf(nfcModel.readNfcData(isoDep, null));
             return result;
         } catch (Exception e) {
             return "Error reading NFC tag: " + e.getMessage();

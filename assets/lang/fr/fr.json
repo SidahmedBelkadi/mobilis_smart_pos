@@ -384,5 +384,14 @@
   "device_not_supported_message": "Ce téléphone ne peut pas prouver qu'il exécute l'application officielle Smart POS (attestation matérielle indisponible). Utilisez un autre téléphone Android récent avec les services Google.",
   "device_not_genuine_title": "Application ou appareil non conforme",
   "device_not_genuine_message": "Cette application n'est pas la version officielle, ou le téléphone a été modifié (root, système non vérifié). Installez l'application officielle Smart POS sur un téléphone non modifié.",
-  "device_check_retry_failed": "La vérification a encore échoué."
+  "device_check_retry_failed": "La vérification a encore échoué.",
+  "nfc_step_auth": "Connexion à la puce…",
+  "nfc_step_read": "Lecture du document…",
+  "nfc_step_verify": "Vérification du document…",
+  "nfc_connection_lost_title": "Connexion avec le document perdue",
+  "nfc_connection_lost_message": "Replacez le document contre le téléphone et gardez-le immobile. La lecture reprendra automatiquement, inutile de scanner à nouveau le document.",
+  "nfc_read_failed_title": "Échec de la lecture",
+  "nfc_bac_failed_message": "La puce n'a pas pu être ouverte. Vérifiez qu'il s'agit bien du document scanné, puis réessayez.",
+  "nfc_read_failed_message": "La puce du document n'a pas pu être lue. Réessayez en gardant le document immobile contre le téléphone.",
+  "nfc_rescan_document": "Scanner à nouveau le document"
 }
