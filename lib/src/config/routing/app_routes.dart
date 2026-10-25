@@ -36,6 +36,7 @@ import '../../features/contract/presentation/ocr/parent_mrz_ocr.dart';
 import '../../features/contract/presentation/parent_contract_screen.dart';
 import '../../features/contract/presentation/parent_preparation_screen.dart';
 import '../../features/contract/presentation/signature_screen.dart';
+import '../../features/device_security/presentation/device_not_supported_screen.dart';
 import '../../features/device_security/presentation/device_security_diagnostic_screen.dart';
 import '../../features/e-payment/presentation/e-payment_screen.dart';
 import '../../features/e-rselli/presentation/e-rselli_screen.dart';
@@ -105,6 +106,7 @@ class Routes {
   static const String rasdBarSignatureSCreen = "/rasd_signature";
   static const String notifications = "/notifications";
   static const String deviceSecurityDiagnostic = "/device_security_diagnostic";
+  static const String deviceNotSupported = "/device_not_supported";
 }
 
 class AppRoutes {
@@ -504,6 +506,10 @@ class AppRoutes {
             value: args as NotificationCubit,
             child: const NotificationScreen(),
           ),
+        );
+      case Routes.deviceNotSupported:
+        return RoutesAnimationManager.slideFromRightTransition(
+          DeviceNotSupportedScreen(code: args as String? ?? 'ATTESTATION_INVALID'),
         );
       case Routes.deviceSecurityDiagnostic:
         if (!DeviceSecurityConfig.diagnosticEnabled) return null;

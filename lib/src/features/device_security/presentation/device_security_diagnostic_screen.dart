@@ -11,7 +11,7 @@ import '../../../core/security/device_security_service.dart';
 import '../../../core/security/request_canonicalizer.dart';
 import '../../../dependency_injection/injection_container.dart';
 
-/// Internal tool (debug builds or DEVICE_SECURITY_DIAGNOSTIC=true) to check on
+/// Internal tool (debug builds only) to check on
 /// a real phone that key generation, attestation and signing work, and to
 /// export a report + test vector for the backend.
 ///

@@ -379,5 +379,10 @@
   "you_are_all_caught_up": "Vous êtes à jour !",
   "refresh": "Actualiser",
   "oops_something_went_wrong": "Oups ! Quelque chose s'est mal passé",
-  "retry": "Réessayer"
+  "retry": "Réessayer",
+  "device_not_supported_title": "Appareil non pris en charge",
+  "device_not_supported_message": "Ce téléphone ne peut pas prouver qu'il exécute l'application officielle Smart POS (attestation matérielle indisponible). Utilisez un autre téléphone Android récent avec les services Google.",
+  "device_not_genuine_title": "Application ou appareil non conforme",
+  "device_not_genuine_message": "Cette application n'est pas la version officielle, ou le téléphone a été modifié (root, système non vérifié). Installez l'application officielle Smart POS sur un téléphone non modifié.",
+  "device_check_retry_failed": "La vérification a encore échoué."
 }

@@ -24,14 +24,9 @@ class DioConsumer extends ApiConsumer {
   }
 
   void _initializeClient() {
-    final httpClientAdapter = IOHttpClientAdapter();
-    httpClientAdapter.createHttpClient = () {
-      final client = HttpClient();
-      client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
-      return client;
-    };
-
-    client.httpClientAdapter = httpClientAdapter;
+    // Default TLS validation: certificates are checked (no bypass), so the
+    // traffic cannot be read or modified by a proxy.
+    client.httpClientAdapter = IOHttpClientAdapter();
     client.options
       ..baseUrl = EndPoints.baseUrl
       ..responseType = ResponseType.plain

@@ -61,6 +61,7 @@ class FakeEnrollmentApi implements DeviceEnrollmentApi {
   int registrations = 0;
   DeviceRegistrationRequest? lastRequest;
   bool fail = false;
+  DeviceEnrollmentRefused? refuse;
 
   @override
   String backendId = 'fake';
@@ -78,6 +79,7 @@ class FakeEnrollmentApi implements DeviceEnrollmentApi {
 
   @override
   Future<DeviceRegistration> register(DeviceRegistrationRequest request) async {
+    if (refuse != null) throw refuse!;
     registrations++;
     lastRequest = request;
     return DeviceRegistration(deviceId: 'device-$registrations', status: 'ACTIVE');
@@ -190,5 +192,31 @@ void main() {
       deviceId: 'device-1',
     );
     expect(headers[SignedRequestHeaders.signature], await keyStore.sign(canonical));
+  });
+
+  test('a refused attestation is not retried during the same run', () async {
+    api.refuse = const DeviceEnrollmentRefused('DEVICE_NOT_SUPPORTED', 'UNTRUSTED_ROOT');
+    final service = newService();
+
+    expect(await service.ensureEnrolled(), isFalse);
+    expect(service.refusal?.code, 'DEVICE_NOT_SUPPORTED');
+    expect(await service.ensureEnrolled(), isFalse);
+    expect(api.challenges, 1);
+  });
+
+  test('automatic re-enrollment happens at most once per app start', () async {
+    final service = newService();
+    await service.ensureEnrolled();
+
+    expect(await service.reEnroll(), isTrue);
+    expect(service.deviceId, 'device-2');
+    expect(await service.reEnroll(), isFalse);
+    expect(api.registrations, 2);
+  });
+
+  test('the clock can be synced from the server Date header', () async {
+    final service = newService();
+    service.syncClockFromServerDate(phoneNow.add(const Duration(seconds: 30)));
+    expect(service.nowMs, phoneNow.millisecondsSinceEpoch + 30000);
   });
 }

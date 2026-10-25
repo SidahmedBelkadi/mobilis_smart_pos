@@ -381,5 +381,10 @@
   "you_are_all_caught_up": "لقد قرأت كل شيء!",
   "refresh": "تحديث",
   "oops_something_went_wrong": "عذراً! حدث خطأ ما",
-  "retry": "إعادة المحاولة"
+  "retry": "إعادة المحاولة",
+  "device_not_supported_title": "الجهاز غير مدعوم",
+  "device_not_supported_message": "لا يمكن لهذا الهاتف إثبات أنه يشغّل تطبيق Smart POS الرسمي (التحقق عبر العتاد غير متوفر). يرجى استخدام هاتف أندرويد حديث آخر مزوّد بخدمات Google.",
+  "device_not_genuine_title": "التطبيق أو الجهاز غير مطابق",
+  "device_not_genuine_message": "هذا ليس الإصدار الرسمي للتطبيق، أو أن الهاتف معدَّل (روت أو نظام غير موثَّق). يرجى تثبيت تطبيق Smart POS الرسمي على هاتف غير معدَّل.",
+  "device_check_retry_failed": "فشل التحقق مرة أخرى."
 }

@@ -71,6 +71,20 @@ class DeviceRegistration {
       );
 }
 
+/// The backend refused the attestation (403). Retrying on this run cannot help.
+class DeviceEnrollmentRefused implements Exception {
+  /// ATTESTATION_INVALID (app or phone not genuine) or DEVICE_NOT_SUPPORTED.
+  final String code;
+
+  /// Precise failed check, e.g. BAD_SIGNING_CERT, BOOT_NOT_VERIFIED, UNTRUSTED_ROOT.
+  final String? reason;
+
+  const DeviceEnrollmentRefused(this.code, this.reason);
+
+  @override
+  String toString() => 'DeviceEnrollmentRefused($code, $reason)';
+}
+
 /// Contract of GET /device/challenge and POST /device/register.
 abstract class DeviceEnrollmentApi {
   /// Identifies where the deviceId comes from, so a mock deviceId is never
@@ -117,10 +131,10 @@ class RemoteDeviceEnrollmentApi implements DeviceEnrollmentApi {
   static String get registerPath => '${EndPoints.baseUrl}/device/register';
 
   /// No JWT exists yet, and these calls cannot be signed (no key yet).
-  static final Options _options = Options(headers: {
-    DioInterceptor.skipAuthHeader: 'true',
-    DeviceSignatureInterceptor.skipSignatureHeader: 'true',
-  });
+  static Options get _options => Options(headers: {
+        DioInterceptor.skipAuthHeader: 'true',
+        DeviceSignatureInterceptor.skipSignatureHeader: 'true',
+      });
 
   @override
   String get backendId => EndPoints.baseUrl;
@@ -135,11 +149,31 @@ class RemoteDeviceEnrollmentApi implements DeviceEnrollmentApi {
   @override
   Future<DeviceRegistration> register(DeviceRegistrationRequest request) async {
     securityLog('POST $registerPath : ${request.certChain.length} certificats, attestée=${request.attested}');
-    final response = await dio.post(registerPath, data: jsonEncode(request.toJson()), options: _options);
-    return DeviceRegistration.fromJson(_decode(response.data));
+    try {
+      final response = await dio.post(registerPath, data: jsonEncode(request.toJson()), options: _options);
+      return DeviceRegistration.fromJson(_decode(response.data));
+    } on DioException catch (e) {
+      // 403 { code, reason }: the attestation was checked and refused
+      if (e.response?.statusCode == 403) {
+        final body = _tryDecode(e.response?.data);
+        throw DeviceEnrollmentRefused(
+          body?['code'] as String? ?? 'ATTESTATION_INVALID',
+          body?['reason'] as String?,
+        );
+      }
+      rethrow;
+    }
   }
 
   /// The shared Dio may be configured with ResponseType.plain.
   static Map<String, dynamic> _decode(Object? data) =>
       (data is String ? jsonDecode(data) : data) as Map<String, dynamic>;
+
+  static Map<String, dynamic>? _tryDecode(Object? data) {
+    try {
+      return _decode(data);
+    } catch (_) {
+      return null;
+    }
+  }
 }

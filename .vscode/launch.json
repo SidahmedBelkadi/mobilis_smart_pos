@@ -32,6 +32,41 @@
       "program": "lib/main.dart",
       "type": "dart",
       "args": ["--dart-define-from-file=env/prod.json"]
+    },
+    {
+      // Device attestation + request signing against the real backend
+      "name": "Mobilis Smart POS -- SECURE (Debug)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define-from-file=env/dev.json",
+        "--dart-define=DEVICE_SECURITY_ENABLED=true"
+      ]
+    },
+    {
+      // Same, with a local fake of /device/challenge and /device/register (no backend needed)
+      "name": "Mobilis Smart POS -- SECURE MOCK (Debug)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define-from-file=env/dev.json",
+        "--dart-define=DEVICE_SECURITY_ENABLED=true",
+        "--dart-define=DEVICE_SECURITY_MOCK=true"
+      ]
+    },
+    {
+      // Release-signed APK: the attestation the backend sees is the real one
+      "name": "Mobilis Smart POS -- SECURE (Release Mode)",
+      "flutterMode": "release",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define-from-file=env/prod.json",
+        "--dart-define=DEVICE_SECURITY_ENABLED=true"
+      ]
     }
   ]
 }

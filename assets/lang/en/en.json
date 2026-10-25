@@ -379,5 +379,10 @@
   "you_are_all_caught_up": "You're all caught up!",
   "refresh": "Refresh",
   "oops_something_went_wrong": "Oops! Something went wrong",
-  "retry": "Retry"
+  "retry": "Retry",
+  "device_not_supported_title": "Device not supported",
+  "device_not_supported_message": "This phone cannot prove that it runs the official Smart POS app (hardware attestation unavailable). Please use another recent Android phone with Google services.",
+  "device_not_genuine_title": "App or device not compliant",
+  "device_not_genuine_message": "This is not the official version of the app, or the phone has been modified (rooted or unverified system). Please install the official Smart POS app on an unmodified phone.",
+  "device_check_retry_failed": "The check failed again."
 }

@@ -16,7 +16,8 @@ class DeviceSecurityService {
   static const _attestedKey = 'device_security.attested';
   static const _backendKey = 'device_security.backend';
 
-  /// Avoid hammering the backend when enrollment keeps failing.
+  /// Avoid hammering the backend when enrollment fails for a transient reason
+  /// (network, 5xx). A refusal (403) is not retried at all on this run.
   static const Duration retryCooldown = Duration(minutes: 1);
 
   final DeviceKeyStore keyStore;
@@ -31,6 +32,8 @@ class DeviceSecurityService {
   bool _loaded = false;
   Future<bool>? _enrollment;
   DateTime? _lastFailure;
+  DeviceEnrollmentRefused? _refusal;
+  bool _reEnrollUsed = false;
 
   DeviceSecurityService({
     required this.keyStore,
@@ -43,6 +46,9 @@ class DeviceSecurityService {
   String? get status => _status;
   bool get attested => _attested;
   bool get isEnrolled => _deviceId != null;
+
+  /// Set when the backend refused this phone's attestation on this run.
+  DeviceEnrollmentRefused? get refusal => _refusal;
 
   /// Phone clock corrected with the server time received at enrollment.
   int get nowMs => _now().millisecondsSinceEpoch + _clockOffsetMs;
@@ -59,6 +65,7 @@ class DeviceSecurityService {
 
     // deviceId and key must exist together, and come from the current backend.
     if (_deviceId != null && hasKey) return true;
+    if (_refusal != null) return false;
     securityLog('Enrôlement nécessaire (deviceId: ${_deviceId ?? 'absent'}, clé Keystore: '
         '${hasKey ? 'présente' : 'absente'}, backend: ${api.backendId})');
 
@@ -74,6 +81,10 @@ class DeviceSecurityService {
       _lastFailure = null;
       securityLog('✅ Enrôlement terminé en ${stopwatch.elapsedMilliseconds} ms');
       return true;
+    } on DeviceEnrollmentRefused catch (e) {
+      _refusal = e;
+      securityLog('⛔ Enrôlement REFUSÉ par le backend : ${e.code} (${e.reason}). Pas de nouvel essai avant le prochain lancement');
+      return false;
     } catch (e) {
       _lastFailure = _now();
       securityLog('❌ Enrôlement échoué après ${stopwatch.elapsedMilliseconds} ms : $e');
@@ -122,7 +133,25 @@ class DeviceSecurityService {
     await storage.write(key: _backendKey, value: api.backendId);
   }
 
-  /// Re-reads the server time, e.g. after a TIMESTAMP_SKEW error.
+  /// Automatic re-enrollment after DEVICE_NOT_ENROLLED / DEVICE_REVOKED /
+  /// repeated SIGNATURE_INVALID. Allowed once per app start, never in a loop.
+  Future<bool> reEnroll() async {
+    if (_reEnrollUsed) {
+      securityLog('Ré-enrôlement déjà utilisé pendant ce lancement : ignoré');
+      return false;
+    }
+    _reEnrollUsed = true;
+    await reset();
+    return ensureEnrolled();
+  }
+
+  /// Uses the HTTP Date header of a response (1 s precision, enough for ±60 s).
+  void syncClockFromServerDate(DateTime serverDate) {
+    _clockOffsetMs = serverDate.millisecondsSinceEpoch - _now().millisecondsSinceEpoch;
+    securityLog('Horloge resynchronisée (en-tête Date) : décalage=${_clockOffsetMs} ms');
+  }
+
+  /// Re-reads the server time from a new challenge, e.g. after a TIMESTAMP_SKEW error.
   Future<void> syncClock() async {
     final challenge = await api.getChallenge();
     _clockOffsetMs = challenge.serverTime - _now().millisecondsSinceEpoch;
@@ -135,6 +164,7 @@ class DeviceSecurityService {
     await _load();
     await _clear();
     _lastFailure = null;
+    _refusal = null;
   }
 
   /// Adds the X-* signature headers to [options]. Returns false when the
