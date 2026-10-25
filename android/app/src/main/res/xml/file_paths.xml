@@ -3,4 +3,8 @@
     <files-path
         name="internal_files"
         path="." />
+    <!-- APKs downloaded by the in-app update -->
+    <cache-path
+        name="app_updates"
+        path="app_updates/" />
 </paths>

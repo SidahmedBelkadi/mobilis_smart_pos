@@ -395,5 +395,21 @@
   "nfc_read_failed_title": "فشلت القراءة",
   "nfc_bac_failed_message": "تعذّر فتح الشريحة. تأكد من أنها نفس الوثيقة التي تم مسحها، ثم أعد المحاولة.",
   "nfc_read_failed_message": "تعذّرت قراءة شريحة الوثيقة. أعد المحاولة مع إبقاء الوثيقة ثابتة على الهاتف.",
-  "nfc_rescan_document": "إعادة مسح الوثيقة"
+  "nfc_rescan_document": "إعادة مسح الوثيقة",
+  "update_title_downloading": "جارٍ تحديث التطبيق",
+  "update_msg_downloading": "يجري تنزيل إصدار جديد. يُرجى إبقاء التطبيق مفتوحًا حتى اكتمال التنزيل.",
+  "update_title_permission": "خطوة أخيرة",
+  "update_msg_permission": "اسمح لتطبيق Mobilis Smart POS بتثبيت التحديث. يُطلب هذا الإذن مرة واحدة فقط.",
+  "update_btn_allow": "السماح",
+  "update_title_installing": "جارٍ التثبيت",
+  "update_msg_installing": "أكِّد التثبيت في النافذة الظاهرة، وسيُعاد تشغيل التطبيق تلقائيًا.",
+  "update_title_ready": "التحديث جاهز",
+  "update_msg_ready": "ثبّت الإصدار الجديد لمواصلة استخدام التطبيق.",
+  "update_btn_install": "تثبيت",
+  "update_title_download_failed": "توقّف التنزيل",
+  "update_msg_download_failed": "تحقّق من اتصالك بالشبكة، ثم أعد المحاولة.",
+  "update_title_invalid": "تعذّر قبول التحديث",
+  "update_msg_invalid": "تعذّر التحقق من الملف الذي تم تنزيله. أعد المحاولة لاحقًا أو اتصل بالدعم.",
+  "update_title_install_failed": "فشل التثبيت",
+  "update_msg_install_failed": "أعد المحاولة. إذا استمرت المشكلة، اتصل بالدعم."
 }

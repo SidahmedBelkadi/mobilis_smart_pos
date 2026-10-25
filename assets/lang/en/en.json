@@ -393,5 +393,21 @@
   "nfc_read_failed_title": "Reading failed",
   "nfc_bac_failed_message": "The chip could not be opened. Make sure this is the same document that was scanned, then try again.",
   "nfc_read_failed_message": "The document chip could not be read. Try again, keeping the document still against the phone.",
-  "nfc_rescan_document": "Scan the document again"
+  "nfc_rescan_document": "Scan the document again",
+  "update_title_downloading": "Updating the app",
+  "update_msg_downloading": "A new version is downloading. Keep the app open until it finishes.",
+  "update_title_permission": "One last step",
+  "update_msg_permission": "Allow Mobilis Smart POS to install the update. You will only be asked once.",
+  "update_btn_allow": "Allow",
+  "update_title_installing": "Installing",
+  "update_msg_installing": "Confirm in the window that appears. The app will restart on its own.",
+  "update_title_ready": "Update ready",
+  "update_msg_ready": "Install the new version to continue using the app.",
+  "update_btn_install": "Install",
+  "update_title_download_failed": "Download interrupted",
+  "update_msg_download_failed": "Check your connection, then try again.",
+  "update_title_invalid": "Update rejected",
+  "update_msg_invalid": "The downloaded file could not be verified. Try again later or contact support.",
+  "update_title_install_failed": "Installation failed",
+  "update_msg_install_failed": "Try again. If the problem persists, contact support."
 }

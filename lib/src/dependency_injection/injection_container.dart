@@ -90,6 +90,7 @@ import '../features/sign_out/data/data_sources/sign_out_data_source.dart';
 import '../features/sign_out/data/repositories/sign_out_repository_impl.dart';
 import '../features/sign_out/domain/repositories/sign_out_repository.dart';
 import '../features/sign_out/domain/use_cases/sign_out_use_case.dart';
+import '../services/app_update_installer.dart';
 import '../services/upgrader_service.dart';
 
 final serviceLocator = GetIt.instance;
@@ -125,6 +126,7 @@ Future<void> initializeAppDependencies() async {
   // serviceLocator.registerLazySingleton<DioConsumer>(() => DioConsumer(client: dio));
 
   serviceLocator.registerLazySingleton(() => UpgraderService(dio: serviceLocator()));
+  serviceLocator.registerLazySingleton(() => AppUpdateInstaller());
 
   // =============== DEVICE SECURITY ============= //
   serviceLocator.registerLazySingleton<DeviceKeyStore>(() => MethodChannelDeviceKeyStore());

@@ -28,6 +28,7 @@ import com.ai_univers.smart_point_of_sale.Reader.NFCResultCallback;
 import com.ai_univers.smart_point_of_sale.Reader.vision.BarcodeScannerActivity;
 import com.ai_univers.smart_point_of_sale.Reader.vision.ScanActivity;
 import com.ai_univers.smart_point_of_sale.security.DeviceSecurityPlugin;
+import com.ai_univers.smart_point_of_sale.update.AppUpdaterPlugin;
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanner;
 import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions;
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanning;
@@ -70,6 +71,7 @@ public class MainActivity extends FlutterActivity {
 
     private MethodChannel.Result pendingResult;
     private MethodChannel.Result barCodePendingResult;
+    private AppUpdaterPlugin appUpdaterPlugin;
 
 
     // Method to check if NFC is enabled on the device
@@ -154,6 +156,10 @@ public class MainActivity extends FlutterActivity {
         // Device key (Android Keystore) used to sign API requests
         new DeviceSecurityPlugin(getApplicationContext(), getFlutterEngine().getDartExecutor().getBinaryMessenger()).register();
 
+        // In-app update: install the downloaded APK
+        appUpdaterPlugin = new AppUpdaterPlugin(this, getFlutterEngine().getDartExecutor().getBinaryMessenger());
+        appUpdaterPlugin.register();
+
         // Set up Otp method channel
         MethodChannel otpMethodChannel = new MethodChannel(getFlutterEngine().getDartExecutor().getBinaryMessenger(), OTP_CHANNEL);
         OtpReceiver otpReceiver = new OtpReceiver(otpMethodChannel);
@@ -187,6 +193,10 @@ public class MainActivity extends FlutterActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        if (appUpdaterPlugin != null && appUpdaterPlugin.onActivityResult(requestCode, resultCode)) {
+            return;
+        }
 
         if (requestCode == MLKIT_SCANNER_REQUEST_CODE && pendingResult != null) {
             if (resultCode == Activity.RESULT_OK && data != null) {

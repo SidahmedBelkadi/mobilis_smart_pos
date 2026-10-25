@@ -1,18 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lottie/lottie.dart';
 import 'package:mobilis_smart_pos/src/config/routing/app_routes.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/session_timeout.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
-import '../../../core/api/end_points.dart';
 import '../../../core/utils/helpers/app_localization_helper.dart';
 import '../../../core/utils/helpers/media_query_values.dart';
 import '../../../core/utils/ressources/app_colors.dart';
-import '../../../core/utils/ressources/app_images.dart';
 import '../../../core/utils/helpers/localization_utils.dart';
 import '../../../dependency_injection/injection_container.dart' as di;
 import '../../../services/upgrader_service.dart';
@@ -65,8 +61,6 @@ List<Widget> screens = [
 late int screenIndex;
 
 class _MyHomePageState extends State<MainScreen> {
-  static const platform = MethodChannel("channel");
-
   @override
   void initState() {
     super.initState();
@@ -121,41 +115,15 @@ class _MyHomePageState extends State<MainScreen> {
     }
   }
 
-  static Future<void> openInBrowser() async {
-    try {
-      await platform.invokeMethod('openBrowser', {'downloadUrl': EndPoints.downloadApk});
-    } catch (e) {
-      debugPrint('Error opening browser: $e');
-    }
-  }
-
-  void _showUpdateDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return PopScope(
-          canPop: false,
-          child: AlertDialog(
-            backgroundColor: context.isDarkMode ? AppColors.darkerGrey : Colors.white,
-            title: Text("update_available".tr(context)),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                LottieBuilder.asset(AppImages.uploading, height: 120.sp, width: 120.sp),
-                Text('update_available_instruction'.tr(context)),
-              ],
-            ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: openInBrowser,
-                child: Text('update_now'.tr(context)),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  /// Blocking in-app update (download with progress, then Android installer).
+  Future<void> _showUpdateDialog() async {
+    if (!mounted) return;
+    final packageInfo = await PackageInfo.fromPlatform();
+    if (!mounted) return;
+    Navigator.of(context).pushNamed(Routes.appUpdate, arguments: {
+      'currentVersion': packageInfo.version,
+      'newVersion': di.serviceLocator<SmartPosLocalStorage>().getCheckedUpdatedversion(),
+    });
   }
 
   @override
