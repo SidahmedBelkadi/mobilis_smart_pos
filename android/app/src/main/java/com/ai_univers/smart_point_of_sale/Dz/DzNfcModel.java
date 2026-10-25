@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory;
 import android.nfc.tech.IsoDep;
 import android.util.Log;
 
+import com.ai_univers.smart_point_of_sale.Reader.ActiveAuthentication;
+import com.ai_univers.smart_point_of_sale.Reader.NfcDiagnostics;
 import com.ai_univers.smart_point_of_sale.utils.ImageUtil;
 import com.google.android.datatransport.runtime.logging.Logging;
 
@@ -14,6 +16,7 @@ import net.sf.scuba.smartcards.CardService;
 import org.jmrtd.BACKey;
 import org.jmrtd.PassportService;
 import org.jmrtd.lds.DisplayedImageInfo;
+import org.jmrtd.lds.SODFile;
 import org.jmrtd.lds.icao.DG11File;
 import org.jmrtd.lds.icao.DG12File;
 import org.jmrtd.lds.icao.DG1File;
@@ -25,15 +28,18 @@ import org.jmrtd.lds.iso19794.FaceInfo;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class DzNfcModel {
 
@@ -56,41 +62,49 @@ public class DzNfcModel {
     }
 
     public JSONObject readNfcData(IsoDep isoDep) throws Exception {
+        NfcDiagnostics diagnostics = new NfcDiagnostics(context, documentType);
+        diagnostics.logTag(isoDep);
+
         CardService cardService = CardService.getInstance(isoDep);
         PassportService passportService = new PassportService(cardService, PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, PassportService.DEFAULT_MAX_BLOCKSIZE, false, true);
-
-        passportService.open();
-
-
-        passportService.sendSelectApplet(false);
-
 
         String dateOfBirth = this.dateOfBirth;
         if (this.dateOfBirth.length() == 2) {
             dateOfBirth = this.dateOfBirth + "0101";
         }
-
-        Log.d("DzNfcModel", "Received parameters: Document Type: " + documentType +
-                ", Document Number: " + documentNumber +
-                ", DOB: " + dateOfBirth +
-                ", DOE: " + dateOfExpiry);
-
-
         BACKey bacKey = new BACKey(this.documentNumber, dateOfBirth, this.dateOfExpiry);
-        passportService.doBAC(bacKey);
+
+        passportService.open();
+
+        // Debug builds only: probes EF.CardAccess and tries PACE before falling back to BAC
+        boolean paceUsed = diagnostics.probeCardAccessAndPace(passportService, bacKey);
+
+        passportService.sendSelectApplet(paceUsed);
+        if (!paceUsed) {
+            passportService.doBAC(bacKey);
+        }
+        diagnostics.logAccessControl(paceUsed);
 
 
         JSONObject certificateJson = new JSONObject();
 
-        InputStream dg1InputStream = passportService.getInputStream(PassportService.EF_DG1);
-        DG1File dg1File = new DG1File(dg1InputStream);
+        // Keep the raw bytes: EF.SOD hashes must be computed on them, not on a re-encoding
+        byte[] dg1Bytes = readBytes(passportService.getInputStream(PassportService.EF_DG1));
+        DG1File dg1File = new DG1File(new ByteArrayInputStream(dg1Bytes));
         MRZInfo mrzInfo = dg1File.getMRZInfo();
 
-        InputStream dg11InputStream = passportService.getInputStream(PassportService.EF_DG11);
-        DG11File dg11File = new DG11File(dg11InputStream);
+        // Keep the raw bytes: EF.SOD hashes must be computed on them, not on a re-encoding
+        byte[] dg11Bytes = readBytes(passportService.getInputStream(PassportService.EF_DG11));
+        DG11File dg11File = new DG11File(new ByteArrayInputStream(dg11Bytes));
 
-        InputStream dg12InputStream = passportService.getInputStream(PassportService.EF_DG12);
-        DG12File dg12File = new DG12File(dg12InputStream);
+        // Keep the raw bytes: EF.SOD hashes must be computed on them, not on a re-encoding
+        byte[] dg12Bytes = readBytes(passportService.getInputStream(PassportService.EF_DG12));
+        DG12File dg12File = new DG12File(new ByteArrayInputStream(dg12Bytes));
+
+        SODFile sod = new SODFile(passportService.getInputStream(PassportService.EF_SOD));
+
+        // Rejects cloned and emulated chips: the chip must sign a fresh random challenge
+        ActiveAuthentication.verify(passportService, sod);
 
         byte[] facialImageBytes = null;
         byte[] signatureImageBytes = null;
@@ -145,6 +159,15 @@ public class DzNfcModel {
             } else {
 
             }
+        }
+
+        if (diagnostics.isEnabled()) {
+            Map<Integer, byte[]> readDataGroups = new LinkedHashMap<>();
+            readDataGroups.put(1, dg1Bytes);
+            readDataGroups.put(11, dg11Bytes);
+            readDataGroups.put(12, dg12Bytes);
+            // Last step before close(): Chip Authentication replaces the secure messaging session
+            diagnostics.inspectSecurity(passportService, readDataGroups);
         }
 
         passportService.close();
