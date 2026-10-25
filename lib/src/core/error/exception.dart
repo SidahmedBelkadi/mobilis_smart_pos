@@ -38,6 +38,11 @@ class InternalServerErrorException extends ServerException {
   const InternalServerErrorException([super.message]);
 }
 
+/// HTTP 503: the service is suspended from the dashboard (maintenance).
+class ServiceUnavailableException extends ServerException {
+  const ServiceUnavailableException([super.message]);
+}
+
 class NoInternetConnectionException extends ServerException {
   const NoInternetConnectionException([super.message]);
 }

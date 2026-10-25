@@ -258,6 +258,9 @@ class DioConsumer extends ApiConsumer {
             throw const ConflictException('conflictOccurred');
           case StatusCode.internalServerError:
             throw const InternalServerErrorException('internalServerError');
+          case StatusCode.serviceUnavailable:
+            // Not logged in (sign in, OTP...): the screen shows this message
+            throw const ServiceUnavailableException('app_under_maintenance');
           case StatusCode.unauthorized:
             throw UnauthorizedException(errorMessage); // Show Real server message
           case StatusCode.unprocessable:

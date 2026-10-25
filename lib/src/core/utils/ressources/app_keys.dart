@@ -18,4 +18,5 @@ class AppKeys {
   static const String theme = '^pytdhggqgyG9H9';
   static const String slot = '^arfcvbdaytf5454H9';
   static const String blockRetryActivation = '^arfcvbdaytadguaghsdas';
+  static const String maintenanceLogout = '^mtnc7q2xlgvb8kz';
 }

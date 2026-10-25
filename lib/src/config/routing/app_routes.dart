@@ -34,6 +34,7 @@ import '../../features/contract/presentation/nfc/nfc_reader_screen.dart';
 import '../../features/contract/presentation/ocr/mrz_ocr_screen.dart';
 import '../../features/app_update/presentation/app_update_screen.dart';
 import '../../features/contract/presentation/ocr/parent_mrz_ocr.dart';
+import '../../features/maintenance/presentation/maintenance_screen.dart';
 import '../../features/contract/presentation/parent_contract_screen.dart';
 import '../../features/contract/presentation/parent_preparation_screen.dart';
 import '../../features/contract/presentation/signature_screen.dart';
@@ -109,6 +110,7 @@ class Routes {
   static const String deviceSecurityDiagnostic = "/device_security_diagnostic";
   static const String deviceNotSupported = "/device_not_supported";
   static const String appUpdate = "/app_update";
+  static const String maintenance = "/maintenance";
 }
 
 class AppRoutes {
@@ -509,6 +511,8 @@ class AppRoutes {
             child: const NotificationScreen(),
           ),
         );
+      case Routes.maintenance:
+        return RoutesAnimationManager.slideFromRightTransition(const MaintenanceScreen());
       case Routes.appUpdate:
         final params = args as Map<String, dynamic>;
         return RoutesAnimationManager.slideFromRightTransition(

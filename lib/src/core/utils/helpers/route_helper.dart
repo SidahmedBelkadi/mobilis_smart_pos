@@ -19,6 +19,9 @@ class InitialRouteHelper {
 
     if (isFirstTime) {
       return Routes.onBoarding;
+    } else if (authLocalDataSource.isMaintenanceLogoutPending()) {
+      // The app was closed before the maintenance screen was read
+      return Routes.maintenance;
     } else if (authResponse != null && authResponse.accessToken.isNotEmpty) {
       if (isConsent) {
         return Routes.main;

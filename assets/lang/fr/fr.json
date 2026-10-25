@@ -409,5 +409,9 @@
   "update_title_invalid": "Mise à jour refusée",
   "update_msg_invalid": "Le fichier téléchargé n'a pas pu être vérifié. Réessayez plus tard ou contactez le support.",
   "update_title_install_failed": "Échec de l'installation",
-  "update_msg_install_failed": "Réessayez. Si le problème persiste, contactez le support."
+  "update_msg_install_failed": "Réessayez. Si le problème persiste, contactez le support.",
+  "maintenance_title": "Application en maintenance",
+  "maintenance_message": "Nous améliorons le service. Vous ne pouvez pas vendre pour le moment. Vous allez être déconnecté, et vous pourrez vous reconnecter après la maintenance.",
+  "maintenance_auto_logout": "Déconnexion automatique",
+  "app_under_maintenance": "L'application est en maintenance. Veuillez réessayer plus tard."
 }

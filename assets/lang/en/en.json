@@ -409,5 +409,9 @@
   "update_title_invalid": "Update rejected",
   "update_msg_invalid": "The downloaded file could not be verified. Try again later or contact support.",
   "update_title_install_failed": "Installation failed",
-  "update_msg_install_failed": "Try again. If the problem persists, contact support."
+  "update_msg_install_failed": "Try again. If the problem persists, contact support.",
+  "maintenance_title": "App under maintenance",
+  "maintenance_message": "We are improving the service. You cannot sell for now. You will be signed out, and you can sign in again once the maintenance is over.",
+  "maintenance_auto_logout": "Automatic sign-out",
+  "app_under_maintenance": "The app is under maintenance. Please try again later."
 }

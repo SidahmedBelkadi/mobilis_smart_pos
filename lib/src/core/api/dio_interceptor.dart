@@ -60,8 +60,30 @@ class DioInterceptor extends Interceptor {
       await di.serviceLocator<SmartPosLocalStorage>().clearLoginCredentials();
       navigatorKey.currentState?.pushNamedAndRemoveUntil(Routes.signIn, (route) => false);
       return;
+    } else if (err.response?.statusCode == StatusCode.serviceUnavailable &&
+        authLocalDataSource.getSavedLoginCredentials() != null) {
+      await _endSessionForMaintenance();
+      return;
     }
     handler.next(err); // Continue with the error
+  }
+
+  /// Several requests may fail together: only the first one ends the session.
+  static bool _maintenanceLogoutInProgress = false;
+
+  /// Service suspended while logged in. The session is cleared right away and
+  /// the flag is saved first, so closing the app cannot get around the logout:
+  /// the maintenance screen comes back at the next launch until it has been read.
+  Future<void> _endSessionForMaintenance() async {
+    if (_maintenanceLogoutInProgress) return;
+    _maintenanceLogoutInProgress = true;
+    try {
+      await authLocalDataSource.setMaintenanceLogoutPending(true);
+      await authLocalDataSource.clearLoginCredentials();
+      navigatorKey.currentState?.pushNamedAndRemoveUntil(Routes.maintenance, (route) => false);
+    } finally {
+      _maintenanceLogoutInProgress = false;
+    }
   }
 
   Future<Response<dynamic>> _retry(RequestOptions requestOptions) async {

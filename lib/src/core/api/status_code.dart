@@ -12,4 +12,6 @@ class StatusCode {
   static const int tokenExpired = 498;
   static const int userAccountOnHold = 460;
   static const int userSessionExpired = 475;
+  /// Service suspended from the dashboard (maintenance): returned by every endpoint.
+  static const int serviceUnavailable = 503;
 }

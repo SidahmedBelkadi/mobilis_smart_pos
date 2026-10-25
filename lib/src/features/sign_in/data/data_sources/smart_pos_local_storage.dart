@@ -28,6 +28,13 @@ abstract class SmartPosLocalStorage {
 
   Future<void> clearScheduledNotificationDate();
 
+  // ============ Service maintenance ========= //
+  /// Set when the service was suspended while logged in: the maintenance
+  /// screen is shown again at the next launch until it has been read.
+  bool isMaintenanceLogoutPending();
+
+  Future<void> setMaintenanceLogoutPending(bool isPending);
+
   // ============ App Version update ========= //
   Future<void> saveCheckedUpdateDate(DateTime dateTime);
 
@@ -195,6 +202,16 @@ class SmartPosLocalStorageImpl implements SmartPosLocalStorage {
   Future<void> saveCheckedUpdateDate(DateTime dateTime) async {
     debugPrint("========= DATE TO SAVE : ${dateTime.toIso8601String()}");
     await sharedPreferences.setString(AppKeys.checkVerionUpdate, dateTime.toIso8601String());
+  }
+
+  @override
+  bool isMaintenanceLogoutPending() {
+    return sharedPreferences.getBool(AppKeys.maintenanceLogout) ?? false;
+  }
+
+  @override
+  Future<void> setMaintenanceLogoutPending(bool isPending) async {
+    await sharedPreferences.setBool(AppKeys.maintenanceLogout, isPending);
   }
 
   @override

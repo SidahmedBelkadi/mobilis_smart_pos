@@ -16,6 +16,8 @@ class ErrorHandler {
       return exception.message ?? AppApiResponsesMessages.conflictOccurred;
     } else if (exception is InternalServerErrorException) {
       return exception.message ?? AppApiResponsesMessages.internalServerError;
+    } else if (exception is ServiceUnavailableException) {
+      return exception.message ?? 'app_under_maintenance';
     } else if (exception is NoInternetConnectionException) {
       return exception.message ?? AppApiResponsesMessages.noInternetConnection;
     } else if (exception is CancelRequestException) {

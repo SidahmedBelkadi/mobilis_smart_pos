@@ -232,6 +232,12 @@ class _SignInScreenState extends State<SignInScreen> {
                                         arguments: {"msisdn": cubit.phoneController.text});
                                   },
                                 );
+                              } else if (state.message == 'app_under_maintenance') {
+                                // Service suspended: not an error of the user
+                                AppToasts.showWarningToast(
+                                  message: state.message.tr(context),
+                                  context: context,
+                                );
                               } else {
                                 AppToasts.showErrorToast(
                                   message: state.message.tr(context),
