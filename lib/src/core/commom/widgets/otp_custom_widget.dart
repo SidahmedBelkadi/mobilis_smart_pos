@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mobilis_smart_pos/src/app.dart';
@@ -138,7 +139,7 @@ class _OTPCustomWidgetState extends State<OTPCustomWidget> with WidgetsBindingOb
             length: 6,
             obscureText: false,
             autofocus: false,
-            readOnly: false, // User cannot type manually
+            readOnly: kDebugMode ? false : true,
             validator: (value) {
               if (value == null || value.isEmpty) return '';
               if (value.length != 6) return '';
