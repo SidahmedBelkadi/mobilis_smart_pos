@@ -12,6 +12,7 @@ import 'package:mobilis_smart_pos/src/features/contract/domain/entities/trigger_
 
 import '../../../../core/error/failure.dart';
 import '../entities/check_before_edit_contract_response_entity.dart';
+import '../entities/check_client_params_entity.dart';
 import '../entities/contract_request_params_entitiy.dart';
 import '../entities/edit_contract_response_entity.dart';
 import '../entities/generate_contract_params_entity.dart';
@@ -23,6 +24,9 @@ abstract class ContractRepository {
   Future<Either<Failure, CheckBeforeEditContractResponseEntity>> checkBeforeEditContract({
     required ContractRequestParamsEntitiy contract,
   });
+
+  /// Right after the ID scan: may the client be activated? Reads only.
+  Future<Either<Failure, Unit>> checkClient({required CheckClientParamsEntity params});
 
   Future<Either<Failure, EditContractResponseEntity>> editContract({
     required ContractRequestParamsEntitiy contract,

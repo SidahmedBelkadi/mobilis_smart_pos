@@ -413,5 +413,12 @@
   "maintenance_title": "Application en maintenance",
   "maintenance_message": "Nous améliorons le service. Vous ne pouvez pas vendre pour le moment. Vous allez être déconnecté, et vous pourrez vous reconnecter après la maintenance.",
   "maintenance_auto_logout": "Déconnexion automatique",
-  "app_under_maintenance": "L'application est en maintenance. Veuillez réessayer plus tard."
+  "app_under_maintenance": "L'application est en maintenance. Veuillez réessayer plus tard.",
+  "check_client_loading": "Vérification du client…",
+  "check_client_refused_title": "Activation impossible",
+  "check_client_failed_title": "Vérification impossible",
+  "check_client_blacklisted": "Ce client ne peut pas obtenir de nouvelle ligne.",
+  "check_client_document_expired": "Ce document n'est plus valide. Demandez au client une carte d'identité ou un passeport valide.",
+  "check_client_sim_limit": "Ce client a déjà {limit} lignes actives, le maximum autorisé.",
+  "check_client_back_home": "Retour à l'accueil"
 }

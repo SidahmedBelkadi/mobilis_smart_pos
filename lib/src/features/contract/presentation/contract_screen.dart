@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:diacritic/diacritic.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -31,7 +32,10 @@ import '../../../dependency_injection/injection_container.dart' as di;
 import '../../sign_in/data/data_sources/smart_pos_local_storage.dart';
 import '../../sign_out/presentation/cubit/sign_out_cubit.dart';
 import '../domain/entities/commune_entity.dart';
+import '../domain/entities/check_client_params_entity.dart';
 import '../domain/entities/contract_request_params_entitiy.dart';
+import 'check_client_feedback.dart';
+import 'cubit/check_client/check_client_cubit.dart';
 
 class ContractScreen extends StatefulWidget {
   const ContractScreen({
@@ -119,10 +123,11 @@ class _ContractScreenState extends State<ContractScreen> {
 
         if (age < 19) {
           if (!widget.isMinor) {
+            _leaving = true;
             AppToasts.showInfoToast(
                 message: "THIS_MINOR_IS_PRESUMING_TO_BE_ADULT".tr(context), context: context);
             Navigator.of(context)
-                .pushNamedAndRemoveUntil(Routes.home, (route) => false, arguments: {'index': 1});
+                .pushNamedAndRemoveUntil(Routes.main, (route) => false, arguments: {'index': 1});
             return;
           }
         }
@@ -153,6 +158,51 @@ class _ContractScreenState extends State<ContractScreen> {
     nationalityEditingController = TextEditingController();
     addressEditingController = TextEditingController();
     emailEditingController = TextEditingController();
+
+    // Before the photos, the SIM and the signature: is this client allowed?
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkClient());
+  }
+
+  /// Set when the screen is already being left (presumed adult minor).
+  bool _leaving = false;
+
+  void _checkClient() {
+    if (_leaving || !mounted) return;
+    context.read<CheckClientCubit>().checkClient(CheckClientParamsEntity(
+          birthDate: CivilsInformationsConverterHelper.convertToIso8601(widget.metaData['date_of_birth']),
+          nin: '${widget.metaData['personal_number']}',
+          documentType: CivilsInformationsConverterHelper.getToSubmitDocumentTypeValue(
+            docType: widget.metaData['document_type'],
+          ),
+          documentNumber: '${widget.metaData['document_number']}',
+          issueDate:
+              CivilsInformationsConverterHelper.convertToIso8601WithTiret(widget.metaData['date_of_delivery']),
+          isMinor: widget.isMinor,
+        ));
+  }
+
+  void _onCheckClientResult(BuildContext context, CheckClientState state) {
+    void leave() => Navigator.of(context)
+        .pushNamedAndRemoveUntil(Routes.main, (route) => false, arguments: {'index': 1});
+
+    if (state is CheckClientRefused) {
+      HapticFeedback.heavyImpact();
+      final message = checkClientRefusalMessageKey(state.message).tr(context);
+      showCheckClientDialog(
+        context: context,
+        refused: true,
+        message: message.replaceFirst('{limit}', state.limit ?? ''),
+        onLeave: leave,
+      );
+    } else if (state is CheckClientFailed) {
+      showCheckClientDialog(
+        context: context,
+        refused: false,
+        message: state.message.tr(context),
+        onLeave: leave,
+        onRetry: _checkClient,
+      );
+    }
   }
 
   @override
@@ -393,7 +443,21 @@ class _ContractScreenState extends State<ContractScreen> {
     final TextRecognizer recognizer = TextRecognizer();
 
     return SessionTimeout(
-      child: Scaffold(
+      child: BlocConsumer<CheckClientCubit, CheckClientState>(
+        listener: _onCheckClientResult,
+        builder: (context, checkState) => Stack(
+          children: [
+            _buildScaffold(context, isPassport, recognizer),
+            if (checkState is CheckClientLoading || checkState is CheckClientInitial)
+              const CheckClientOverlay(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildScaffold(BuildContext context, bool isPassport, TextRecognizer recognizer) {
+    return Scaffold(
         appBar: CustomAppbarWithDenyContract(
           actionTitle: "home",
           title: "contractTitle".tr(context),
@@ -553,7 +617,6 @@ class _ContractScreenState extends State<ContractScreen> {
             ),
           ),
         ),
-      ),
     );
   }
 }

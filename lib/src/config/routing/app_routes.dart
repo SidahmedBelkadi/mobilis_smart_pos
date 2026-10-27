@@ -33,6 +33,7 @@ import '../../features/contract/presentation/nfc/nfc_preparation_screen.dart';
 import '../../features/contract/presentation/nfc/nfc_reader_screen.dart';
 import '../../features/contract/presentation/ocr/mrz_ocr_screen.dart';
 import '../../features/app_update/presentation/app_update_screen.dart';
+import '../../features/contract/presentation/cubit/check_client/check_client_cubit.dart';
 import '../../features/contract/presentation/ocr/parent_mrz_ocr.dart';
 import '../../features/maintenance/presentation/maintenance_screen.dart';
 import '../../features/contract/presentation/parent_contract_screen.dart';
@@ -392,10 +393,13 @@ class AppRoutes {
 
         return RoutesAnimationManager.slideFromRightTransition(
           args: args,
-          ContractScreen(
-            metaData: params['data'] as Map,
-            isMinor: params['isMinor'],
-            isPresumed: params['isPresumed'],
+          BlocProvider(
+            create: (_) => serviceLocator<CheckClientCubit>(),
+            child: ContractScreen(
+              metaData: params['data'] as Map,
+              isMinor: params['isMinor'],
+              isPresumed: params['isPresumed'],
+            ),
           ),
         );
 

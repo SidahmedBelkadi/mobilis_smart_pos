@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dartz/dartz.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/rasd_edit_contract_response_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/rasd_generate_contract_params_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/rasd_request_params_entity.dart';
@@ -16,6 +17,7 @@ import '../../../../core/networking/network_info.dart';
 import '../../../../core/utils/handlers/error_handler.dart';
 import '../../../../core/utils/ressources/app_api_messages.dart';
 import '../../domain/entities/check_before_edit_contract_response_entity.dart';
+import '../../domain/entities/check_client_params_entity.dart';
 import '../../domain/entities/contract_request_params_entitiy.dart';
 import '../../domain/entities/edit_contract_response_entity.dart';
 import '../../domain/entities/generate_contract_params_entity.dart';
@@ -29,6 +31,34 @@ class ContractRepositoryImpl implements ContractRepository {
   final ContractRemoteDataSource remoteDataSource;
 
   ContractRepositoryImpl({required this.networkInfo, required this.remoteDataSource});
+
+  /// Refusals the PDV must see as they are. Any other 400 (validator text) is an app bug.
+  static const _clientRefusals = {
+    'CLIENT_BLACKLISTED',
+    'DOCUMENT_EXPIRED',
+    'CLIENT_HAS_REACHED_SIM_LIMIT',
+    'THIS_MINOR_IS_PRESUMING_TO_BE_ADULT',
+  };
+
+  @override
+  Future<Either<Failure, Unit>> checkClient({required CheckClientParamsEntity params}) async {
+    if (await networkInfo.isConnected) {
+      try {
+        await remoteDataSource.checkClient(params: params);
+        return const Right(unit);
+      } on UnprocessableEntityException catch (e) {
+        if (_clientRefusals.contains(e.message)) {
+          return Left(ClientRefusedFailure(message: e.message!, limit: e.body?['limit']?.toString()));
+        }
+        debugPrint('check-client rejected the request: ${e.message}');
+        return const Left(ServerFailure(message: 'unexpectedError'));
+      } on ServerException catch (e) {
+        return Left(ServerFailure(message: ErrorHandler.getErrorMessage(e)));
+      }
+    } else {
+      return const Left(NoInternetConnectionFailure(message: 'noInternetConnection'));
+    }
+  }
 
   @override
   Future<Either<Failure, CheckBeforeEditContractResponseEntity>> checkBeforeEditContract({

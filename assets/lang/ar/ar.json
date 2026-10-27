@@ -415,5 +415,12 @@
   "maintenance_title": "التطبيق قيد الصيانة",
   "maintenance_message": "نقوم حاليًا بتحسين الخدمة، ولا يمكنك البيع الآن. سيتم إخراجك من التطبيق، ويمكنك الدخول من جديد بعد انتهاء الصيانة.",
   "maintenance_auto_logout": "الخروج تلقائيًا",
-  "app_under_maintenance": "التطبيق قيد الصيانة حاليًا. يُرجى المحاولة مرة أخرى لاحقًا."
+  "app_under_maintenance": "التطبيق قيد الصيانة حاليًا. يُرجى المحاولة مرة أخرى لاحقًا.",
+  "check_client_loading": "جارٍ التحقق من الزبون…",
+  "check_client_refused_title": "لا يمكن التفعيل",
+  "check_client_failed_title": "تعذّر التحقق",
+  "check_client_blacklisted": "لا يمكن لهذا الزبون الحصول على خط جديد.",
+  "check_client_document_expired": "هذه الوثيقة لم تعد صالحة. اطلب من الزبون بطاقة تعريف أو جواز سفر صالحًا.",
+  "check_client_sim_limit": "لدى هذا الزبون {limit} خطوط نشطة، وهو الحد الأقصى المسموح به.",
+  "check_client_back_home": "العودة إلى الرئيسية"
 }

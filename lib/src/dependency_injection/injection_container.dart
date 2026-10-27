@@ -54,6 +54,8 @@ import '../features/contract/data/data_sources/contract_remote_data_source.dart'
 import '../features/contract/data/repositories/contract_repository_impl.dart';
 import '../features/contract/domain/repositories/contract_repository.dart';
 import '../features/contract/domain/use_cases/check_before_edit_contract_use_case.dart';
+import '../features/contract/domain/use_cases/check_client_use_case.dart';
+import '../features/contract/presentation/cubit/check_client/check_client_cubit.dart';
 import '../features/contract/domain/use_cases/edit_contract_use_case.dart';
 import '../features/contract/domain/use_cases/generate_contract_use_case.dart';
 import '../features/contract/domain/use_cases/get_cgv_per_offer_use_case.dart';
@@ -262,6 +264,7 @@ Future<void> initializeAppDependencies() async {
   serviceLocator.registerLazySingleton(() => SignOutUseCase(repository: serviceLocator()));
   serviceLocator
       .registerLazySingleton(() => CheckBeforeEditContractUseCase(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton(() => CheckClientUseCase(repository: serviceLocator()));
   serviceLocator.registerLazySingleton(() => EditContractUseCase(repository: serviceLocator()));
   serviceLocator.registerLazySingleton(() => GenerateContractUseCase(repository: serviceLocator()));
   serviceLocator.registerLazySingleton(() => ResetPasswordUseCase(repository: serviceLocator()));
@@ -302,6 +305,7 @@ Future<void> initializeAppDependencies() async {
       ));
   // serviceLocator.registerFactory(
   //     () => SignOutCubit(useCase: serviceLocator(), localDataSource: serviceLocator()));
+  serviceLocator.registerFactory(() => CheckClientCubit(checkClientUseCase: serviceLocator()));
   serviceLocator.registerFactory(() => ContractCubit(
         checkBeforeEditContractUseCase: serviceLocator(),
         editContractUseCase: serviceLocator(),

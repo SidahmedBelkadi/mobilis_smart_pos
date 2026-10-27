@@ -228,6 +228,7 @@ class DioConsumer extends ApiConsumer {
 
   dynamic _handleDioError(DioException error) {
     String errorMessage = 'Unknown error';
+    Map<String, dynamic>? errorBody;
 
     if (error.response?.data != null) {
       try {
@@ -235,6 +236,10 @@ class DioConsumer extends ApiConsumer {
         final responseData = jsonDecode(error.response!.data);
         if (responseData is Map<String, dynamic> && responseData.containsKey('message')) {
           errorMessage = responseData['message'];
+          errorBody = responseData;
+        } else if (responseData is String) {
+          // Some refusals are a bare JSON string, e.g. "THIS_MINOR_IS_PRESUMING_TO_BE_ADULT"
+          errorMessage = responseData;
         } else {
           errorMessage = error.response!.data.toString();
         }
@@ -264,9 +269,9 @@ class DioConsumer extends ApiConsumer {
           case StatusCode.unauthorized:
             throw UnauthorizedException(errorMessage); // Show Real server message
           case StatusCode.unprocessable:
-            throw UnprocessableEntityException(errorMessage); // Show Real server message
+            throw UnprocessableEntityException(errorMessage, errorBody); // Show Real server message
           case StatusCode.badRequest:
-            throw UnprocessableEntityException(errorMessage); // Show Real server messages
+            throw UnprocessableEntityException(errorMessage, errorBody); // Show Real server messages
           default:
             throw const ServerException("errorDuringCommunication");
         }

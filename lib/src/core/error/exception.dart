@@ -52,5 +52,8 @@ class CancelRequestException extends ServerException {
 }
 
 class UnprocessableEntityException extends ServerException {
-  const UnprocessableEntityException([super.message]);
+  /// Full JSON body of the refusal, for extra fields such as "limit".
+  final Map<String, dynamic>? body;
+
+  const UnprocessableEntityException([super.message, this.body]);
 }

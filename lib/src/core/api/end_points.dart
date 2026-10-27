@@ -37,6 +37,7 @@ class EndPoints {
 
   // ================== CLIENT ================= //
   static String checkBeforeEditContract = "$baseUrl/contract/check-before-edit";
+  static String checkClient = "$baseUrl/contract/check-client";
   static String editContract = "$baseUrl/contract/edit";
   static String rasdEditContract = "$baseUrl/contract-rasd/edit";
   static String generateContrcat = "$baseUrl/contract/attributeMSISDN";

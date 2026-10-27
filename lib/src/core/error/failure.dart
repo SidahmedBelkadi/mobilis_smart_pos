@@ -20,3 +20,14 @@ class NoInternetConnectionFailure extends Failure {
 class CacheFailure extends Failure {
   const CacheFailure({required super.message});
 }
+
+/// The client cannot be activated (blacklisted, expired document, SIM limit...).
+class ClientRefusedFailure extends Failure {
+  /// Active SIM limit, sent with CLIENT_HAS_REACHED_SIM_LIMIT.
+  final String? limit;
+
+  const ClientRefusedFailure({required super.message, this.limit});
+
+  @override
+  List<Object?> get props => [message, limit];
+}

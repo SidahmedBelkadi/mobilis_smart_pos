@@ -17,6 +17,7 @@ import 'package:mobilis_smart_pos/src/services/pdf_cache_manager.dart';
 
 import '../../../../core/api/dio_consumer.dart';
 import '../../../../core/api/end_points.dart';
+import '../../domain/entities/check_client_params_entity.dart';
 import '../../domain/entities/contract_request_params_entitiy.dart';
 import '../../domain/entities/generate_contract_params_entity.dart';
 import '../models/check_before_edit_contract_response_model.dart';
@@ -34,6 +35,9 @@ abstract class ContractRemoteDataSource {
   Future<CheckBeforeEditContractResponseModel> checkBeforeEditContract({
     required ContractRequestParamsEntitiy contract,
   });
+
+  /// Completes when the client is eligible (CLIENT_ELIGIBLE), throws otherwise.
+  Future<void> checkClient({required CheckClientParamsEntity params});
 
   Future<EditContractResponseModel> editContract({
     required ContractRequestParamsEntitiy contract,
@@ -87,6 +91,11 @@ class ContractRemoteDataSourceImpl implements ContractRemoteDataSource {
     );
 
     return CheckBeforeEditContractResponseModel.fromJson(jsonDecode(response));
+  }
+
+  @override
+  Future<void> checkClient({required CheckClientParamsEntity params}) async {
+    await dioConsumer.post(EndPoints.checkClient, body: params.toJson());
   }
 
   @override
