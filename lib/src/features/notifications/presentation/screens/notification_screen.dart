@@ -28,7 +28,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
     super.initState();
     _scrollController = ScrollController()..addListener(_onScroll);
     final cubit = context.read<NotificationCubit>();
-    if (cubit.state is! NotificationLoaded) {
+    // The cubit outlives this screen (it belongs to the main screen): a list loaded
+    // on a previous visit is shown at once, then replaced by the server's latest.
+    if (cubit.state is NotificationLoaded) {
+      cubit.getNotifications(isRefresh: true);
+    } else {
       cubit.getNotifications();
     }
   }
@@ -349,15 +353,15 @@ class _NotificationTile extends StatelessWidget {
 
   void _showNotificationDetailModal(BuildContext context, NotificationModel notification) {
     final cubit = context.read<NotificationCubit>();
-    // Mark as read in the background using notificationPdvId
-    cubit.markAsRead(notification.notificationPdvId);
-
-    // Refresh HomeCubit count to sync the badge
+    HomeCubit? homeCubit;
     try {
-      context.read<HomeCubit>().getUnreadCount();
+      homeCubit = context.read<HomeCubit>();
     } catch (_) {
       // HomeCubit might not be available in some contexts, safe to ignore
     }
+    // Read as soon as it is opened. The badge is refreshed once the server has saved it,
+    // otherwise it would still count this notification.
+    cubit.markAsRead(notification.notificationPdvId).then((_) => homeCubit?.getUnreadCount());
 
     final locale = Localizations.localeOf(context).languageCode;
     final title = notification.title.getLocalized(locale);

@@ -79,45 +79,58 @@ class NotificationCubit extends Cubit<NotificationState> {
     final notificationIndex = currentState.notifications.rows.indexWhere((n) => n.notificationPdvId == id);
     if (notificationIndex == -1 || currentState.notifications.rows[notificationIndex].isRead) return;
 
-    // Call the use case in the background
+    // Shown as read as soon as it is opened, without waiting for the server
+    final updatedRows = List<NotificationModel>.from(currentState.notifications.rows);
+    final oldNotification = updatedRows[notificationIndex];
+
+    updatedRows[notificationIndex] = NotificationModel(
+      id: oldNotification.id,
+      notificationId: oldNotification.notificationId,
+      notificationPdvId: oldNotification.notificationPdvId,
+      isRead: true, // Marker as read
+      readAt: DateTime.now(),
+      receivedAt: oldNotification.receivedAt,
+      title: oldNotification.title,
+      description: oldNotification.description,
+      priority: oldNotification.priority,
+      type: oldNotification.type,
+      createdAt: oldNotification.createdAt,
+    );
+
+    final newUnreadCount = (currentState.notifications.unreadCount ?? 0) > 0
+        ? (currentState.notifications.unreadCount! - 1)
+        : 0;
+
+    emit(NotificationLoaded(
+      notifications: NotificationResponseModel(
+        rows: updatedRows,
+        count: currentState.notifications.count,
+        unreadCount: newUnreadCount,
+      ),
+      hasMore: currentState.hasMore,
+    ));
+
     final result = await markAsReadUseCase(id);
 
     result.fold(
       (failure) {
-        // We silent fail or log as user requested not to change UI
-      },
-      (_) {
-        // Update local state silently
-        final updatedRows = List<NotificationModel>.from(currentState.notifications.rows);
-        final oldNotification = updatedRows[notificationIndex];
-        
-        updatedRows[notificationIndex] = NotificationModel(
-          id: oldNotification.id,
-          notificationId: oldNotification.notificationId,
-          notificationPdvId: oldNotification.notificationPdvId,
-          isRead: true, // Marker as read
-          readAt: DateTime.now(),
-          receivedAt: oldNotification.receivedAt,
-          title: oldNotification.title,
-          description: oldNotification.description,
-          priority: oldNotification.priority,
-          type: oldNotification.type,
-          createdAt: oldNotification.createdAt,
-        );
-
-        final newUnreadCount = (currentState.notifications.unreadCount ?? 0) > 0 
-            ? (currentState.notifications.unreadCount! - 1) 
-            : 0;
-
+        // Not saved on the server: show it unread again, so it is marked at the next opening
+        final latestState = state;
+        if (latestState is! NotificationLoaded) return;
+        final rows = List<NotificationModel>.from(latestState.notifications.rows);
+        final index = rows.indexWhere((n) => n.notificationPdvId == id);
+        if (index == -1) return;
+        rows[index] = oldNotification;
         emit(NotificationLoaded(
           notifications: NotificationResponseModel(
-            rows: updatedRows,
-            count: currentState.notifications.count,
-            unreadCount: newUnreadCount,
+            rows: rows,
+            count: latestState.notifications.count,
+            unreadCount: (latestState.notifications.unreadCount ?? 0) + 1,
           ),
-          hasMore: currentState.hasMore,
+          hasMore: latestState.hasMore,
         ));
-
+      },
+      (_) {
         // Fetch real count from server to remain perfectly synced
         getUnreadNotificationsCountUseCase().then((result) {
           result.fold(
