@@ -27,6 +27,11 @@ class MrzDetailsScreen extends StatefulWidget {
   final String dateOfExpiry;
   final String docType;
 
+  /// Temporary: the client suspended activations for minors. Every client follows the
+  /// adult flow (no guardian steps) and check-client decides, with the backend's own
+  /// age threshold. Set back to false to restore the guardian flow.
+  static const bool minorFlowSuspended = true;
+
   @override
   MrzDetailsScreenState createState() => MrzDetailsScreenState();
 }
@@ -86,6 +91,8 @@ class MrzDetailsScreenState extends State<MrzDetailsScreen> {
           );
         });
       }
+
+      if (MrzDetailsScreen.minorFlowSuspended) return;
 
       final birthDateParsed = _parseDate(birthDate, false);
       final age = currentDate.year - birthDateParsed.year;
