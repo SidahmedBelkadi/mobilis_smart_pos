@@ -420,5 +420,6 @@
   "check_client_blacklisted": "This client cannot get a new line.",
   "check_client_document_expired": "This document is no longer valid. Ask the client for a valid ID card or passport.",
   "check_client_sim_limit": "This client already has {limit} active lines, the maximum allowed.",
+  "MINOR_ACTIVATION_DISABLED": "Sorry, this customer is not eligible to acquire a SIM card.",
   "check_client_back_home": "Back to home"
 }

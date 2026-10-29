@@ -124,11 +124,22 @@ class _ContractScreenState extends State<ContractScreen> {
         if (age < 19) {
           if (!widget.isMinor) {
             _leaving = true;
-            AppToasts.showInfoToast(
-                message: "THIS_MINOR_IS_PRESUMING_TO_BE_ADULT".tr(context), context: context);
-            Navigator.of(context)
-                .pushNamedAndRemoveUntil(Routes.main, (route) => false, arguments: {'index': 1});
-            return;
+            // Translations and dialogs need a built context: not available in initState
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              HapticFeedback.heavyImpact();
+              showCheckClientDialog(
+                context: context,
+                refused: true,
+                message: (minorActivationSuspended
+                        ? "MINOR_ACTIVATION_DISABLED"
+                        : "THIS_MINOR_IS_PRESUMING_TO_BE_ADULT")
+                    .tr(context),
+                onLeave: () => Navigator.of(context)
+                    .pushNamedAndRemoveUntil(Routes.main, (route) => false, arguments: {'index': 1}),
+              );
+            });
+            // No return: the rest of initState must run, the first frame builds the form
           }
         }
       } catch (e) {
@@ -448,7 +459,7 @@ class _ContractScreenState extends State<ContractScreen> {
         builder: (context, checkState) => Stack(
           children: [
             _buildScaffold(context, isPassport, recognizer),
-            if (checkState is CheckClientLoading || checkState is CheckClientInitial)
+            if (!_leaving && (checkState is CheckClientLoading || checkState is CheckClientInitial))
               const CheckClientOverlay(),
           ],
         ),

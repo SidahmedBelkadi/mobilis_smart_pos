@@ -8,6 +8,7 @@ import '../../../../core/utils/helpers/dialog_helper.dart';
 import '../../../../services/screenshot_service.dart';
 
 import '../../../../config/routing/app_routes.dart';
+import '../check_client_feedback.dart';
 import '../../../../core/commom/widgets/app_text_form_field.dart';
 import '../../../../core/commom/widgets/custom_app_bar.dart';
 import '../../../../core/utils/helpers/app_localization_helper.dart';
@@ -91,9 +92,11 @@ class MrzDetailsScreenState extends State<MrzDetailsScreen> {
       final birthDateParsed = _parseDate(birthDate, false);
       final age = currentDate.year - birthDateParsed.year;
 
-      if (age < 19 ||
+      // Minor flow suspended: the chip check on the contract screen refuses them
+      if (!minorActivationSuspended &&
+          (age < 19 ||
           (age == 19 &&
-              currentDate.isBefore(birthDateParsed.add(const Duration(days: 365 * 19))))) {
+              currentDate.isBefore(birthDateParsed.add(const Duration(days: 365 * 19)))))) {
         setState(() {
           isMinor = true;
         });

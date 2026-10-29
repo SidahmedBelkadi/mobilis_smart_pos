@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 import '../../../core/utils/helpers/app_localization_helper.dart';
 import '../../../core/utils/ressources/app_colors.dart';
 
+/// Temporary: the client suspended activations for minors. The MRZ step no longer
+/// offers the guardian flow, and a minor read from the chip is refused with
+/// MINOR_ACTIVATION_DISABLED. Set back to false to restore the minor flow.
+const bool minorActivationSuspended = true;
+
 /// Covers the screen while the client is being checked after the ID scan.
 class CheckClientOverlay extends StatelessWidget {
   const CheckClientOverlay({super.key});

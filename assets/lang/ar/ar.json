@@ -422,5 +422,6 @@
   "check_client_blacklisted": "لا يمكن لهذا الزبون الحصول على خط جديد.",
   "check_client_document_expired": "هذه الوثيقة لم تعد صالحة. اطلب من الزبون بطاقة تعريف أو جواز سفر صالحًا.",
   "check_client_sim_limit": "لدى هذا الزبون {limit} خطوط نشطة، وهو الحد الأقصى المسموح به.",
+  "MINOR_ACTIVATION_DISABLED": "نعتذر، هذا الزبون غير مؤهل لاقتناء شريحة.",
   "check_client_back_home": "العودة إلى الرئيسية"
 }

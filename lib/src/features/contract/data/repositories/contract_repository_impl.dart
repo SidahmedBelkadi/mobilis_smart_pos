@@ -38,6 +38,7 @@ class ContractRepositoryImpl implements ContractRepository {
     'DOCUMENT_EXPIRED',
     'CLIENT_HAS_REACHED_SIM_LIMIT',
     'THIS_MINOR_IS_PRESUMING_TO_BE_ADULT',
+    'MINOR_ACTIVATION_DISABLED',
   };
 
   @override
