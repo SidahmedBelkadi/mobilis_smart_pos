@@ -103,52 +103,6 @@ class _ContractScreenState extends State<ContractScreen> {
   void initState() {
     super.initState();
 
-    final String isoBirthDate = CivilsInformationsConverterHelper.convertToIso8601(
-      widget.metaData['date_of_birth'],
-    );
-
-    if (isoBirthDate.isNotEmpty) {
-      try {
-        final DateTime birthDate = DateTime.parse(isoBirthDate);
-        final DateTime today = DateTime.now();
-
-        // Calculate the age
-        int age = today.year - birthDate.year;
-
-        // Adjust for the birthday not yet reached this year
-        if (today.month < birthDate.month ||
-            (today.month == birthDate.month && today.day < birthDate.day)) {
-          age--;
-        }
-
-        if (age < 19) {
-          if (!widget.isMinor) {
-            _leaving = true;
-            // Translations and dialogs need a built context: not available in initState
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (!mounted) return;
-              HapticFeedback.heavyImpact();
-              showCheckClientDialog(
-                context: context,
-                refused: true,
-                message: (minorActivationSuspended
-                        ? "MINOR_ACTIVATION_DISABLED"
-                        : "THIS_MINOR_IS_PRESUMING_TO_BE_ADULT")
-                    .tr(context),
-                onLeave: () => Navigator.of(context)
-                    .pushNamedAndRemoveUntil(Routes.main, (route) => false, arguments: {'index': 1}),
-              );
-            });
-            // No return: the rest of initState must run, the first frame builds the form
-          }
-        }
-      } catch (e) {
-        debugPrint("Error parsing birth date: $e");
-      }
-    } else {
-      debugPrint("============== Birth date is not provided or invalid.");
-    }
-
     ScreenshotService.preventScreenshotOn();
 
     _loadData();
@@ -174,11 +128,8 @@ class _ContractScreenState extends State<ContractScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkClient());
   }
 
-  /// Set when the screen is already being left (presumed adult minor).
-  bool _leaving = false;
-
   void _checkClient() {
-    if (_leaving || !mounted) return;
+    if (!mounted) return;
     context.read<CheckClientCubit>().checkClient(CheckClientParamsEntity(
           birthDate: CivilsInformationsConverterHelper.convertToIso8601(widget.metaData['date_of_birth']),
           nin: '${widget.metaData['personal_number']}',
@@ -459,7 +410,7 @@ class _ContractScreenState extends State<ContractScreen> {
         builder: (context, checkState) => Stack(
           children: [
             _buildScaffold(context, isPassport, recognizer),
-            if (!_leaving && (checkState is CheckClientLoading || checkState is CheckClientInitial))
+            if (checkState is CheckClientLoading || checkState is CheckClientInitial)
               const CheckClientOverlay(),
           ],
         ),

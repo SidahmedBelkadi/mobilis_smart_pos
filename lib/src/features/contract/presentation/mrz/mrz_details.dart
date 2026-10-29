@@ -4,11 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/session_timeout.dart';
 import 'package:mobilis_smart_pos/src/services/nfc_service.dart';
 import '../../../../core/commom/widgets/custom_floating_action_button.dart';
-import '../../../../core/utils/helpers/dialog_helper.dart';
 import '../../../../services/screenshot_service.dart';
 
 import '../../../../config/routing/app_routes.dart';
-import '../check_client_feedback.dart';
 import '../../../../core/commom/widgets/app_text_form_field.dart';
 import '../../../../core/commom/widgets/custom_app_bar.dart';
 import '../../../../core/utils/helpers/app_localization_helper.dart';
@@ -92,30 +90,13 @@ class MrzDetailsScreenState extends State<MrzDetailsScreen> {
       final birthDateParsed = _parseDate(birthDate, false);
       final age = currentDate.year - birthDateParsed.year;
 
-      // Minor flow suspended: the chip check on the contract screen refuses them
-      if (!minorActivationSuspended &&
-          (age < 19 ||
+      if (age < 19 ||
           (age == 19 &&
-              currentDate.isBefore(birthDateParsed.add(const Duration(days: 365 * 19)))))) {
+              currentDate.isBefore(birthDateParsed.add(const Duration(days: 365 * 19))))) {
+        // No decision here: check-client (backend) accepts or refuses minors.
+        // The flag only sends the document in the minor format and adds the guardian steps.
         setState(() {
           isMinor = true;
-        });
-
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          AppDialog.showCustomAppDialog(
-            title: "client_is_minor_title".tr(context),
-            content: "client_is_minor_instruction".tr(context),
-            acceptName: "yes",
-            discardName: "no",
-            onPressed: () => Navigator.of(context).pushNamed(Routes.nfcReader, arguments: {
-              'documentNumber': widget.documentNumber,
-              'dateOfBirth': widget.dateOfBirth,
-              'dateOfExpiry': widget.dateOfExpiry,
-              'docType': widget.docType,
-              'isMinor': true
-            }),
-            context: context,
-          );
         });
       }
     } catch (e) {
@@ -155,7 +136,7 @@ class MrzDetailsScreenState extends State<MrzDetailsScreen> {
           currentStep: 1,
           allSteps: isMinor ? 8 : 5,
         ),
-        floatingActionButton: isExpired || isMinor
+        floatingActionButton: isExpired
             ? null
             : Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -197,7 +178,7 @@ class MrzDetailsScreenState extends State<MrzDetailsScreen> {
                         'dateOfBirth': widget.dateOfBirth,
                         'dateOfExpiry': widget.dateOfExpiry,
                         'docType': widget.docType,
-                        'isMinor': false
+                        'isMinor': isMinor
                       });
                     },
                   ),
