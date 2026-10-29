@@ -54,10 +54,13 @@ class AppUpdateInstaller {
 
   void cancelDownload() => _cancelToken?.cancel();
 
-  /// Deletes downloaded APKs, e.g. after the installer rejected one.
-  Future<void> discardDownloads() async {
-    final dir = Directory('${(await getTemporaryDirectory()).path}/app_updates');
-    if (await dir.exists()) await dir.delete(recursive: true);
+  /// Deletes downloaded APKs: at app start (an installed update leaves its APK
+  /// behind, hundreds of MB) and when the installer refused one.
+  static Future<void> discardDownloads() async {
+    try {
+      final dir = Directory('${(await getTemporaryDirectory()).path}/app_updates');
+      if (await dir.exists()) await dir.delete(recursive: true);
+    } on FileSystemException catch (_) {}
   }
 
   /// "Install unknown apps" must be allowed once for our app.

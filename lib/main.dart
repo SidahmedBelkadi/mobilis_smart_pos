@@ -10,6 +10,7 @@ import 'src/core/security/device_security_config.dart';
 import 'src/core/security/device_security_logger.dart';
 import 'src/core/security/device_security_service.dart';
 import 'src/core/utils/helpers/security_helper.dart';
+import 'src/services/app_update_installer.dart';
 import 'src/app.dart';
 import 'src/dependency_injection/injection_container.dart' as di;
 
@@ -27,6 +28,9 @@ void main() async {
   if (DeviceSecurityConfig.enabled) {
     unawaited(di.serviceLocator<DeviceSecurityService>().ensureEnrolled());
   }
+
+  // A finished update leaves its APK in the cache: free that space.
+  unawaited(AppUpdateInstaller.discardDownloads());
 
   final bool isNotSafeDevice = await SecurityCheck.checkSecurity();
 

@@ -101,14 +101,10 @@ class _AppUpdateScreenState extends State<AppUpdateScreen> with WidgetsBindingOb
       if (mounted) setState(() => _stage = _UpdateStage.readyToInstall);
     } on PlatformException catch (e) {
       debugPrint('App update install refused: ${e.code} ${e.message}');
-      if (e.code == 'INSTALL_FAILED') {
-        _fail(_Failure.install);
-      } else {
-        // Not our app or not our signature: never reuse this file
-        _apk = null;
-        await _installer.discardDownloads();
-        _fail(_Failure.invalidFile);
-      }
+      // The file may be corrupt, or not ours: retry with a fresh download
+      _apk = null;
+      await AppUpdateInstaller.discardDownloads();
+      _fail(e.code == 'INSTALL_FAILED' ? _Failure.install : _Failure.invalidFile);
     }
   }
 
