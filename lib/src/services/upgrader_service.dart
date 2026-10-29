@@ -24,6 +24,9 @@ class UpgraderService {
       // If the version has been updated, clear the flags
       if (isCurrentVersionNewer(currentVersion, lastCheckedVersion)) {
         debugPrint("======== TRUE");
+        // The installed version is the one the server announced: the pending update
+        // is done, even if the check below fails (expired session after the update)
+        storage.setUpdatePending(false);
 
         final DateTime adjustedDate = DateTime.now().subtract(const Duration(minutes: 32));
         storage.saveCheckedUpdateDate(adjustedDate);
