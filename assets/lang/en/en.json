@@ -411,7 +411,7 @@
   "update_title_install_failed": "Installation failed",
   "update_msg_install_failed": "Try again. If the problem persists, contact support.",
   "maintenance_title": "App under maintenance",
-  "maintenance_message": "We are improving the service. You cannot sell for now. You will be signed out, and you can sign in again once the maintenance is over.",
+  "maintenance_message": "Service temporarily unavailable. Please try again later.",
   "maintenance_auto_logout": "Automatic sign-out",
   "app_under_maintenance": "Service temporarily unavailable. Please try again later.",
   "check_client_loading": "Checking the client…",
@@ -420,6 +420,7 @@
   "check_client_blacklisted": "Sorry, this customer is not authorized to acquire a SIM card.",
   "check_client_document_expired": "This document is no longer valid. Ask the client for a valid ID card or passport.",
   "check_client_sim_limit": "Sorry, the customer has reached the maximum number of SIM cards allowed.",
+  "CLIENT_HAS_5_CONTRACTS": "Sorry, the customer has reached the maximum number of SIM cards allowed.",
   "MINOR_ACTIVATION_DISABLED": "Sorry, this customer is not eligible to acquire a SIM card.",
   "check_client_back_home": "Back to home"
 }

@@ -411,7 +411,7 @@
   "update_title_install_failed": "Échec de l'installation",
   "update_msg_install_failed": "Réessayez. Si le problème persiste, contactez le support.",
   "maintenance_title": "Application en maintenance",
-  "maintenance_message": "Nous améliorons le service. Vous ne pouvez pas vendre pour le moment. Vous allez être déconnecté, et vous pourrez vous reconnecter après la maintenance.",
+  "maintenance_message": "Service momentanément indisponible. Veuillez réessayer ultérieurement.",
   "maintenance_auto_logout": "Déconnexion automatique",
   "app_under_maintenance": "Service momentanément indisponible. Veuillez réessayer ultérieurement.",
   "check_client_loading": "Vérification du client…",
@@ -420,6 +420,7 @@
   "check_client_blacklisted": "Désolé, ce client n'est pas autorisé à acquérir une carte SIM.",
   "check_client_document_expired": "Ce document n'est plus valide. Demandez au client une carte d'identité ou un passeport valide.",
   "check_client_sim_limit": "Désolé, le client a atteint le nombre maximal de cartes SIM autorisé.",
+  "CLIENT_HAS_5_CONTRACTS": "Désolé, le client a atteint le nombre maximal de cartes SIM autorisé.",
   "MINOR_ACTIVATION_DISABLED": "Désolé, ce client n'est pas éligible pour l'acquisition d'une carte SIM.",
   "check_client_back_home": "Retour à l'accueil"
 }
