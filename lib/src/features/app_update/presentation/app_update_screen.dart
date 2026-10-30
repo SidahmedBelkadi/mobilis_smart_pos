@@ -182,11 +182,13 @@ class _AppUpdateScreenState extends State<AppUpdateScreen> with WidgetsBindingOb
           Directionality(
             textDirection: TextDirection.ltr,
             child: Text(
-              _total > 0 ? '${_megabytes(_received)} / ${_megabytes(_total)} MB' : '${_megabytes(_received)} MB',
+              _total > 0
+                  ? '${_megabytes(_received)} / ${_megabytes(_total)} MB'
+                  : '${_megabytes(_received)} MB',
               style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                    color: AppColors.secondaryText,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
+                color: AppColors.secondaryText,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
             ),
           ),
         ],
@@ -198,7 +200,11 @@ class _AppUpdateScreenState extends State<AppUpdateScreen> with WidgetsBindingOb
 
   Widget _buildFailed() {
     final (title, message, retry) = switch (_failure) {
-      _Failure.download => ('update_title_download_failed', 'update_msg_download_failed', _download),
+      _Failure.download => (
+          'update_title_download_failed',
+          'update_msg_download_failed',
+          _download
+        ),
       _Failure.invalidFile => ('update_title_invalid', 'update_msg_invalid', _download),
       _Failure.install => ('update_title_install_failed', 'update_msg_install_failed', _install),
     };
@@ -210,7 +216,8 @@ class _AppUpdateScreenState extends State<AppUpdateScreen> with WidgetsBindingOb
       ),
       title: title.tr(context),
       message: message.tr(context),
-      action: _ActionButton(label: 'retry'.tr(context), icon: Icons.refresh_rounded, onPressed: retry),
+      action:
+          _ActionButton(label: 'retry'.tr(context), icon: Icons.refresh_rounded, onPressed: retry),
     );
   }
 }
@@ -251,11 +258,11 @@ class _UpdateLayout extends StatelessWidget {
                     style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
-                  Text(
-                    message,
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodyMedium?.copyWith(height: 1.5, color: AppColors.secondaryText),
-                  ),
+                  // Text(
+                  //   message,
+                  //   textAlign: TextAlign.center,
+                  //   style: theme.textTheme.bodyMedium?.copyWith(height: 1.5, color: AppColors.secondaryText),
+                  // ),
                   if (footer != null) ...[
                     const SizedBox(height: 24),
                     footer!,
@@ -302,10 +309,10 @@ class _ProgressRing extends StatelessWidget {
                       child: Text(
                         '${(value * 100).round()}%',
                         style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                              fontFeatures: const [FontFeature.tabularFigures()],
-                            ),
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
                       ),
                     ),
             ),
@@ -333,8 +340,10 @@ class _StateIcon extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          DecoratedBox(decoration: BoxDecoration(color: tint.withOpacity(.1), shape: BoxShape.circle)),
-          if (busy) CircularProgressIndicator(strokeWidth: 3, strokeCap: StrokeCap.round, color: tint),
+          DecoratedBox(
+              decoration: BoxDecoration(color: tint.withOpacity(.1), shape: BoxShape.circle)),
+          if (busy)
+            CircularProgressIndicator(strokeWidth: 3, strokeCap: StrokeCap.round, color: tint),
           Icon(icon, size: 52, color: tint),
         ],
       ),
