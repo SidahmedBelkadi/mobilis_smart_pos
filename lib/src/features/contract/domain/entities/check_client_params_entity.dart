@@ -2,7 +2,9 @@
 class CheckClientParamsEntity {
   /// ISO date: the backend decides from it if the client is a minor.
   final String birthDate;
-  final String nin;
+
+  /// Null for RASD documents, which have none.
+  final String? nin;
   final String documentType;
   final String documentNumber;
 
@@ -23,7 +25,7 @@ class CheckClientParamsEntity {
 
   Map<String, dynamic> toJson() {
     final document = {
-      "NIN": nin,
+      if (nin != null) "NIN": nin,
       "Document_type": documentType,
       "Document_number": documentNumber,
       "Issue_date": issueDate,

@@ -2,12 +2,13 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image/image.dart' as img;
 import 'package:insta_image_viewer/insta_image_viewer.dart';
-import 'package:intl/intl.dart';
 import 'package:mobilis_smart_pos/src/config/routing/app_routes.dart';
 import 'package:mobilis_smart_pos/src/core/commom/widgets/app_text_form_field.dart';
 import 'package:mobilis_smart_pos/src/core/commom/widgets/commune_drop_down.dart';
@@ -23,9 +24,12 @@ import 'package:mobilis_smart_pos/src/core/utils/helpers/media_query_values.dart
 import 'package:mobilis_smart_pos/src/core/utils/helpers/session_timeout.dart';
 import 'package:mobilis_smart_pos/src/core/utils/helpers/toast_helper.dart';
 import 'package:mobilis_smart_pos/src/core/utils/ressources/app_colors.dart';
+import 'package:mobilis_smart_pos/src/features/contract/domain/entities/check_client_params_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/commune_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/rasd_request_params_entity.dart';
 import 'package:mobilis_smart_pos/src/features/contract/domain/entities/wilaya_entity.dart';
+import 'package:mobilis_smart_pos/src/features/contract/presentation/check_client_feedback.dart';
+import 'package:mobilis_smart_pos/src/features/contract/presentation/cubit/check_client/check_client_cubit.dart';
 import 'package:mobilis_smart_pos/src/features/profile/presentation/widget/upload_image_field.dart';
 import 'package:mobilis_smart_pos/src/services/native_camera_scanner.dart';
 import 'package:mobilis_smart_pos/src/services/screenshot_service.dart';
@@ -125,8 +129,65 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
     }
   }
 
+  /// Form validated, waiting for check-client before the barcode scan.
+  RasdEditRequestParamsEntity? _pendingParams;
+
+  void _checkClient() {
+    final params = _pendingParams;
+    if (params == null || context.read<CheckClientCubit>().state is CheckClientLoading) return;
+    context.read<CheckClientCubit>().checkClient(CheckClientParamsEntity(
+          birthDate: params.birthDate,
+          nin: null, // RASD documents have none
+          documentType: 'RASD',
+          documentNumber: params.documentNumber,
+          issueDate: params.issueDate,
+          isMinor: false,
+        ));
+  }
+
+  void _onCheckClientResult(BuildContext context, CheckClientState state) {
+    void leave() => Navigator.of(context)
+        .pushNamedAndRemoveUntil(Routes.main, (route) => false, arguments: {'index': 1});
+
+    if (state is CheckClientEligible) {
+      Navigator.of(context).pushNamed(Routes.rasdBarCodeScanner, arguments: {
+        'rasdParams': _pendingParams,
+        'recto': rectoImage,
+        'verso': versoImage,
+      });
+    } else if (state is CheckClientRefused) {
+      HapticFeedback.heavyImpact();
+      showCheckClientDialog(
+        context: context,
+        refused: true,
+        message: checkClientRefusalMessageKey(state.message).tr(context).replaceFirst('{limit}', state.limit ?? ''),
+        onLeave: leave,
+      );
+    } else if (state is CheckClientFailed) {
+      showCheckClientDialog(
+        context: context,
+        refused: false,
+        message: state.message.tr(context),
+        onLeave: leave,
+        onRetry: _checkClient,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    return BlocConsumer<CheckClientCubit, CheckClientState>(
+      listener: _onCheckClientResult,
+      builder: (context, checkState) => Stack(
+        children: [
+          _buildScaffold(context),
+          if (checkState is CheckClientLoading) const CheckClientOverlay(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScaffold(BuildContext context) {
     return SessionTimeout(
       child: Scaffold(
         floatingActionButton: isCaptureDone
@@ -174,51 +235,6 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
                     return;
                   }
 
-                  if (dateOfBirthController.text.isNotEmpty) {
-                    try {
-                      DateTime birthDate =
-                          DateFormat("dd/MM/yyyy").parse(dateOfBirthController.text);
-                      DateTime now = DateTime.now();
-                      int age = now.year - birthDate.year;
-                      if (now.month < birthDate.month ||
-                          (now.month == birthDate.month && now.day < birthDate.day)) {
-                        age--;
-                      }
-
-                      if (age < 19) {
-                        AppToasts.showWarningToast(
-                          message: "rasd_minor_message".tr(context),
-                          context: context,
-                        );
-                        return;
-                      }
-                    } catch (e) {
-                      return;
-                    }
-                  }
-
-                  // Check if the document is expired
-                  if (fechaDeExpedicionController.text.isNotEmpty) {
-                    try {
-                      DateTime issueDate =
-                          DateFormat("dd/MM/yyyy").parse(fechaDeExpedicionController.text);
-                      DateTime expiryDate = issueDate.add(const Duration(days: 365 * 10));
-                      DateTime now = DateTime.now();
-
-                      if (expiryDate.isBefore(now)) {
-                        AppToasts.showWarningToast(
-                          message: "cardExpiredMessage".tr(context),
-                          context: context,
-                        );
-                        return;
-                      } else {
-                        debugPrint("============= RASD CARD STILL VALIDE");
-                      }
-                    } catch (e) {
-                      return;
-                    }
-                  }
-
                   RasdEditRequestParamsEntity params = RasdEditRequestParamsEntity(
                     firstName: firstNameController.text,
                     birthLastName: lastNameController.text,
@@ -240,12 +256,9 @@ class _RasdOcrScreenState extends State<RasdOcrScreen> {
 
                   // debugPrint(prettyPrintJson(jsonEncode(params.toJson())));
 
-                  Navigator.of(context).pushNamed(Routes.rasdBarCodeScanner, arguments: {
-                    'rasdParams': params,
-                    'recto': rectoImage,
-                    'verso': versoImage,
-                  });
-                  return;
+                  // Minor, blacklist, expired document: the backend decides before the SIM scan
+                  _pendingParams = params;
+                  _checkClient();
                 },
               )
             : null,

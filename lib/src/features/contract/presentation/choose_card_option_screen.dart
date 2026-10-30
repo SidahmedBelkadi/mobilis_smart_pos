@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 import 'package:mobilis_smart_pos/src/features/contract/presentation/rasd_ocr_screen.dart';
@@ -12,6 +13,8 @@ import '../../../core/utils/helpers/media_query_values.dart';
 import '../../../core/utils/helpers/permissions_helper.dart';
 import '../../../core/utils/ressources/app_colors.dart';
 import '../../../core/utils/ressources/app_images.dart';
+import '../../../dependency_injection/injection_container.dart';
+import 'cubit/check_client/check_client_cubit.dart';
 
 class ChooseCardOptionScreen extends StatefulWidget {
   const ChooseCardOptionScreen({super.key});
@@ -148,7 +151,10 @@ class _ChooseCardOptionScreenState extends State<ChooseCardOptionScreen> {
                                     // ignore: use_build_context_synchronously
                                     Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) {
-                                        return const RasdOcrScreen();
+                                        return BlocProvider(
+                                          create: (_) => serviceLocator<CheckClientCubit>(),
+                                          child: const RasdOcrScreen(),
+                                        );
                                       },
                                     ));
                                   } else {
