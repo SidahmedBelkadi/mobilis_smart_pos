@@ -8,12 +8,15 @@ abstract class AppToasts {
   static final progressBarTheme =
       ProgressIndicatorThemeData(refreshBackgroundColor: AppColors.secondary);
 
+  /// toastification cuts the description at 2 lines: an explicit maxLines shows long messages in full.
+  static Widget _description(String message) => Text(message, maxLines: 10);
+
   static void showSuccessToast({required String message, required BuildContext context}) {
     toastification.show(
       backgroundColor: context.isDarkMode ? Colors.black : Colors.white,
       foregroundColor: context.isDarkMode ? Colors.white : Colors.black,
       context: context,
-      description: Text(message),
+      description: _description(message),
       autoCloseDuration: const Duration(seconds: 5),
       showProgressBar: true,
       progressBarTheme: progressBarTheme,
@@ -31,7 +34,7 @@ abstract class AppToasts {
       backgroundColor: context.isDarkMode ? Colors.black : Colors.white,
       foregroundColor: context.isDarkMode ? Colors.white : Colors.black,
       context: context,
-      description: Text(message),
+      description: _description(message),
       autoCloseDuration: const Duration(seconds: 5),
       type: ToastificationType.info,
       style: ToastificationStyle.flat,
@@ -52,7 +55,7 @@ abstract class AppToasts {
         backgroundColor: context.isDarkMode ? Colors.black : Colors.white,
         foregroundColor: context.isDarkMode ? Colors.white : Colors.black,
         context: context,
-        description: Text(message),
+        description: _description(message),
         autoCloseDuration: const Duration(seconds: 5),
         type: ToastificationType.error,
         style: ToastificationStyle.flat,
@@ -71,7 +74,7 @@ abstract class AppToasts {
       backgroundColor: context.isDarkMode ? Colors.black : Colors.white,
       foregroundColor: context.isDarkMode ? Colors.white : Colors.black,
       context: context,
-      description: Text(message),
+      description: _description(message),
       autoCloseDuration: const Duration(seconds: 5),
       showProgressBar: true,
       progressBarTheme: progressBarTheme,
